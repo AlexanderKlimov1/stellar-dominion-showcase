@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+        Три вещи разом, потому что они об одном — о том, что происходит с игроком помимо
+        его собственных действий:
+
+        1. player_event — очередь событий игрока: знакомство с расой, объявление войны,
+           договор, кража технологии, захват колонии. Они случаются внутри хода, часто по
+           воле соседа, а показать их нужно в итогах хода — значит, до конца хода их надо
+           где-то держать.
+        2. fleet — флот игрока в звёздной системе: без сущности флоту негде встретиться
+           с чужим.
+        3. fleet_encounter — сама встреча: кто кого встретил, чей ход решать и чем всё
+           кончилось.
+    -->
+
+    <changeSet id="030-01-player-event" author="moo3">
+        <comment>Очередь событий игрока до итогов хода — п. 11.1.</comment>
+        <createTable tableName="player_event">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_player_event" nullable="false"/>
+            </column>
+            <column name="game_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="player_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="turn" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="code" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="text" type="VARCHAR(512)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="star_system_id" type="UUID"/>
+            <column name="planet_id" type="UUID"/>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="player_event" baseColumnNames="game_id"
+                                 constraintName="fk_player_event_game"
+                                 referencedTableName="game" referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+        <createIndex tableName="player_event" indexName="ix_player_event_player_turn">
+            <column name="player_id"/>
+            <column name="turn"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="030-02-fleet" author="moo3">
+        <comment>Флот игрока в системе — п. 8: корабли, построенные колониями.</comment>
+        <createTable tableName="fleet">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_fleet" nullable="false"/>
+            </column>
+            <column name="game_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="owner_player_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="star_system_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ships" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_turn" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="fleet" baseColumnNames="game_id"
+                                 constraintName="fk_fleet_game"
+                                 referencedTableName="game" referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+        <addUniqueConstraint tableName="fleet" columnNames="owner_player_id, star_system_id"
+                             constraintName="uq_fleet_owner_system"/>
+        <createIndex tableName="fleet" indexName="ix_fleet_game_system">
+            <column name="game_id"/>
+            <column name="star_system_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="030-03-fleet-encounter" author="moo3">
+        <comment>Встреча флотов в системе — п. 8: чей ход решать и чем кончилось.</comment>
+        <createTable tableName="fleet_encounter">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_fleet_encounter" nullable="false"/>
+            </column>
+            <column name="game_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="star_system_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="turn" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <!-- Первый — тот, чья инициатива выше: он и решает первым. -->
+            <column name="first_player_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="second_player_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="state" type="VARCHAR(24)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="attacker_player_id" type="UUID"/>
+            <column name="outcome" type="VARCHAR(512)"/>
+            <column name="version" type="BIGINT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="fleet_encounter" baseColumnNames="game_id"
+                                 constraintName="fk_fleet_encounter_game"
+                                 referencedTableName="game" referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+        <createIndex tableName="fleet_encounter" indexName="ix_encounter_game_state">
+            <column name="game_id"/>
+            <column name="state"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

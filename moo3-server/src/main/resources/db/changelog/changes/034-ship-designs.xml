@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+        Дизайн кораблей — п. 8. Раньше корабль был безымянным: колония строила «корабль»
+        за 16 единиц, а флот считал их числом. Теперь у империи есть проекты, как в окне
+        Ship Design MOO II, и флот знает, из каких кораблей он собран.
+
+        1. ship_design и ship_design_component — проекты игрока и их состав. Корпус и
+           компоненты хранятся кодами: сами характеристики лежат в ship-components.json и
+           правятся без миграций.
+        2. fleet_ship — состав флота по проектам. Общее число кораблей остаётся в fleet:
+           по нему считают бой, разведка и слепок партии.
+        3. planet.project_design_id — какой проект строит колония. Код проекта в
+           planet.project_code остаётся прежним («SHIP»), а какой именно корабль строится,
+           говорит эта ссылка.
+        4. ship_hull и weapon уходят: справочник кораблей переехал в JSON целиком, и
+           держать рядом две правды о корпусах не нужно.
+    -->
+
+    <changeSet id="034-01-ship-design" author="moo3">
+        <comment>Проекты кораблей игрока — п. 8: шесть ячеек, как в MOO II.</comment>
+        <createTable tableName="ship_design">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_ship_design" nullable="false"/>
+            </column>
+            <column name="game_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="owner_player_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="slot" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="hull_code" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_turn" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="obsolete" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="ship_design" baseColumnNames="game_id"
+                                 constraintName="fk_ship_design_game"
+                                 referencedTableName="game" referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+        <createIndex tableName="ship_design" indexName="ix_ship_design_owner">
+            <column name="owner_player_id"/>
+            <column name="slot"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="034-02-ship-design-component" author="moo3">
+        <comment>Состав проекта: компонент и сколько раз он взят — п. 8.</comment>
+        <createTable tableName="ship_design_component">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_ship_design_component" nullable="false"/>
+            </column>
+            <column name="design_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="component_code" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="count" type="INT" defaultValueNumeric="1">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sort_order" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="ship_design_component" baseColumnNames="design_id"
+                                 constraintName="fk_ship_design_component_design"
+                                 referencedTableName="ship_design" referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+        <createIndex tableName="ship_design_component" indexName="ix_ship_design_component_design">
+            <column name="design_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="034-03-fleet-ship" author="moo3">
+        <comment>Состав флота по проектам — п. 8: из каких кораблей он собран.</comment>
+        <createTable tableName="fleet_ship">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_fleet_ship" nullable="false"/>
+            </column>
+            <column name="fleet_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="design_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ships" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="fleet_ship" baseColumnNames="fleet_id"
+                                 constraintName="fk_fleet_ship_fleet"
+                                 referencedTableName="fleet" referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+        <addForeignKeyConstraint baseTableName="fleet_ship" baseColumnNames="design_id"
+                                 constraintName="fk_fleet_ship_design"
+                                 referencedTableName="ship_design" referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+        <createIndex tableName="fleet_ship" indexName="ix_fleet_ship_fleet">
+            <column name="fleet_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="034-04-planet-project-design" author="moo3">
+        <comment>Какой проект строит колония — п. 8. Пусто, пока строится не корабль.</comment>
+        <addColumn tableName="planet">
+            <column name="project_design_id" type="UUID"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="034-05-drop-stub-catalog" author="moo3">
+        <comment>
+            Корпуса и оружие переехали в ship-components.json целиком: таблицы-заглушки
+            больше не нужны, а две правды о корпусах рядом опаснее их отсутствия.
+        </comment>
+        <dropTable tableName="ship_hull"/>
+        <dropTable tableName="weapon"/>
+    </changeSet>
+
+</databaseChangeLog>

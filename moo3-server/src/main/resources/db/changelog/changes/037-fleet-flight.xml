@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+        Флот в пути — п. 8. Раньше перелёт был мгновенным: приказ переставлял флот в другую
+        систему тем же запросом. Теперь у флота есть путь и срок: откуда вылетел, куда летит
+        и на каком ходу придёт. Пока путь не кончился, флота нет нигде — ни в системе вылета,
+        ни в системе назначения.
+    -->
+
+    <changeSet id="037-01-fleet-flight" author="moo3">
+        <comment>Куда флот летит и когда придёт — п. 8.</comment>
+        <addColumn tableName="fleet">
+            <!-- Откуда вылетел: по нему на карте рисуется линия полёта. -->
+            <column name="origin_system_id" type="UUID"/>
+            <!-- Куда летит; NULL — флот стоит в своей системе. -->
+            <column name="target_system_id" type="UUID"/>
+            <!-- Ход вылета и ход прибытия: между ними флот в пути. -->
+            <column name="departure_turn" type="INT"/>
+            <column name="arrival_turn" type="INT"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="037-02-fleet-unique-standing-only" author="moo3">
+        <comment>
+            Один флот на систему — правило только для стоящих флотов: у летящего
+            star_system_id остаётся системой вылета, и рядом с ним там может стоять свой же
+            флот из кораблей, которые никуда не полетели.
+        </comment>
+        <dropUniqueConstraint tableName="fleet" constraintName="uq_fleet_owner_system"/>
+        <sql>
+            CREATE UNIQUE INDEX uq_fleet_owner_system ON fleet (owner_player_id, star_system_id)
+            WHERE target_system_id IS NULL
+        </sql>
+        <rollback>
+            <sql>DROP INDEX uq_fleet_owner_system</sql>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="037-03-fleet-arrival-index" author="moo3">
+        <comment>Фаза прибытия ищет флоты партии, которым пора приходить.</comment>
+        <createIndex tableName="fleet" indexName="ix_fleet_game_arrival">
+            <column name="game_id"/>
+            <column name="arrival_turn"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

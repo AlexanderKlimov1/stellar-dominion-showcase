@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+        Здания колоний — п. 10.
+
+        Действие здания описано колонками, а не кодом: здание либо прибавляет к выработке
+        занятия (на фермера, на рабочего, на учёного), либо даёт постоянную прибавку
+        независимо от жителей, либо поднимает вместимость, рождаемость или доход.
+        Поэтому новое здание — это строка в справочнике, а не правка сервиса.
+    -->
+    <changeSet id="022-01-add-building-effects" author="moo3">
+        <addColumn tableName="building">
+            <column name="food_flat" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="food_per_farmer" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="production_flat" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="production_per_worker" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="research_flat" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="research_per_scientist" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="max_population_bonus" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="growth_k_bonus" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="income_percent" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <!--
+        Настоящий справочник зданий вместо трёх строк-заглушек «Здание 1…3».
+
+        Стоимость в единицах производства и содержание в кредитах — из MOO II. Здание
+        строится после того, как изучена его технология (required_tech_code — код
+        технологии в дереве), и на одной планете возводится один раз.
+
+        В справочнике только те здания MOO II, чьё действие выражается этой моделью:
+        еда, производство, наука, вместимость, рождаемость, доход. Военные постройки,
+        верфи и корабельные модули ждут своих подсистем.
+    -->
+    <changeSet id="022-02-seed-buildings" author="moo3">
+        <delete tableName="building"/>
+
+        <!-- Еда и население. -->
+        <insert tableName="building">
+            <column name="code" value="hydroponic-farm"/>
+            <column name="name" value="Гидропонная ферма"/>
+            <column name="description" value="Даёт 2 единицы еды без единого фермера."/>
+            <column name="cost" valueNumeric="60"/>
+            <column name="upkeep" valueNumeric="2"/>
+            <column name="required_tech_code" value="hydroponic-farm"/>
+            <column name="food_flat" valueNumeric="2"/>
+            <column name="sort_order" valueNumeric="1"/>
+        </insert>
+        <insert tableName="building">
+            <column name="code" value="biospheres"/>
+            <column name="name" value="Биосферы"/>
+            <column name="description" value="Поднимает вместимость планеты на 2 жителей."/>
+            <column name="cost" valueNumeric="60"/>
+            <column name="upkeep" valueNumeric="1"/>
+            <column name="required_tech_code" value="biospheres"/>
+            <column name="max_population_bonus" valueNumeric="2"/>
+            <column name="sort_order" valueNumeric="2"/>
+        </insert>
+        <insert tableName="building">
+            <column name="code" value="cloning-center"/>
+            <column name="name" value="Центр клонирования"/>
+            <column name="description" value="Прибавляет 100 тысяч жителей к приросту за ход."/>
+            <column name="cost" valueNumeric="100"/>
+            <column name="upkeep" valueNumeric="2"/>
+            <column name="required_tech_code" value="cloning-center"/>
+            <column name="growth_k_bonus" valueNumeric="100"/>
+            <column name="sort_order" valueNumeric="3"/>
+        </insert>
+        <insert tableName="building">
+            <column name="code" value="soil-enrichment"/>
+            <column name="name" value="Обогащение почвы"/>
+            <column name="description" value="Каждый фермер даёт на единицу еды больше."/>
+            <column name="cost" valueNumeric="120"/>
+            <column name="upkeep" valueNumeric="0"/>
+            <column name="required_tech_code" value="soil-enrichment"/>
+            <column name="food_per_farmer" valueNumeric="1"/>
+            <column name="sort_order" valueNumeric="4"/>
+        </insert>
+        <insert tableName="building">
+            <column name="code" value="subterranean-farms"/>
+            <column name="name" value="Подземные фермы"/>
+            <column name="description" value="Дают 4 единицы еды без единого фермера."/>
+            <column name="cost" valueNumeric="150"/>
+            <column name="upkeep" valueNumeric="4"/>
+            <column name="required_tech_code" value="subterranean-farms"/>
+            <column name="food_flat" valueNumeric="4"/>
+            <column name="sort_order" valueNumeric="5"/>
+        </insert>
+        <insert tableName="building">
+            <column name="code" value="weather-controller"/>
+            <column name="name" value="Управление погодой"/>
+            <column name="description" value="Каждый фермер даёт на две единицы еды больше."/>
+            <column name="cost" valueNumeric="200"/>
+            <column name="upkeep" valueNumeric="3"/>
+            <column name="required_tech_code" value="weather-controller"/>
+            <column name="food_per_farmer" valueNumeric="2"/>
+            <column name="sort_order" valueNumeric="6"/>
+        </insert>
+
+        <!-- Производство. -->
+        <insert tableName="building">
+            <column name="code" value="automated-factory"/>
+            <column name="name" value="Автоматический завод"/>
+            <column name="description" value="Даёт 5 единиц производства и ещё по единице с рабочего."/>
+            <column name="cost" valueNumeric="60"/>
+            <column name="upkeep" valueNumeric="1"/>
+            <column name="required_tech_code" value="automated-factory"/>
+            <column name="production_flat" valueNumeric="5"/>
+            <column name="production_per_worker" valueNumeric="1"/>
+            <column name="sort_order" valueNumeric="7"/>
+        </insert>
+        <insert tableName="building">
+            <column name="code" value="robo-miners"/>
+            <column name="name" value="Робошахтёры"/>
+            <column name="description" value="Дают 10 единиц производства и ещё по две с рабочего."/>
+            <column name="cost" valueNumeric="150"/>
+            <column name="upkeep" valueNumeric="2"/>
+            <column name="required_tech_code" value="robo-miners"/>
+            <column name="production_flat" valueNumeric="10"/>
+            <column name="production_per_worker" valueNumeric="2"/>
+            <column name="sort_order" valueNumeric="8"/>
+        </insert>
+        <insert tableName="building">
+            <column name="code" value="deep-core-mine"/>
+            <column name="name" value="Глубинный рудник"/>
+            <column name="description" value="Даёт 15 единиц производства и ещё по три с рабочего."/>
+            <column name="cost" valueNumeric="250"/>
+            <column name="upkeep" valueNumeric="3"/>
+            <column name="required_tech_code" value="deep-core-mine"/>
+            <column name="production_flat" valueNumeric="15"/>
+            <column name="production_per_worker" valueNumeric="3"/>
+            <column name="sort_order" valueNumeric="9"/>
+        </insert>
+
+        <!-- Наука. -->
+        <insert tableName="building">
+            <column name="code" value="research-laboratory"/>
+            <column name="name" value="Исследовательская лаборатория"/>
+            <column name="description" value="Даёт 5 очков исследований и ещё по одному с учёного."/>
+            <column name="cost" valueNumeric="60"/>
+            <column name="upkeep" valueNumeric="1"/>
+            <column name="required_tech_code" value="research-laboratory"/>
+            <column name="research_flat" valueNumeric="5"/>
+            <column name="research_per_scientist" valueNumeric="1"/>
+            <column name="sort_order" valueNumeric="10"/>
+        </insert>
+        <insert tableName="building">
+            <column name="code" value="supercomputer"/>
+            <column name="name" value="Суперкомпьютер"/>
+            <column name="description" value="Даёт 10 очков исследований и ещё по два с учёного."/>
+            <column name="cost" valueNumeric="150"/>
+            <column name="upkeep" valueNumeric="2"/>
+            <column name="required_tech_code" value="supercomputer"/>
+            <column name="research_flat" valueNumeric="10"/>
+            <column name="research_per_scientist" valueNumeric="2"/>
+            <column name="sort_order" valueNumeric="11"/>
+        </insert>
+        <insert tableName="building">
+            <column name="code" value="autolab"/>
+            <column name="name" value="Автолаборатория"/>
+            <column name="description" value="Даёт 30 очков исследований без единого учёного."/>
+            <column name="cost" valueNumeric="200"/>
+            <column name="upkeep" valueNumeric="3"/>
+            <column name="required_tech_code" value="autolab"/>
+            <column name="research_flat" valueNumeric="30"/>
+            <column name="sort_order" valueNumeric="12"/>
+        </insert>
+        <insert tableName="building">
+            <column name="code" value="galactic-cybernet"/>
+            <column name="name" value="Галактическая сеть"/>
+            <column name="description" value="Даёт 15 очков исследований и ещё по три с учёного."/>
+            <column name="cost" valueNumeric="250"/>
+            <column name="upkeep" valueNumeric="3"/>
+            <column name="required_tech_code" value="galactic-cybernet"/>
+            <column name="research_flat" valueNumeric="15"/>
+            <column name="research_per_scientist" valueNumeric="3"/>
+            <column name="sort_order" valueNumeric="13"/>
+        </insert>
+        <insert tableName="building">
+            <column name="code" value="astro-university"/>
+            <column name="name" value="Астроуниверситет"/>
+            <column name="description" value="Каждый житель работает лучше: по единице к еде, производству и науке."/>
+            <column name="cost" valueNumeric="200"/>
+            <column name="upkeep" valueNumeric="4"/>
+            <column name="required_tech_code" value="astro-university"/>
+            <column name="food_per_farmer" valueNumeric="1"/>
+            <column name="production_per_worker" valueNumeric="1"/>
+            <column name="research_per_scientist" valueNumeric="1"/>
+            <column name="sort_order" valueNumeric="14"/>
+        </insert>
+
+        <!-- Доход. -->
+        <insert tableName="building">
+            <column name="code" value="space-port"/>
+            <column name="name" value="Космопорт"/>
+            <column name="description" value="Поднимает налоговый доход колонии наполовину."/>
+            <column name="cost" valueNumeric="80"/>
+            <column name="upkeep" valueNumeric="1"/>
+            <column name="required_tech_code" value="space-port"/>
+            <column name="income_percent" valueNumeric="50"/>
+            <column name="sort_order" valueNumeric="15"/>
+        </insert>
+        <insert tableName="building">
+            <column name="code" value="stock-exchange"/>
+            <column name="name" value="Фондовая биржа"/>
+            <column name="description" value="Удваивает налоговый доход колонии."/>
+            <column name="cost" valueNumeric="150"/>
+            <column name="upkeep" valueNumeric="2"/>
+            <column name="required_tech_code" value="stock-exchange"/>
+            <column name="income_percent" valueNumeric="100"/>
+            <column name="sort_order" valueNumeric="16"/>
+        </insert>
+    </changeSet>
+
+    <!-- Построенные здания: одно здание на планете возводится один раз. -->
+    <changeSet id="022-03-create-planet-building" author="moo3">
+        <createTable tableName="planet_building">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_planet_building" nullable="false"/>
+            </column>
+            <column name="planet_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="building_code" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="built_turn" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="planet_building" baseColumnNames="planet_id"
+                                 referencedTableName="planet" referencedColumnNames="id"
+                                 constraintName="fk_planet_building_planet" onDelete="CASCADE"/>
+        <addUniqueConstraint tableName="planet_building" columnNames="planet_id, building_code"
+                             constraintName="uq_planet_building"/>
+        <createIndex tableName="planet_building" indexName="ix_planet_building_planet">
+            <column name="planet_id"/>
+        </createIndex>
+    </changeSet>
+
+    <!--
+        Что колония строит и сколько единиц производства уже вложила.
+
+        Проект — либо код здания, либо HOUSING (дома) или TRADE_GOODS (товары). Дома и
+        товары зданиями не становятся и на планете ничего не занимают: они превращают
+        производство в рождаемость и в деньги и потому не заканчиваются никогда.
+    -->
+    <changeSet id="022-04-add-planet-project" author="moo3">
+        <addColumn tableName="planet">
+            <column name="project_code" type="VARCHAR(64)"/>
+            <column name="project_points" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <!-- Казна игрока: доход колоний за ход минус содержание зданий. -->
+    <changeSet id="022-05-add-player-credits" author="moo3">
+        <addColumn tableName="player">
+            <column name="credits" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

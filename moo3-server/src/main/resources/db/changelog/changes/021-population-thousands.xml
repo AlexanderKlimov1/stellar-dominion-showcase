@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+        Население в тысячах жителей — п. 4.1.1.
+
+        MOO II считает население тысячами: прирост за ход это десятки и сотни тысяч,
+        а нового работника колония получает, накопив целую тысячу. Без дробной части
+        роста не выразить, поэтому колонка population (целые жители) заменяется на
+        population_k (тысячи), а целые жители теперь считаются делением.
+
+        Значения переносятся один к одному: прежние жители это ровно столько тысяч.
+    -->
+    <changeSet id="021-01-add-planet-population-k" author="moo3">
+        <addColumn tableName="planet">
+            <column name="population_k" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="021-02-fill-planet-population-k" author="moo3">
+        <update tableName="planet">
+            <column name="population_k" valueComputed="population * 1000"/>
+        </update>
+    </changeSet>
+
+    <changeSet id="021-03-drop-planet-population" author="moo3">
+        <dropColumn tableName="planet" columnName="population"/>
+    </changeSet>
+
+</databaseChangeLog>

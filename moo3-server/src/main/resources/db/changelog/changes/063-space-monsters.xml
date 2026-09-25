@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+      Космические чудища MOO II — п. 11.1: они сторожат звёздные системы.
+
+      Почему полями системы, а не своей таблицей. Чудище живёт в системе и никуда не
+      девается: у него нет ни флота, ни колоний, ни хозяина — только место и здоровье.
+      Своя таблица означала бы выборку «на систему» изнутри посчитанного хода, а система и
+      так вычитывается ходом целиком (TurnContext). Ровно та же причина, по которой в
+      планете лежат очередь стройки и подданные захваченной колонии.
+
+      Сила убывает: чудище, отбившее флот, слабеет и однажды гибнет. Пусто в monster_code —
+      система чиста.
+    -->
+    <changeSet id="063-space-monsters" author="moo3">
+        <addColumn tableName="star_system">
+            <column name="monster_code" type="varchar(32)"/>
+            <column name="monster_strength" type="integer"/>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

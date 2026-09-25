@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+        Партия на несколько игроков сразу: каждый заканчивает ход сам, а галактика
+        считается один раз, когда закончили все. Отсюда три правки схемы:
+
+        1. Игрок помнит, до какого хода он дошёл (ended_turn) — по этому полю видно,
+           кого ещё ждём.
+        2. Игра, игрок и планета получают version: без него одновременные действия
+           двух игроков молча затирали друг друга (последняя запись побеждала).
+        3. Автосохранение убрано целиком: слепок партии писался каждый ход и целиком,
+           а нужен он был редко. Сохранение осталось только по команде игрока.
+    -->
+
+    <changeSet id="029-01-player-ended-turn" author="moo3">
+        <comment>До какого хода игрок дошёл: ход считается, когда дошли все люди партии.</comment>
+        <addColumn tableName="player">
+            <column name="ended_turn" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="029-02-optimistic-lock-versions" author="moo3">
+        <comment>Версии строк для оптимистичной блокировки: конкурирующая запись видна, а не теряется.</comment>
+        <addColumn tableName="game">
+            <column name="version" type="BIGINT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <addColumn tableName="player">
+            <column name="version" type="BIGINT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <addColumn tableName="planet">
+            <column name="version" type="BIGINT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="029-03-drop-autosave" author="moo3">
+        <comment>Автосохранений больше нет: прежние записи уходят вместе с признаком.</comment>
+        <delete tableName="game_save">
+            <where>autosave = TRUE</where>
+        </delete>
+        <dropColumn tableName="game_save" columnName="autosave"/>
+    </changeSet>
+
+    <changeSet id="029-04-indexes" author="moo3">
+        <comment>Индексы под запросы, которые идут на каждый ход и на каждый вход игрока.</comment>
+
+        <!-- Опознание игрока по пропуску: запрос на каждое действие в партии. -->
+        <createIndex tableName="player" indexName="ix_player_game_token">
+            <column name="game_id"/>
+            <column name="access_token"/>
+        </createIndex>
+
+        <!--
+            Разведанные системы и отношения по игроку индекса не требуют: их уникальные
+            ограничения (player_id, star_system_id) и (player_id, other_player_id) уже
+            дают индекс с player_id первым столбцом — второй был бы копией.
+        -->
+
+        <!-- Колонии игрока: фазы хода и доход империи ходят по владельцу. -->
+        <createIndex tableName="planet" indexName="ix_planet_owner">
+            <column name="owner_player_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="029-05-turn-report" author="moo3">
+        <comment>
+            Что изменилось за ход у каждого игрока: ход считается один раз на всех, и
+            игрок, закончивший первым, узнаёт о пересчёте не из своего ответа. Хранится
+            последний отчёт — строка на игрока, переписывается каждый ход: он нужен, пока
+            игрок его не прочитал, в том числе после перезагрузки страницы.
+        </comment>
+        <createTable tableName="turn_report">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_turn_report" nullable="false"/>
+            </column>
+            <column name="game_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="player_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="turn" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="state" type="JSONB">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="turn_report" baseColumnNames="game_id"
+                                 constraintName="fk_turn_report_game"
+                                 referencedTableName="game" referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+        <addUniqueConstraint tableName="turn_report" columnNames="player_id"
+                             constraintName="uq_turn_report_player"/>
+    </changeSet>
+
+</databaseChangeLog>

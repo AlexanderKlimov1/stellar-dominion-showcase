@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+      Подданные захваченной колонии и их ассимиляция — п. 7, п. 12.
+
+      В MOO II взятая колония достаётся победителю вместе с жителями, и жители эти ещё
+      долго остаются чужой расой: работают по своим расовым правилам, пока не
+      ассимилируются. Скорость зависит от строя победителя (объединение — один житель за
+      двадцать ходов, демократия вдвое быстрее) и от его обаяния.
+
+      Хранится это на самой планете: подданные — часть её населения, а не отдельная
+      сущность, и своей таблицей они дали бы выборку «на планету» изнутри посчитанного
+      хода — ровно то, чего в этом проекте избегают.
+    -->
+    <changeSet id="053-assimilation" author="moo3">
+        <addColumn tableName="planet">
+            <column name="alien_population" type="integer" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="alien_owner_player_id" type="uuid"/>
+            <column name="assimilation_points" type="integer" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

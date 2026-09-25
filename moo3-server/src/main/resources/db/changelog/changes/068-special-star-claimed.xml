@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+      Клад особой звезды взят — п. 4.2.1.
+
+      Wardenhold сторожит Страж, а за ним лежит наследие: три технологии первой империи,
+      которая там поселится. Признак нужен затем, чтобы клад достался ОДИН раз: колонию
+      отбивают и заселяют заново, и без отметки каждый такой раз приносил бы новые три
+      технологии — награда за бой превратилась бы в источник дохода.
+
+      Признак у СИСТЕМЫ, а не у планеты: планет в системе несколько, а клад один. Старым
+      партиям ставится `false` — их особую звезду никто не стерёг и клада там не было,
+      так что первое заселение принесёт награду честно.
+    -->
+    <changeSet id="068-special-star-claimed" author="moo3">
+        <addColumn tableName="star_system">
+            <column name="special_claimed" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

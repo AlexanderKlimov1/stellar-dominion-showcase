@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!-- Состояние игры: игра, игроки, звёздные системы, планеты -->
+    <changeSet id="003-01-game" author="moo3">
+        <createTable tableName="game">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_game" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="galaxy_size" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="width_gre" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="height_gre" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="star_count" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="turn" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="total_players" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="max_human_players" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="seed" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="host_player_id" type="UUID"/>
+            <column name="created_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="started_at" type="TIMESTAMP WITH TIME ZONE"/>
+        </createTable>
+        <createIndex tableName="game" indexName="ix_game_status_created">
+            <column name="status"/>
+            <column name="created_at"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="003-02-player" author="moo3">
+        <createTable tableName="player">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_player" nullable="false"/>
+            </column>
+            <column name="game_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="slot" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="player_type" type="VARCHAR(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="race_code" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="color" type="VARCHAR(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="access_token" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="home_system_id" type="UUID"/>
+            <column name="joined_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="player" baseColumnNames="game_id"
+                                 referencedTableName="game" referencedColumnNames="id"
+                                 constraintName="fk_player_game" onDelete="CASCADE"/>
+        <addUniqueConstraint tableName="player" columnNames="game_id, slot"
+                             constraintName="uq_player_game_slot"/>
+        <createIndex tableName="player" indexName="ix_player_game">
+            <column name="game_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="003-03-star-system" author="moo3">
+        <createTable tableName="star_system">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_star_system" nullable="false"/>
+            </column>
+            <column name="game_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="x_gre" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="y_gre" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="star_color" type="VARCHAR(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="special" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="star_system" baseColumnNames="game_id"
+                                 referencedTableName="game" referencedColumnNames="id"
+                                 constraintName="fk_star_system_game" onDelete="CASCADE"/>
+        <addUniqueConstraint tableName="star_system" columnNames="game_id, name"
+                             constraintName="uq_star_system_game_name"/>
+        <addUniqueConstraint tableName="star_system" columnNames="game_id, x_gre, y_gre"
+                             constraintName="uq_star_system_game_position"/>
+        <createIndex tableName="star_system" indexName="ix_star_system_game">
+            <column name="game_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="003-04-planet" author="moo3">
+        <createTable tableName="planet">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_planet" nullable="false"/>
+            </column>
+            <column name="star_system_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="orbit" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="planet_size" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="climate" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="minerals" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="max_population" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="owner_player_id" type="UUID"/>
+            <column name="population" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="homeworld" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="planet" baseColumnNames="star_system_id"
+                                 referencedTableName="star_system" referencedColumnNames="id"
+                                 constraintName="fk_planet_star_system" onDelete="CASCADE"/>
+        <addUniqueConstraint tableName="planet" columnNames="star_system_id, orbit"
+                             constraintName="uq_planet_system_orbit"/>
+        <createIndex tableName="planet" indexName="ix_planet_star_system">
+            <column name="star_system_id"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

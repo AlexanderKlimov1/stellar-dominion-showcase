@@ -1,0 +1,470 @@
+{
+  "game": "Stellar Dominion",
+  "version": "1.0",
+  "description": "Buildings available to colonies, with production cost, upkeep and effects",
+  "notes": {
+    "cost": "Cost is in production points (PP), upkeep in credits (BC) per turn. Values are from MOO II.",
+    "required_tech": "Code of the technology in tech.json that unlocks the building. Absent — available from the start.",
+    "effects": "What the building does for the colony: a type and an amount. Effects of all buildings on a planet add up.",
+    "effect_types": {
+      "FOOD_FLAT": "Food per turn regardless of farmers",
+      "FOOD_PER_FARMER": "Extra food from every farmer",
+      "PRODUCTION_FLAT": "Production per turn regardless of workers",
+      "PRODUCTION_PER_WORKER": "Extra production from every worker",
+      "PRODUCTION_PER_COLONIST": "Production from every colonist whatever their job (the Reclaimer Plant); it does not pollute the planet",
+      "RESEARCH_FLAT": "Research points per turn regardless of scientists",
+      "RESEARCH_PER_SCIENTIST": "Extra research points from every scientist",
+      "MAX_POPULATION": "Extra population capacity of the planet",
+      "POPULATION_GROWTH_K": "Extra population growth per turn, in thousands",
+      "INCOME_PERCENT": "Percent added to the colony tax income",
+      "POLLUTION_HALVINGS": "How many times the dirty production is halved before the clean-up is charged: MOO II divides it by 2 with a Pollution Processor, by 4 with an Atmosphere Renewer and by 8 with both, so the halvings of all buildings add up",
+      "POLLUTION_TOLERANCE_PERCENT": "Percent added to how much industry the planet tolerates without pollution (Nano Disassemblers double it)",
+      "POLLUTION_NONE": "No pollution at all, whatever the industry (Core Waste Dump; the Tolerant race gets the same)",
+      "GROUND_DEFENCE_PERCENT": "Percent added to the strength of the colony's defenders in ground combat (barracks); defence only"
+    },
+    "pollution_buildings": "Of the four clean-up buildings only the cost of the Pollution Processor is taken from the original (80 PP, StrategyWiki, Chemistry); their upkeep and the cost of the other three are a reconstruction on the scale of this catalogue, with the Core Waste Dump the dearest to keep — the original calls its maintenance very high.",
+    "scope": "Only buildings whose effect this model expresses. Military installations, shipyards and ship modules wait for their subsystems.",
+    "rules": "A building may also act by a rule rather than by a number: star-base is the colony shipyard, and without it a colony builds only the two smallest hulls."
+  },
+  "buildings": [
+    {
+      "code": "star-base",
+      "name": { "en": "Star Base", "ru": "Звёздная база" },
+      "description": {
+        "en": "The colony's orbital shipyard: without it only frigates and destroyers leave the slipway. The home world gets one on the first turn.",
+        "ru": "Орбитальная верфь колонии: без неё со стапеля сходят только фрегаты и эсминцы. Родной мир получает её с первого хода."
+      },
+      "cost": 90,
+      "upkeep": 2,
+      "effects": []
+    },
+    {
+      "code": "battle-station",
+      "name": { "en": "Battle Station", "ru": "Боевая станция" },
+      "description": {
+        "en": "An orbital platform in place of a star base: twice as tough, with twice the room for weapons. It arms itself with the best researched.",
+        "ru": "Орбитальная платформа вместо звёздной базы: вдвое крепче и вдвое больше места под оружие. Вооружается сама, по последнему изученному."
+      },
+      "cost": 300,
+      "upkeep": 3,
+      "required_tech": "battlestation",
+      "effects": []
+    },
+    {
+      "code": "star-fortress",
+      "name": { "en": "Star Fortress", "ru": "Звёздная крепость" },
+      "description": {
+        "en": "The strongest orbital platform: replaces both the base and the station. It arms itself with the best researched.",
+        "ru": "Сильнейшая орбитальная платформа: заменяет и базу, и станцию. Вооружается сама, по последнему изученному."
+      },
+      "cost": 700,
+      "upkeep": 5,
+      "required_tech": "star-fortress",
+      "effects": []
+    },
+    {
+      "code": "missile-base",
+      "name": { "en": "Missile Base", "ru": "Ракетная база" },
+      "description": {
+        "en": "Missile silos on the planet: they fire at an enemy fleet from the surface. Orbit is easier to destroy than a planet.",
+        "ru": "Ракетные шахты на планете: бьют по чужому флоту с поверхности. Орбиту уничтожить проще, чем планету."
+      },
+      "cost": 120,
+      "upkeep": 2,
+      "required_tech": "missile-base",
+      "effects": []
+    },
+    {
+      "code": "ground-batteries",
+      "name": { "en": "Ground Batteries", "ru": "Наземные батареи" },
+      "description": {
+        "en": "Heavy guns of the planetary defence: they strengthen the fire from the surface.",
+        "ru": "Тяжёлые орудия планетарной обороны: усиливают огонь с поверхности."
+      },
+      "cost": 200,
+      "upkeep": 3,
+      "required_tech": "ground-batteries",
+      "effects": []
+    },
+    {
+      "code": "fighter-garrison",
+      "name": { "en": "Fighter Garrison", "ru": "Гарнизон истребителей" },
+      "description": {
+        "en": "Hangars on the planet: fighters take off to meet an enemy fleet.",
+        "ru": "Ангары на планете: истребители взлетают навстречу чужому флоту."
+      },
+      "cost": 150,
+      "upkeep": 2,
+      "required_tech": "fighter-garrison",
+      "effects": []
+    },
+    {
+      "code": "planetary-flux-shield",
+      "name": { "en": "Planetary Flux Shield", "ru": "Планетарный щит" },
+      "description": {
+        "en": "A field around the planet: it takes the fire from orbit upon itself. In battle it stands as a target to be broken and does not shoot back.",
+        "ru": "Поле вокруг планеты: держит на себе огонь с орбиты. В бою стоит целью, которую надо разбить, а сам не стреляет."
+      },
+      "cost": 400,
+      "upkeep": 4,
+      "required_tech": "planetary-flux-shield",
+      "effects": []
+    },
+    {
+      "code": "planetary-barrier-shield",
+      "name": { "en": "Planetary Barrier Shield", "ru": "Планетарный барьер" },
+      "description": {
+        "en": "An almost impenetrable field: while it holds, no troops can land on the planet at all — neither yours nor the enemy's.",
+        "ru": "Почти непроницаемое поле: пока оно стоит, десант на планету не высадить вовсе — ни своим, ни чужим."
+      },
+      "cost": 900,
+      "upkeep": 6,
+      "required_tech": "planetary-barrier-shield",
+      "effects": []
+    },
+    {
+      "code": "artemis-system-net",
+      "name": { "en": "Hunters' Net", "ru": "Сеть охотников" },
+      "description": {
+        "en": "A minefield around the whole system: an enemy fleet loses a ship on entering it. The mines spare your own.",
+        "ru": "Минное поле вокруг всей системы: чужой флот теряет корабль, входя в неё. Своих мины не трогают."
+      },
+      "cost": 600,
+      "upkeep": 5,
+      "required_tech": "artemis-system-net",
+      "effects": []
+    },
+    {
+      "code": "marine-barracks",
+      "name": { "en": "Marine Barracks", "ru": "Казармы морской пехоты" },
+      "description": {
+        "en": "Trained soldiers defend the colony instead of colonists with rifles: the defence is half again as strong. Built from the first turn, with no technology at all; the home world gets it at once.",
+        "ru": "Колонию защищают обученные бойцы, а не жители с винтовками: оборона в полтора раза крепче. Строится с первого хода, без всяких технологий; родной мир получает её сразу."
+      },
+      "cost": 60,
+      "upkeep": 1,
+      "effects": [
+        {
+          "type": "GROUND_DEFENCE_PERCENT",
+          "amount": 50
+        }
+      ]
+    },
+    {
+      "code": "armor-barracks",
+      "name": { "en": "Armor Barracks", "ru": "Бронеказармы" },
+      "description": {
+        "en": "Armour joins the infantry: the defence of the colony doubles on top of the barracks.",
+        "ru": "К пехоте прибавляется бронетехника: оборона колонии удваивается сверх казарм."
+      },
+      "cost": 150,
+      "upkeep": 2,
+      "required_tech": "armor-barracks",
+      "effects": [
+        {
+          "type": "GROUND_DEFENCE_PERCENT",
+          "amount": 100
+        }
+      ]
+    },
+    {
+      "code": "hydroponic-farm",
+      "name": { "en": "Hydroponic Farm", "ru": "Гидропонная ферма" },
+      "description": {
+        "en": "Gives 2 food a turn without a single farmer.",
+        "ru": "Даёт 2 единицы еды без единого фермера."
+      },
+      "cost": 60,
+      "upkeep": 2,
+      "required_tech": "hydroponic-farm",
+      "effects": [
+        { "type": "FOOD_FLAT", "amount": 2 }
+      ]
+    },
+    {
+      "code": "biospheres",
+      "name": { "en": "Biospheres", "ru": "Биосферы" },
+      "description": {
+        "en": "Raises the planet's capacity by 2 colonists.",
+        "ru": "Поднимает вместимость планеты на 2 жителей."
+      },
+      "cost": 60,
+      "upkeep": 1,
+      "required_tech": "biospheres",
+      "effects": [
+        { "type": "MAX_POPULATION", "amount": 2 }
+      ]
+    },
+    {
+      "code": "cloning-center",
+      "name": { "en": "Cloning Center", "ru": "Центр клонирования" },
+      "description": {
+        "en": "Adds 100 thousand colonists to the growth each turn.",
+        "ru": "Прибавляет 100 тысяч жителей к приросту за ход."
+      },
+      "cost": 100,
+      "upkeep": 2,
+      "required_tech": "cloning-center",
+      "effects": [
+        { "type": "POPULATION_GROWTH_K", "amount": 100 }
+      ]
+    },
+    {
+      "code": "soil-enrichment",
+      "name": { "en": "Soil Enrichment", "ru": "Обогащение почвы" },
+      "description": {
+        "en": "Every farmer gives one more food.",
+        "ru": "Каждый фермер даёт на единицу еды больше."
+      },
+      "cost": 120,
+      "upkeep": 0,
+      "required_tech": "soil-enrichment",
+      "effects": [
+        { "type": "FOOD_PER_FARMER", "amount": 1 }
+      ]
+    },
+    {
+      "code": "subterranean-farms",
+      "name": { "en": "Subterranean Farms", "ru": "Подземные фермы" },
+      "description": {
+        "en": "Give 4 food a turn without a single farmer.",
+        "ru": "Дают 4 единицы еды без единого фермера."
+      },
+      "cost": 150,
+      "upkeep": 4,
+      "required_tech": "subterranean-farms",
+      "effects": [
+        { "type": "FOOD_FLAT", "amount": 4 }
+      ]
+    },
+    {
+      "code": "weather-controller",
+      "name": { "en": "Weather Controller", "ru": "Управление погодой" },
+      "description": {
+        "en": "Every farmer gives two more food.",
+        "ru": "Каждый фермер даёт на две единицы еды больше."
+      },
+      "cost": 200,
+      "upkeep": 3,
+      "required_tech": "weather-controller",
+      "effects": [
+        { "type": "FOOD_PER_FARMER", "amount": 2 }
+      ]
+    },
+    {
+      "code": "automated-factory",
+      "name": { "en": "Automated Factory", "ru": "Автоматический завод" },
+      "description": {
+        "en": "Gives 5 production and one more from every worker.",
+        "ru": "Даёт 5 единиц производства и ещё по единице с рабочего."
+      },
+      "cost": 60,
+      "upkeep": 1,
+      "required_tech": "automated-factory",
+      "effects": [
+        { "type": "PRODUCTION_FLAT", "amount": 5 },
+        { "type": "PRODUCTION_PER_WORKER", "amount": 1 }
+      ]
+    },
+    {
+      "code": "robo-miners",
+      "name": { "en": "Robo Mining Plant", "ru": "Робошахтёры" },
+      "description": {
+        "en": "Gives 10 production and two more from every worker.",
+        "ru": "Дают 10 единиц производства и ещё по две с рабочего."
+      },
+      "cost": 150,
+      "upkeep": 2,
+      "required_tech": "robo-miners",
+      "effects": [
+        { "type": "PRODUCTION_FLAT", "amount": 10 },
+        { "type": "PRODUCTION_PER_WORKER", "amount": 2 }
+      ]
+    },
+    {
+      "code": "deep-core-mine",
+      "name": { "en": "Deep Core Mine", "ru": "Глубинный рудник" },
+      "description": {
+        "en": "Gives 15 production and three more from every worker.",
+        "ru": "Даёт 15 единиц производства и ещё по три с рабочего."
+      },
+      "cost": 250,
+      "upkeep": 3,
+      "required_tech": "deep-core-mine",
+      "effects": [
+        { "type": "PRODUCTION_FLAT", "amount": 15 },
+        { "type": "PRODUCTION_PER_WORKER", "amount": 3 }
+      ]
+    },
+    {
+      "code": "research-laboratory",
+      "name": { "en": "Research Laboratory", "ru": "Исследовательская лаборатория" },
+      "description": {
+        "en": "Gives 5 research points and one more from every scientist.",
+        "ru": "Даёт 5 очков исследований и ещё по одному с учёного."
+      },
+      "cost": 60,
+      "upkeep": 1,
+      "required_tech": "research-laboratory",
+      "effects": [
+        { "type": "RESEARCH_FLAT", "amount": 5 },
+        { "type": "RESEARCH_PER_SCIENTIST", "amount": 1 }
+      ]
+    },
+    {
+      "code": "supercomputer",
+      "name": { "en": "Supercomputer", "ru": "Суперкомпьютер" },
+      "description": {
+        "en": "Gives 10 research points and two more from every scientist.",
+        "ru": "Даёт 10 очков исследований и ещё по два с учёного."
+      },
+      "cost": 150,
+      "upkeep": 2,
+      "required_tech": "supercomputer",
+      "effects": [
+        { "type": "RESEARCH_FLAT", "amount": 10 },
+        { "type": "RESEARCH_PER_SCIENTIST", "amount": 2 }
+      ]
+    },
+    {
+      "code": "autolab",
+      "name": { "en": "Automated Lab", "ru": "Автоматическая лаборатория" },
+      "description": {
+        "en": "Gives 30 research points without a single scientist.",
+        "ru": "Даёт 30 очков исследований без единого учёного."
+      },
+      "cost": 200,
+      "upkeep": 3,
+      "required_tech": "autolab",
+      "effects": [
+        { "type": "RESEARCH_FLAT", "amount": 30 }
+      ]
+    },
+    {
+      "code": "galactic-cybernet",
+      "name": { "en": "Galactic Cybernet", "ru": "Галактическая сеть" },
+      "description": {
+        "en": "Gives 15 research points and three more from every scientist.",
+        "ru": "Даёт 15 очков исследований и ещё по три с учёного."
+      },
+      "cost": 250,
+      "upkeep": 3,
+      "required_tech": "galactic-cybernet",
+      "effects": [
+        { "type": "RESEARCH_FLAT", "amount": 15 },
+        { "type": "RESEARCH_PER_SCIENTIST", "amount": 3 }
+      ]
+    },
+    {
+      "code": "astro-university",
+      "name": { "en": "Astro University", "ru": "Астроуниверситет" },
+      "description": {
+        "en": "Every colonist works better: one more food, production and research.",
+        "ru": "Каждый житель работает лучше: по единице к еде, производству и науке."
+      },
+      "cost": 200,
+      "upkeep": 4,
+      "required_tech": "astro-university",
+      "effects": [
+        { "type": "FOOD_PER_FARMER", "amount": 1 },
+        { "type": "PRODUCTION_PER_WORKER", "amount": 1 },
+        { "type": "RESEARCH_PER_SCIENTIST", "amount": 1 }
+      ]
+    },
+    {
+      "code": "space-port",
+      "name": { "en": "Space Port", "ru": "Космопорт" },
+      "description": {
+        "en": "Raises the colony's tax income by half.",
+        "ru": "Поднимает налоговый доход колонии наполовину."
+      },
+      "cost": 80,
+      "upkeep": 1,
+      "required_tech": "space-port",
+      "effects": [
+        { "type": "INCOME_PERCENT", "amount": 50 }
+      ]
+    },
+    {
+      "code": "stock-exchange",
+      "name": { "en": "Stock Exchange", "ru": "Фондовая биржа" },
+      "description": { "en": "Doubles the colony's tax income.", "ru": "Удваивает налоговый доход колонии." },
+      "cost": 150,
+      "upkeep": 2,
+      "required_tech": "stock-exchange",
+      "effects": [
+        { "type": "INCOME_PERCENT", "amount": 100 }
+      ]
+    },
+    {
+      "code": "recyclotron",
+      "name": { "en": "Reclaimer Plant", "ru": "Переработчик" },
+      "description": {
+        "en": "Recycles the colony's waste: one production from every colonist whatever their job, and it does not soil the planet.",
+        "ru": "Перерабатывает мусор колонии: единица производства с каждого жителя, чем бы он ни был занят, и планету она не пачкает."
+      },
+      "cost": 200,
+      "upkeep": 3,
+      "required_tech": "recyclotron",
+      "effects": [
+        { "type": "PRODUCTION_PER_COLONIST", "amount": 1 }
+      ]
+    },
+    {
+      "code": "pollution-processor",
+      "name": { "en": "Pollution Processor", "ru": "Переработчик отходов" },
+      "description": {
+        "en": "Half of the colony's production stops soiling the planet: the clean-up costs half as much.",
+        "ru": "Половина производства колонии перестаёт пачкать планету: уборка обходится вдвое дешевле."
+      },
+      "cost": 80,
+      "upkeep": 3,
+      "required_tech": "pollution-processor",
+      "effects": [
+        { "type": "POLLUTION_HALVINGS", "amount": 1 }
+      ]
+    },
+    {
+      "code": "atmospheric-renewer",
+      "name": { "en": "Atmosphere Renewer", "ru": "Атмосферный преобразователь" },
+      "description": {
+        "en": "The air renews itself: only a quarter of the colony's production counts towards the clean-up.",
+        "ru": "Воздух очищается сам: для уборки считается лишь четверть производства колонии."
+      },
+      "cost": 150,
+      "upkeep": 5,
+      "required_tech": "atmospheric-renewer",
+      "effects": [
+        { "type": "POLLUTION_HALVINGS", "amount": 2 }
+      ]
+    },
+    {
+      "code": "nano-disassemblers",
+      "name": { "en": "Nano Disassemblers", "ru": "Наноразборщики" },
+      "description": {
+        "en": "The planet tolerates twice as much industry before it starts to choke.",
+        "ru": "Планета терпит вдвое больше промышленности, прежде чем начнёт задыхаться."
+      },
+      "cost": 150,
+      "upkeep": 4,
+      "required_tech": "nano-disassemblers",
+      "effects": [
+        { "type": "POLLUTION_TOLERANCE_PERCENT", "amount": 100 }
+      ]
+    },
+    {
+      "code": "core-waste-dump",
+      "name": { "en": "Core Waste Dump", "ru": "Свалка в ядре планеты" },
+      "description": {
+        "en": "The waste goes into the planet's core: the clean-up costs the colony nothing.",
+        "ru": "Отходы уходят в ядро планеты: уборка не стоит колонии ничего."
+      },
+      "cost": 200,
+      "upkeep": 8,
+      "required_tech": "core-waste-dump",
+      "effects": [
+        { "type": "POLLUTION_NONE", "amount": 1 }
+      ]
+    }
+  ]
+}

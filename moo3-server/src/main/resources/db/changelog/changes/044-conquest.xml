@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+        Расселение и покорение галактики — п. 4.1, п. 8, п. 12.
+
+        До сих пор империя не могла выйти за пределы родной системы: колониальная база
+        селится только на соседней орбите, а десант высаживался только в своей системе.
+        Партия из восьми империй в такой галактике не могла кончиться ничем — каждая
+        сидела в своём углу. Появляются гражданские корабли MOO II (колониальный корабль
+        и транспорт), а вместе с ними и конец партии: победитель записывается в саму
+        партию.
+    -->
+
+    <!--
+        Роль корабля — п. 8. В MOO II колониальный корабль и транспорт не собираются в
+        окне дизайна: они стоят в списке стройки готовыми, со своей ценой. Здесь это
+        проекты империи в служебной ячейке 0 — так они проходят через флот, перелёт и
+        бой наравне с боевыми, но в шести ячейках дизайна не показываются.
+    -->
+    <changeSet id="044-01-ship-design-role" author="moo3">
+        <addColumn tableName="ship_design">
+            <column name="role" type="VARCHAR(16)" defaultValue="WARSHIP">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <!--
+        Сколько жителей везёт корабль — п. 4.1, п. 12. У колониального корабля это
+        поселенцы, у транспорта — десант; у боевого корабля жителей нет вовсе, и колонка
+        остаётся пустой. Хранится на строке состава флота, а не на проекте: транспорт
+        может прилететь полупустым, если часть десанта уже высадили.
+    -->
+    <changeSet id="044-02-fleet-ship-colonists" author="moo3">
+        <addColumn tableName="fleet_ship">
+            <column name="colonists" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <!--
+        Конец партии — победитель и час победы. Партия со статусом FINISHED дальше не
+        считается: ходов в ней больше нет, а список партий показывает, кто взял галактику.
+    -->
+    <changeSet id="044-03-game-winner" author="moo3">
+        <addColumn tableName="game">
+            <column name="winner_player_id" type="UUID"/>
+            <column name="victory_kind" type="VARCHAR(32)"/>
+            <column name="finished_at" type="TIMESTAMP WITH TIME ZONE"/>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

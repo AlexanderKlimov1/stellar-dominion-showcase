@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+        Демонстрационный бой — п. 8: два флота сходятся сами, без игрока, ради показа сцены.
+        Такой бой ни из чего не вырос: встречи флотов у него нет, потому что нет и партии
+        с флотами. Поэтому ссылка на встречу становится необязательной.
+    -->
+
+    <changeSet id="036-01-battle-without-encounter" author="moo3">
+        <comment>У демонстрационного боя встречи нет: он не вырос из столкновения флотов.</comment>
+        <dropNotNullConstraint tableName="space_battle" columnName="encounter_id" columnDataType="UUID"/>
+    </changeSet>
+
+</databaseChangeLog>

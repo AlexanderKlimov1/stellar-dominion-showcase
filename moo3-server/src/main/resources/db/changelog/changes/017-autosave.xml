@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+        Автосохранение: партия сама пишется в конце каждого хода игрока, и на игру
+        держится ровно одна такая запись — она обновляется на месте. В списке загрузки
+        автосохранения идут первыми, поэтому сортировка тоже опирается на этот признак.
+    -->
+    <changeSet id="017-01-clear-game-saves" author="moo3">
+        <comment>Прежние сохранения снимались отладочными прогонами; список начинаем с чистого.</comment>
+        <delete tableName="game_save"/>
+    </changeSet>
+
+    <changeSet id="017-02-add-autosave-flag" author="moo3">
+        <addColumn tableName="game_save">
+            <column name="autosave" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+
+        <createIndex tableName="game_save" indexName="ix_game_save_autosave">
+            <column name="autosave"/>
+            <column name="game_id"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

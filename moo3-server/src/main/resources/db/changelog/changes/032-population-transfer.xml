@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+        Перевозка жителей между колониями — п. 4.1.1.
+        <p>
+        Рейс живёт строкой, а не числом: пока жители в пути, грузовики заняты именно им —
+        по грузовику на единицу населения, — и еду они в этот ход не возят. Без строки
+        было бы негде хранить ни груз, ни то, кто его ждёт.
+    -->
+    <changeSet id="032-01-population-transfer" author="moo3">
+        <comment>Рейс с жителями: кто везёт, откуда, куда и сколько грузовиков занято.</comment>
+        <createTable tableName="population_transfer">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_population_transfer" nullable="false"/>
+            </column>
+            <column name="game_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="owner_player_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="from_planet_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="to_planet_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <!-- Жителей на борту: столько же грузовиков и занято — по одному на единицу. -->
+            <column name="population" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="departed_turn" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="population_transfer" baseColumnNames="game_id"
+                                 constraintName="fk_population_transfer_game"
+                                 referencedTableName="game" referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+        <createIndex tableName="population_transfer" indexName="ix_transfer_owner">
+            <column name="owner_player_id"/>
+        </createIndex>
+        <createIndex tableName="population_transfer" indexName="ix_transfer_game">
+            <column name="game_id"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

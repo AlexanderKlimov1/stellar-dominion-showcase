@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+      Проект, собранный самой игрой, — п. 8.
+
+      В MOO II шесть ячеек дизайна не пустуют: игра держит в них готовые проекты под
+      нынешний уровень технологий, и колония строит их, пока игрок не собрал своего.
+      Такой проект игра вправе переписать сама, когда изучены новые двигатель, броня или
+      пушка, — а проект, собранный игроком, не трогает никогда. Этим признаком они и
+      различаются.
+
+      Уже заведённым проектам ставится ложь: они либо собраны игроком, либо остались от
+      стартового проекта партии, и переписывать их за спиной игрока нельзя.
+    -->
+    <changeSet id="050-ship-design-auto" author="moo3">
+        <addColumn tableName="ship_design">
+            <column name="auto" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

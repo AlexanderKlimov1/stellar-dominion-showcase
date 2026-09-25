@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!-- п. 4.2 / 4.2.1 — размеры галактик в ГРЕ и количество звёзд -->
+    <changeSet id="001-01-ref-galaxy-size" author="moo3">
+        <createTable tableName="ref_galaxy_size">
+            <column name="code" type="VARCHAR(32)">
+                <constraints primaryKey="true" primaryKeyName="pk_ref_galaxy_size" nullable="false"/>
+            </column>
+            <column name="label" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="width_gre" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="height_gre" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="star_count" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sort_order" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <!-- п. 4.1.1 / 4.1.1.1 — размеры планет и базовое население -->
+    <changeSet id="001-02-ref-planet-size" author="moo3">
+        <createTable tableName="ref_planet_size">
+            <column name="code" type="VARCHAR(32)">
+                <constraints primaryKey="true" primaryKeyName="pk_ref_planet_size" nullable="false"/>
+            </column>
+            <column name="label" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="base_population" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sort_order" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <!-- п. 4.1.2 / 4.1.2.1 — плодородность и цепочка терраформирования -->
+    <changeSet id="001-03-ref-planet-climate" author="moo3">
+        <createTable tableName="ref_planet_climate">
+            <column name="code" type="VARCHAR(32)">
+                <constraints primaryKey="true" primaryKeyName="pk_ref_planet_climate" nullable="false"/>
+            </column>
+            <column name="label" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="population_multiplier_percent" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="colonizable" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="terraform_order" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="next_climate_code" type="VARCHAR(32)"/>
+            <column name="required_tech_code" type="VARCHAR(64)"/>
+            <column name="sort_order" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <!-- п. 4.1.3 — минералы -->
+    <changeSet id="001-04-ref-mineral-richness" author="moo3">
+        <createTable tableName="ref_mineral_richness">
+            <column name="code" type="VARCHAR(32)">
+                <constraints primaryKey="true" primaryKeyName="pk_ref_mineral_richness" nullable="false"/>
+            </column>
+            <column name="label" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="production_per_worker" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sort_order" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <!-- п. 11.3 — каталог реальных названий звёзд -->
+    <changeSet id="001-05-ref-star-name" author="moo3">
+        <createTable tableName="ref_star_name">
+            <column name="name" type="VARCHAR(64)">
+                <constraints primaryKey="true" primaryKeyName="pk_ref_star_name" nullable="false"/>
+            </column>
+            <column name="sort_order" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>

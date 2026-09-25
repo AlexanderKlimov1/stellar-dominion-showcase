@@ -1,0 +1,697 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!-- п. 11.3 — каталог реальных названий звёзд. Orion в каталог не входит:
+         это специальная звезда, её имя задаёт генератор галактики (п. 4.2.1). -->
+    <changeSet id="011-01-seed-star-names" author="moo3">
+        <insert tableName="ref_star_name">
+            <column name="name" value="Sol"/>
+            <column name="sort_order" valueNumeric="1"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Sirius"/>
+            <column name="sort_order" valueNumeric="2"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Canopus"/>
+            <column name="sort_order" valueNumeric="3"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Arcturus"/>
+            <column name="sort_order" valueNumeric="4"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Vega"/>
+            <column name="sort_order" valueNumeric="5"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Capella"/>
+            <column name="sort_order" valueNumeric="6"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Rigel"/>
+            <column name="sort_order" valueNumeric="7"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Procyon"/>
+            <column name="sort_order" valueNumeric="8"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Betelgeuse"/>
+            <column name="sort_order" valueNumeric="9"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Achernar"/>
+            <column name="sort_order" valueNumeric="10"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Hadar"/>
+            <column name="sort_order" valueNumeric="11"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Altair"/>
+            <column name="sort_order" valueNumeric="12"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Acrux"/>
+            <column name="sort_order" valueNumeric="13"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Aldebaran"/>
+            <column name="sort_order" valueNumeric="14"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Antares"/>
+            <column name="sort_order" valueNumeric="15"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Spica"/>
+            <column name="sort_order" valueNumeric="16"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Pollux"/>
+            <column name="sort_order" valueNumeric="17"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Fomalhaut"/>
+            <column name="sort_order" valueNumeric="18"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Deneb"/>
+            <column name="sort_order" valueNumeric="19"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Mimosa"/>
+            <column name="sort_order" valueNumeric="20"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Regulus"/>
+            <column name="sort_order" valueNumeric="21"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Adhara"/>
+            <column name="sort_order" valueNumeric="22"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Castor"/>
+            <column name="sort_order" valueNumeric="23"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Gacrux"/>
+            <column name="sort_order" valueNumeric="24"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Shaula"/>
+            <column name="sort_order" valueNumeric="25"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Bellatrix"/>
+            <column name="sort_order" valueNumeric="26"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Elnath"/>
+            <column name="sort_order" valueNumeric="27"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Miaplacidus"/>
+            <column name="sort_order" valueNumeric="28"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Alnilam"/>
+            <column name="sort_order" valueNumeric="29"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Alnair"/>
+            <column name="sort_order" valueNumeric="30"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Alnitak"/>
+            <column name="sort_order" valueNumeric="31"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Alioth"/>
+            <column name="sort_order" valueNumeric="32"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Dubhe"/>
+            <column name="sort_order" valueNumeric="33"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Mirfak"/>
+            <column name="sort_order" valueNumeric="34"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Wezen"/>
+            <column name="sort_order" valueNumeric="35"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Sargas"/>
+            <column name="sort_order" valueNumeric="36"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Avior"/>
+            <column name="sort_order" valueNumeric="37"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Alkaid"/>
+            <column name="sort_order" valueNumeric="38"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Menkalinan"/>
+            <column name="sort_order" valueNumeric="39"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Atria"/>
+            <column name="sort_order" valueNumeric="40"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Alhena"/>
+            <column name="sort_order" valueNumeric="41"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Peacock"/>
+            <column name="sort_order" valueNumeric="42"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Alsephina"/>
+            <column name="sort_order" valueNumeric="43"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Mirzam"/>
+            <column name="sort_order" valueNumeric="44"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Alphard"/>
+            <column name="sort_order" valueNumeric="45"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Polaris"/>
+            <column name="sort_order" valueNumeric="46"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Hamal"/>
+            <column name="sort_order" valueNumeric="47"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Algieba"/>
+            <column name="sort_order" valueNumeric="48"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Diphda"/>
+            <column name="sort_order" valueNumeric="49"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Mizar"/>
+            <column name="sort_order" valueNumeric="50"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Nunki"/>
+            <column name="sort_order" valueNumeric="51"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Menkent"/>
+            <column name="sort_order" valueNumeric="52"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Mirach"/>
+            <column name="sort_order" valueNumeric="53"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Alpheratz"/>
+            <column name="sort_order" valueNumeric="54"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Rasalhague"/>
+            <column name="sort_order" valueNumeric="55"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Kochab"/>
+            <column name="sort_order" valueNumeric="56"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Saiph"/>
+            <column name="sort_order" valueNumeric="57"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Denebola"/>
+            <column name="sort_order" valueNumeric="58"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Algol"/>
+            <column name="sort_order" valueNumeric="59"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Tiaki"/>
+            <column name="sort_order" valueNumeric="60"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Muhlifain"/>
+            <column name="sort_order" valueNumeric="61"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Aspidiske"/>
+            <column name="sort_order" valueNumeric="62"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Suhail"/>
+            <column name="sort_order" valueNumeric="63"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Alphecca"/>
+            <column name="sort_order" valueNumeric="64"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Mintaka"/>
+            <column name="sort_order" valueNumeric="65"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Sadr"/>
+            <column name="sort_order" valueNumeric="66"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Eltanin"/>
+            <column name="sort_order" valueNumeric="67"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Schedar"/>
+            <column name="sort_order" valueNumeric="68"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Naos"/>
+            <column name="sort_order" valueNumeric="69"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Almach"/>
+            <column name="sort_order" valueNumeric="70"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Caph"/>
+            <column name="sort_order" valueNumeric="71"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Izar"/>
+            <column name="sort_order" valueNumeric="72"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Dschubba"/>
+            <column name="sort_order" valueNumeric="73"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Larawag"/>
+            <column name="sort_order" valueNumeric="74"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Merak"/>
+            <column name="sort_order" valueNumeric="75"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Ankaa"/>
+            <column name="sort_order" valueNumeric="76"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Girtab"/>
+            <column name="sort_order" valueNumeric="77"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Enif"/>
+            <column name="sort_order" valueNumeric="78"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Scheat"/>
+            <column name="sort_order" valueNumeric="79"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Sabik"/>
+            <column name="sort_order" valueNumeric="80"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Phecda"/>
+            <column name="sort_order" valueNumeric="81"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Aludra"/>
+            <column name="sort_order" valueNumeric="82"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Markeb"/>
+            <column name="sort_order" valueNumeric="83"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Markab"/>
+            <column name="sort_order" valueNumeric="84"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Aljanah"/>
+            <column name="sort_order" valueNumeric="85"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Acrab"/>
+            <column name="sort_order" valueNumeric="86"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Zosma"/>
+            <column name="sort_order" valueNumeric="87"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Arneb"/>
+            <column name="sort_order" valueNumeric="88"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Cursa"/>
+            <column name="sort_order" valueNumeric="89"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Kraz"/>
+            <column name="sort_order" valueNumeric="90"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Ruchbah"/>
+            <column name="sort_order" valueNumeric="91"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Tarazed"/>
+            <column name="sort_order" valueNumeric="92"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Unukalhai"/>
+            <column name="sort_order" valueNumeric="93"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Sheratan"/>
+            <column name="sort_order" valueNumeric="94"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Phact"/>
+            <column name="sort_order" valueNumeric="95"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Nihal"/>
+            <column name="sort_order" valueNumeric="96"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Rastaban"/>
+            <column name="sort_order" valueNumeric="97"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Algorab"/>
+            <column name="sort_order" valueNumeric="98"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Chara"/>
+            <column name="sort_order" valueNumeric="99"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Alcor"/>
+            <column name="sort_order" valueNumeric="100"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Vindemiatrix"/>
+            <column name="sort_order" valueNumeric="101"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Sadalsuud"/>
+            <column name="sort_order" valueNumeric="102"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Zubeneschamali"/>
+            <column name="sort_order" valueNumeric="103"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Alderamin"/>
+            <column name="sort_order" valueNumeric="104"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Sadalmelik"/>
+            <column name="sort_order" valueNumeric="105"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Gomeisa"/>
+            <column name="sort_order" valueNumeric="106"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Menkar"/>
+            <column name="sort_order" valueNumeric="107"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Zubenelgenubi"/>
+            <column name="sort_order" valueNumeric="108"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Achird"/>
+            <column name="sort_order" valueNumeric="109"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Homam"/>
+            <column name="sort_order" valueNumeric="110"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Electra"/>
+            <column name="sort_order" valueNumeric="111"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Maia"/>
+            <column name="sort_order" valueNumeric="112"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Merope"/>
+            <column name="sort_order" valueNumeric="113"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Alcyone"/>
+            <column name="sort_order" valueNumeric="114"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Atlas"/>
+            <column name="sort_order" valueNumeric="115"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Talitha"/>
+            <column name="sort_order" valueNumeric="116"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Muscida"/>
+            <column name="sort_order" valueNumeric="117"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Zaurak"/>
+            <column name="sort_order" valueNumeric="118"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Kitalpha"/>
+            <column name="sort_order" valueNumeric="119"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Rana"/>
+            <column name="sort_order" valueNumeric="120"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Alrescha"/>
+            <column name="sort_order" valueNumeric="121"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Beid"/>
+            <column name="sort_order" valueNumeric="122"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Keid"/>
+            <column name="sort_order" valueNumeric="123"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Wazn"/>
+            <column name="sort_order" valueNumeric="124"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Furud"/>
+            <column name="sort_order" valueNumeric="125"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Tureis"/>
+            <column name="sort_order" valueNumeric="126"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Propus"/>
+            <column name="sort_order" valueNumeric="127"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Alzirr"/>
+            <column name="sort_order" valueNumeric="128"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Mebsuta"/>
+            <column name="sort_order" valueNumeric="129"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Tejat"/>
+            <column name="sort_order" valueNumeric="130"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Wasat"/>
+            <column name="sort_order" valueNumeric="131"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Nusakan"/>
+            <column name="sort_order" valueNumeric="132"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Seginus"/>
+            <column name="sort_order" valueNumeric="133"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Muphrid"/>
+            <column name="sort_order" valueNumeric="134"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Thuban"/>
+            <column name="sort_order" valueNumeric="135"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Edasich"/>
+            <column name="sort_order" valueNumeric="136"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Altais"/>
+            <column name="sort_order" valueNumeric="137"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Grumium"/>
+            <column name="sort_order" valueNumeric="138"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Kuma"/>
+            <column name="sort_order" valueNumeric="139"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Alrakis"/>
+            <column name="sort_order" valueNumeric="140"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Alcyoneus"/>
+            <column name="sort_order" valueNumeric="141"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Asellus"/>
+            <column name="sort_order" valueNumeric="142"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Azelfafage"/>
+            <column name="sort_order" valueNumeric="143"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Biham"/>
+            <column name="sort_order" valueNumeric="144"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Botein"/>
+            <column name="sort_order" valueNumeric="145"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Celaeno"/>
+            <column name="sort_order" valueNumeric="146"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Chertan"/>
+            <column name="sort_order" valueNumeric="147"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Cebalrai"/>
+            <column name="sort_order" valueNumeric="148"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Dabih"/>
+            <column name="sort_order" valueNumeric="149"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Errai"/>
+            <column name="sort_order" valueNumeric="150"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Fawaris"/>
+            <column name="sort_order" valueNumeric="151"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Giausar"/>
+            <column name="sort_order" valueNumeric="152"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Hassaleh"/>
+            <column name="sort_order" valueNumeric="153"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Heze"/>
+            <column name="sort_order" valueNumeric="154"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Kastra"/>
+            <column name="sort_order" valueNumeric="155"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Lesath"/>
+            <column name="sort_order" valueNumeric="156"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Matar"/>
+            <column name="sort_order" valueNumeric="157"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Nashira"/>
+            <column name="sort_order" valueNumeric="158"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Okab"/>
+            <column name="sort_order" valueNumeric="159"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Pherkad"/>
+            <column name="sort_order" valueNumeric="160"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Rotanev"/>
+            <column name="sort_order" valueNumeric="161"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Sadachbia"/>
+            <column name="sort_order" valueNumeric="162"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Salm"/>
+            <column name="sort_order" valueNumeric="163"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Segin"/>
+            <column name="sort_order" valueNumeric="164"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Sulafat"/>
+            <column name="sort_order" valueNumeric="165"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Syrma"/>
+            <column name="sort_order" valueNumeric="166"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Tania"/>
+            <column name="sort_order" valueNumeric="167"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Torcular"/>
+            <column name="sort_order" valueNumeric="168"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Yildun"/>
+            <column name="sort_order" valueNumeric="169"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Zavijava"/>
+            <column name="sort_order" valueNumeric="170"/>
+        </insert>
+        <insert tableName="ref_star_name">
+            <column name="name" value="Zibal"/>
+            <column name="sort_order" valueNumeric="171"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!-- п. 5 / п. 7 — расы и их конфигурация -->
+    <changeSet id="002-01-race" author="moo3">
+        <createTable tableName="race">
+            <column name="code" type="VARCHAR(64)">
+                <constraints primaryKey="true" primaryKeyName="pk_race" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(1024)"/>
+            <column name="home_climate_code" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="color" type="VARCHAR(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sort_order" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <!-- п. 6 — способности -->
+    <changeSet id="002-02-ability" author="moo3">
+        <createTable tableName="ability">
+            <column name="code" type="VARCHAR(64)">
+                <constraints primaryKey="true" primaryKeyName="pk_ability" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(1024)"/>
+            <column name="pick_cost" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sort_order" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <!-- п. 7 — связка расы и способностей, заполняется при детализации конфигурации рас -->
+    <changeSet id="002-03-race-ability" author="moo3">
+        <createTable tableName="race_ability">
+            <column name="race_code" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ability_code" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addPrimaryKey tableName="race_ability" columnNames="race_code, ability_code"
+                       constraintName="pk_race_ability"/>
+        <addForeignKeyConstraint baseTableName="race_ability" baseColumnNames="race_code"
+                                 referencedTableName="race" referencedColumnNames="code"
+                                 constraintName="fk_race_ability_race"/>
+        <addForeignKeyConstraint baseTableName="race_ability" baseColumnNames="ability_code"
+                                 referencedTableName="ability" referencedColumnNames="code"
+                                 constraintName="fk_race_ability_ability"/>
+    </changeSet>
+
+    <!-- п. 9 / п. 11.1 — дерево технологий -->
+    <changeSet id="002-04-technology" author="moo3">
+        <createTable tableName="technology">
+            <column name="code" type="VARCHAR(64)">
+                <constraints primaryKey="true" primaryKeyName="pk_technology" nullable="false"/>
+            </column>
+            <column name="section_code" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="section_name" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="section_order" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(1024)"/>
+            <column name="research_cost" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="parent_code" type="VARCHAR(64)"/>
+            <column name="sort_order" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex tableName="technology" indexName="ix_technology_section">
+            <column name="section_order"/>
+            <column name="sort_order"/>
+        </createIndex>
+    </changeSet>
+
+    <!-- п. 10 — здания -->
+    <changeSet id="002-05-building" author="moo3">
+        <createTable tableName="building">
+            <column name="code" type="VARCHAR(64)">
+                <constraints primaryKey="true" primaryKeyName="pk_building" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(1024)"/>
+            <column name="cost" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="upkeep" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="required_tech_code" type="VARCHAR(64)"/>
+            <column name="sort_order" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <!-- п. 8 — корпуса кораблей и вооружение -->
+    <changeSet id="002-06-ship-hull" author="moo3">
+        <createTable tableName="ship_hull">
+            <column name="code" type="VARCHAR(64)">
+                <constraints primaryKey="true" primaryKeyName="pk_ship_hull" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(1024)"/>
+            <column name="space" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="cost" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="required_tech_code" type="VARCHAR(64)"/>
+            <column name="sort_order" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="002-07-weapon" author="moo3">
+        <createTable tableName="weapon">
+            <column name="code" type="VARCHAR(64)">
+                <constraints primaryKey="true" primaryKeyName="pk_weapon" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(1024)"/>
+            <column name="damage" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="shots" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="cost" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="required_tech_code" type="VARCHAR(64)"/>
+            <column name="sort_order" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>

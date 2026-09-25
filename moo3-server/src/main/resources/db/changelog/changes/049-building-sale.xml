@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+        Продажа построек — п. 10.
+
+        В MOO II колония продаёт **одно здание за ход**, и помнить об этом должна сама
+        колония: предел у каждой свой, и общего счётчика у империи нет. Поэтому в планете
+        заводится номер хода последней продажи — по нему и видно, продавала ли она уже.
+
+        Своей таблицы «что и когда продали» не заводим: сыгранного она не меняет, здание
+        из `planet_building` просто исчезает, а в отчёт хода продажа не идёт вовсе —
+        игрок нажал её сам и видел ответ сразу.
+    -->
+    <changeSet id="049-01-planet-sold-turn" author="moo3">
+        <addColumn tableName="planet">
+            <column name="sold_turn" type="INT"/>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

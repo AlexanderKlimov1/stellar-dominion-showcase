@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+      Событие игрока хранит КЛЮЧ СЛОВАРЯ и подстановки вместо готовой строки — п. 3.5.
+
+      Событие рождается внутри посчитанного хода: сосед объявил войну, агента поймали,
+      колонию отняли. Показывается оно позже — в итогах хода, тому, кого касается, — и язык
+      известен только тому запросу, который придёт его читать. Готовая строка в колонке
+      означала бы, что язык отчёта выбрал тот, кто закончил ход первым.
+
+      Строки этой таблицы живут ОДИН ХОД: `TurnService` собирает их в отчёт и удаляет. Поэтому
+      старые строки не переносятся, а сносятся: перевести их обратно в ключи нечем (текст
+      собран склейкой), а потеря — это события одного незакрытого хода. Честнее потерять их
+      здесь, чем оставить строки без ключа, на которых упадёт первая же сборка отчёта.
+    -->
+    <changeSet id="066-player-event-drop-pending" author="moo3">
+        <comment>Снести незакрытые события: у них нет ключа, а текст в ключ не превратить</comment>
+        <delete tableName="player_event"/>
+    </changeSet>
+
+    <changeSet id="066-player-event-message-key" author="moo3">
+        <comment>Ключ словаря и подстановки вместо готовой строки</comment>
+        <addColumn tableName="player_event">
+            <column name="message_key" type="varchar(128)"/>
+            <column name="args" type="varchar(1024)"/>
+        </addColumn>
+        <addNotNullConstraint tableName="player_event" columnName="message_key"
+                              columnDataType="varchar(128)"/>
+        <dropColumn tableName="player_event" columnName="text"/>
+    </changeSet>
+
+</databaseChangeLog>

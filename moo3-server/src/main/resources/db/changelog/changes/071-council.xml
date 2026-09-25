@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+      Выборы Высшего совета — п. 3.
+
+      Голосование случается внутри посчитанного хода, а смотрит на него игрок потом, сценой
+      совета: голоса идут по одному, и видно, кто кого поддержал. Пересчитать это позже
+      нельзя — доверие меняется каждый ход, — поэтому голоса записываются строками.
+
+      У самой партии остаётся итог последнего совета: ход, избранный и числа, по которым
+      сцена собирает заголовок.
+    -->
+    <changeSet id="071-council-vote" author="moo3">
+        <createTable tableName="council_vote">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="game_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="turn" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="voter_player_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="weight" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="choice_player_id" type="uuid"/>
+            <column name="candidate" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createIndex tableName="council_vote" indexName="ix_council_vote_game_turn">
+            <column name="game_id"/>
+            <column name="turn"/>
+        </createIndex>
+
+        <addForeignKeyConstraint baseTableName="council_vote" baseColumnNames="game_id"
+                                 constraintName="fk_council_vote_game"
+                                 referencedTableName="game" referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="071-council-summary" author="moo3">
+        <addColumn tableName="game">
+            <column name="council_turn" type="int"/>
+            <column name="council_elected_player_id" type="uuid"/>
+            <column name="council_total_votes" type="int"/>
+            <column name="council_required_votes" type="int"/>
+        </addColumn>
+    </changeSet>
+
+    <!--
+      Признак партии «собирается ли совет». Выключают его замеры балансировки: партия на
+      заданное число ходов не должна обрываться избранием раньше срока. Старым партиям
+      ставится `true` — как в оригинале.
+    -->
+    <changeSet id="071-council-flag" author="moo3">
+        <addColumn tableName="game">
+            <column name="council" type="boolean" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <!--
+      Отказ подчиниться совету — п. 3: проигравший вправе не признать избрания, и тогда
+      партия продолжается, а все, кто голосовал за избранного, объявляют отказнику войну.
+      Признак у партии: он говорит, что ЭТОТ приговор уже отвергнут, — иначе отказ можно
+      было бы повторять, пока не надоест.
+    -->
+    <changeSet id="071-council-refused" author="moo3">
+        <addColumn tableName="game">
+            <column name="council_refused" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+      Проверяемая связка прогона — этап 2, п. 2.14 (balance-metrics-works.txt).
+
+      Связку двух сторон случайная сборка не ловит, и это не вопрос длины прогона: на 400
+      партиях киборгов взяли 104 сборки из 3200, великих промышленников 61, а вместе они
+      сошлись реже, чем нужно для замера. Поэтому пару ПОДСАЖИВАЮТ: четверть сборок несёт
+      обе стороны, четверть только первую, четверть только вторую, четверть ни одной.
+
+      Какая пара проверялась, обязано лежать в самой записи прогона — по той же причине,
+      по которой там лежит снимок цен: через день по одним приговорам не понять, был это
+      прогон с подсаженной связкой или обычный.
+    -->
+    <changeSet id="057-balance-pair" author="moo3">
+        <addColumn tableName="balance_run">
+            <column name="pair_traits" type="jsonb"/>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

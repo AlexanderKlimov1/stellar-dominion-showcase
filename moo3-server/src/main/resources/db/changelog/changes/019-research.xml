@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+        Исследования игрока — п. 9.
+
+        Империя исследует одну технологию за раз, как в MOO II, поэтому текущая цель
+        и вложенные в неё очки лежат колонками на самом игроке, а не отдельной таблицей:
+        строка на игрока всегда одна, и цель меняется на месте.
+
+        Дерево и стоимости уровней сюда не переносятся: они живут в файле дерева
+        (moo3.game.tech-file) и правятся без миграций. В базе остаются только коды
+        раздела, уровня и технологии — ссылки в этот файл.
+    -->
+    <changeSet id="019-01-add-player-research" author="moo3">
+        <addColumn tableName="player">
+            <column name="research_category_code" type="VARCHAR(64)"/>
+            <column name="research_level_order" type="INT"/>
+            <column name="research_option_code" type="VARCHAR(128)"/>
+            <column name="research_points" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <!--
+        Изученные технологии: по одной строке на технологию. На общих уровнях дерева
+        (Nuclear Fission, Cold Fusion, Chemistry, Physics) строк на уровень несколько —
+        их технологии выдаются все сразу.
+    -->
+    <changeSet id="019-02-create-player-technology" author="moo3">
+        <createTable tableName="player_technology">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_player_technology" nullable="false"/>
+            </column>
+            <column name="player_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="category_code" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="level_order" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="option_code" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="acquired_turn" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="player_technology" baseColumnNames="player_id"
+                                 referencedTableName="player" referencedColumnNames="id"
+                                 constraintName="fk_player_technology_player" onDelete="CASCADE"/>
+        <addUniqueConstraint tableName="player_technology" columnNames="player_id, option_code"
+                             constraintName="uq_player_technology_option"/>
+        <createIndex tableName="player_technology" indexName="ix_player_technology_player">
+            <column name="player_id"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

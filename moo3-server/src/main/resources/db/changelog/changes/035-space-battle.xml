@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+        Тактический бой — п. 8. Раньше исход считала заглушка одной формулой; теперь бой
+        идёт на поле, и у него есть состояние между запросами игрока.
+
+        1. space_battle — сам бой: где идёт, из какой встречи вырос, какой круг и чей
+           корабль ходит. Зерно случайности хранится: попадания разыгрываются.
+        2. battle_ship — корабль на поле. Во флоте корабли лежат числом по проектам, а в
+           бою каждый ходит и гибнет сам по себе, поэтому на время боя они разворачиваются
+           в отдельные строки.
+        3. fleet_encounter.battle_id — встреча помнит свой бой: по нему клиент открывает
+           сцену, а итог боя возвращается во встречу.
+    -->
+
+    <changeSet id="035-01-space-battle" author="moo3">
+        <comment>Тактический бой в системе — п. 8.</comment>
+        <createTable tableName="space_battle">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_space_battle" nullable="false"/>
+            </column>
+            <column name="game_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="star_system_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="encounter_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="attacker_player_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="defender_player_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="turn" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="round" type="INT" defaultValueNumeric="1">
+                <constraints nullable="false"/>
+            </column>
+            <column name="current_ship_id" type="UUID"/>
+            <column name="state" type="VARCHAR(16)" defaultValue="IN_PROGRESS">
+                <constraints nullable="false"/>
+            </column>
+            <column name="retreated_player_id" type="UUID"/>
+            <column name="outcome" type="VARCHAR(512)"/>
+            <column name="seed" type="BIGINT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="space_battle" baseColumnNames="game_id"
+                                 constraintName="fk_space_battle_game"
+                                 referencedTableName="game" referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+        <addForeignKeyConstraint baseTableName="space_battle" baseColumnNames="encounter_id"
+                                 constraintName="fk_space_battle_encounter"
+                                 referencedTableName="fleet_encounter" referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+        <createIndex tableName="space_battle" indexName="ix_space_battle_game_state">
+            <column name="game_id"/>
+            <column name="state"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="035-02-battle-ship" author="moo3">
+        <comment>Корабль на поле боя — п. 8: своё место, прочность и очередь хода.</comment>
+        <createTable tableName="battle_ship">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_battle_ship" nullable="false"/>
+            </column>
+            <column name="battle_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="owner_player_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="design_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="side" type="VARCHAR(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ordinal" type="INT" defaultValueNumeric="1">
+                <constraints nullable="false"/>
+            </column>
+            <column name="x" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="y" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="structure" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="armour" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="shield" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="initiative" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="moved" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="fired" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="destroyed" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="battle_ship" baseColumnNames="battle_id"
+                                 constraintName="fk_battle_ship_battle"
+                                 referencedTableName="space_battle" referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+        <createIndex tableName="battle_ship" indexName="ix_battle_ship_battle">
+            <column name="battle_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="035-03-encounter-battle" author="moo3">
+        <comment>Встреча помнит свой бой — п. 8: по нему открывается сцена.</comment>
+        <addColumn tableName="fleet_encounter">
+            <column name="battle_id" type="UUID"/>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

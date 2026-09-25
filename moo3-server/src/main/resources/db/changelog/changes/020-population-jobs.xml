@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+        Занятия жителей колонии: фермеры, рабочие, учёные.
+
+        Сумма трёх колонок равна населению планеты — незанятых жителей в колонии нет.
+        Значения по умолчанию нули: у незаселённой планеты население тоже ноль.
+
+        Партии, начатые до этой правки, останутся с нулями при ненулевом населении.
+        Заполнять их здесь нечем: распределение по умолчанию зависит от климата и
+        считается в коде, поэтому расхождение выправляется на лету при первом же
+        обращении к колонии.
+    -->
+    <changeSet id="020-01-add-planet-population-jobs" author="moo3">
+        <addColumn tableName="planet">
+            <column name="farmers" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="workers" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="scientists" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

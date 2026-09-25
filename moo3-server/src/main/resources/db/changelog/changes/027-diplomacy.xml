@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+        Разведка чужих систем и дипломатия — п. 15.
+
+        Разведанная система запоминается навсегда: знание не теряется, даже если колония
+        в ней сменит хозяина. Свои системы в таблицу не пишутся — они разведаны по факту
+        владения.
+
+        Отношения хранятся по направлениям: доверие у сторон своё, а война и мир общие —
+        одинаковыми их держит сервис. Строка появляется в момент знакомства, поэтому её
+        отсутствие и означает «империи ещё не встретились».
+    -->
+    <changeSet id="027-01-create-player-explored-system" author="moo3">
+        <createTable tableName="player_explored_system">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_player_explored_system" nullable="false"/>
+            </column>
+            <column name="player_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="star_system_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="explored_turn" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="player_explored_system" baseColumnNames="player_id"
+                                 referencedTableName="player" referencedColumnNames="id"
+                                 constraintName="fk_explored_player" onDelete="CASCADE"/>
+        <addUniqueConstraint tableName="player_explored_system" columnNames="player_id, star_system_id"
+                             constraintName="uq_explored_player_system"/>
+    </changeSet>
+
+    <changeSet id="027-02-create-diplomacy-relation" author="moo3">
+        <createTable tableName="diplomacy_relation">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_diplomacy_relation" nullable="false"/>
+            </column>
+            <column name="player_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="other_player_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="stance" type="VARCHAR(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="trust" type="INT" defaultValueNumeric="50">
+                <constraints nullable="false"/>
+            </column>
+            <column name="met_turn" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="diplomacy_relation" baseColumnNames="player_id"
+                                 referencedTableName="player" referencedColumnNames="id"
+                                 constraintName="fk_relation_player" onDelete="CASCADE"/>
+        <addUniqueConstraint tableName="diplomacy_relation" columnNames="player_id, other_player_id"
+                             constraintName="uq_relation_pair"/>
+    </changeSet>
+
+    <!--
+        Шпионы — п. 13: колония строит их проектом стройки, исследований они не требуют.
+        Сколько их у империи, знает сама империя: отдельных сущностей у шпионов нет,
+        пока нет операций, где важен конкретный шпион.
+    -->
+    <changeSet id="027-03-add-player-spies" author="moo3">
+        <addColumn tableName="player">
+            <column name="spies" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

@@ -1,0 +1,1751 @@
+{
+  "game": "Stellar Dominion",
+  "version": "1.0",
+  "description": "Ship hulls and components for the ship design screen (p. 8)",
+  "notes": {
+    "hull": "Space is the room for components, cost is in production points (PP), structure is the hull hit points, command is the command points the ship takes from the empire, hit_chance_percent is the MOO II chance for an enemy shot to hit a hull of this size.",
+    "system_factor": "Armour, shields, engines, computers, ECM and specials cover the whole ship, so their space and cost are multiplied by this factor. Weapons are not: a laser takes the same room on any hull, which is why a big hull carries proportionally more guns, as in MOO II.",
+    "required_tech": "Code of the technology in tech.json that unlocks the hull or component. Absent means available from the start: Nuclear Drive, Titanium Armour and the Mass Driver, the three MOO II races start every game with, plus the four smaller hulls.",
+    "effects": "What the component gives the ship: a type and an amount. Effects of all components add up.",
+    "effect_types": {
+      "WEAPON_DAMAGE": "Damage of one shot",
+      "WEAPON_SHOTS": "Shots per salvo",
+      "ARMOUR": "Armour points per system_factor",
+      "ARMOUR_PERCENT": "Percent added to armour",
+      "SHIELD": "Shield points per system_factor",
+      "SPEED": "Ship speed in parsecs per turn",
+      "ATTACK_PERCENT": "Percent added to the salvo",
+      "DEFENSE": "Flat defence points added to hull evasion",
+      "STRUCTURE_PERCENT": "Percent added to hull structure",
+      "SPACE_PERCENT": "Percent added to hull space",
+      "TROOPS": "Marines carried for boarding and invasion",
+      "COMBAT_SPEED": "Combat speed of the drive as in MOO II (Nuclear Drive — 12); the battlefield turns it into cells",
+      "MISSILE_EVASION": "Points subtracted from the hit chance of enemy missiles only (ECM Jammer); ECCM halves it"
+    },
+    "sources": "Verified against sources: command points 1-6 by hull class and the chance to be hit by hull size (20/30/40/50/80/100 percent). The rest is a reconstruction: StrategyWiki answers 403 and the wiki mirrors 402. Damage of Mass Driver (6), Laser (4) and Fusion Beam (10) and the hull spaces and costs are the numbers this project already used in ship_hull and weapon; the rest of each ladder follows their step and the published ordering of MOO II weapons.",
+    "weapon_kind": "How the shot looks and behaves: BEAM strikes at once, PROJECTILE flies as a shell, MISSILE goes to the target on its own. The battle scene draws each kind differently.",
+    "weapon_modifications": "Mount modifications of MOO II. Beams and projectiles take one set (HV, PD, AP, SP, CO, NR, AF, ENV), missiles another (ARM, FST, OVR, ECCM, MIRV, EMG) — `applies_to` says which weapon a modification fits, and the weapon itself may narrow that list further. Numbers are those of the original; the way ARM, FST, EMG and ENV show themselves in battle is a reconstruction — see BattleRules.",
+    "modifications": "Which modifications a weapon carries. Absent — every modification that fits its kind; a list narrows that down, and an empty list means the weapon takes none at all. The original works the same way: Particle Beam takes point defence, Death Ray does not, and the Nova Lance (the original's Stellar Converter) is not modified at all."
+  },
+  "hulls": [
+    {
+      "code": "frigate",
+      "name": { "en": "Frigate", "ru": "Фрегат" },
+      "description": {
+        "en": "The smallest hull: cheap, nimble, hard to hit.",
+        "ru": "Самый малый корпус: дёшев, юрок, попасть по нему трудно."
+      },
+      "space": 30,
+      "cost": 16,
+      "structure": 20,
+      "command": 1,
+      "hit_chance_percent": 20,
+      "system_factor": 1,
+      "sort_order": 1
+    },
+    {
+      "code": "destroyer",
+      "name": { "en": "Destroyer", "ru": "Эсминец" },
+      "description": {
+        "en": "Twice the size of a frigate: there is room for guns at last.",
+        "ru": "Вдвое крупнее фрегата: место под пушки уже есть."
+      },
+      "space": 60,
+      "cost": 42,
+      "structure": 40,
+      "command": 2,
+      "hit_chance_percent": 30,
+      "system_factor": 2,
+      "sort_order": 2
+    },
+    {
+      "code": "cruiser",
+      "name": { "en": "Cruiser", "ru": "Крейсер" },
+      "description": {
+        "en": "The workhorse of a middling fleet: room, armour and firepower at once.",
+        "ru": "Рабочая лошадь среднего флота: место, броня и огонь разом."
+      },
+      "space": 120,
+      "cost": 110,
+      "structure": 80,
+      "command": 3,
+      "hit_chance_percent": 40,
+      "system_factor": 4,
+      "sort_order": 3
+    },
+    {
+      "code": "battleship",
+      "name": { "en": "Battleship", "ru": "Линкор" },
+      "description": {
+        "en": "A heavy hull: it carries everything, but it is seen from afar.",
+        "ru": "Тяжёлый корпус: несёт всё, но виден издалека."
+      },
+      "space": 250,
+      "cost": 280,
+      "structure": 160,
+      "command": 4,
+      "hit_chance_percent": 50,
+      "system_factor": 8,
+      "sort_order": 4
+    },
+    {
+      "code": "titan",
+      "name": { "en": "Titan", "ru": "Титан" },
+      "description": {
+        "en": "A huge hull, requires Titan Construction.",
+        "ru": "Огромный корпус, требует технологии Titan Construction."
+      },
+      "space": 500,
+      "cost": 700,
+      "structure": 320,
+      "command": 5,
+      "hit_chance_percent": 80,
+      "system_factor": 16,
+      "required_tech": "titan-construction",
+      "sort_order": 5
+    },
+    {
+      "code": "doom-star",
+      "name": { "en": "Leviathan", "ru": "Левиафан" },
+      "description": {
+        "en": "A fortress under way: it is always hit, but it withstands a great deal.",
+        "ru": "Крепость на ходу: попадают по ней всегда, но выдержит она многое."
+      },
+      "space": 1200,
+      "cost": 1800,
+      "structure": 640,
+      "command": 6,
+      "hit_chance_percent": 100,
+      "system_factor": 40,
+      "required_tech": "doom-star-construction",
+      "sort_order": 6
+    },
+    {
+      "code": "star-base",
+      "name": { "en": "Star Base", "ru": "Звёздная база" },
+      "description": {
+        "en": "The colony's orbital platform: it neither moves nor flies, but it has more room for weapons than a cruiser — it needs no engine.",
+        "ru": "Орбитальная платформа колонии: не ходит и не летает, зато места под оружие у неё больше, чем у крейсера, — двигателя ей не нужно."
+      },
+      "space": 200,
+      "cost": 0,
+      "structure": 150,
+      "command": 0,
+      "hit_chance_percent": 70,
+      "system_factor": 6,
+      "sort_order": 7,
+      "platform": true
+    },
+    {
+      "code": "battle-station",
+      "name": { "en": "Battle Station", "ru": "Боевая станция" },
+      "description": {
+        "en": "A battle station: twice the room and twice as tough as a star base. It replaces it in orbit.",
+        "ru": "Боевая станция: вдвое больше места и вдвое крепче звёздной базы. Заменяет её на орбите."
+      },
+      "space": 400,
+      "cost": 0,
+      "structure": 350,
+      "command": 0,
+      "hit_chance_percent": 85,
+      "system_factor": 12,
+      "required_tech": "battlestation",
+      "sort_order": 8,
+      "platform": true
+    },
+    {
+      "code": "star-fortress",
+      "name": { "en": "Star Fortress", "ru": "Звёздная крепость" },
+      "description": {
+        "en": "A star fortress: the strongest thing in orbit. It replaces both the base and the station.",
+        "ru": "Звёздная крепость: сильнейшее, что бывает на орбите. Заменяет и базу, и станцию."
+      },
+      "space": 800,
+      "cost": 0,
+      "structure": 700,
+      "command": 0,
+      "hit_chance_percent": 100,
+      "system_factor": 24,
+      "required_tech": "star-fortress",
+      "sort_order": 9,
+      "platform": true
+    },
+    {
+      "code": "planetary-battery",
+      "name": { "en": "Planetary Battery", "ru": "Наземная батарея" },
+      "description": {
+        "en": "The planet's ground defence: missile silos, batteries and fighter hangars fire from the surface. It stands still and does not die with orbit — it has to be suppressed on its own.",
+        "ru": "Наземная оборона планеты: ракетные шахты, батареи и ангары истребителей бьют с поверхности. Стоит на месте и не гибнет вместе с орбитой — её надо подавлять отдельно."
+      },
+      "space": 120,
+      "cost": 0,
+      "structure": 250,
+      "command": 0,
+      "hit_chance_percent": 100,
+      "system_factor": 8,
+      "sort_order": 10,
+      "platform": true
+    },
+    {
+      "code": "planetary-shield",
+      "name": { "en": "Planetary Shield", "ru": "Планетарный щит" },
+      "description": {
+        "en": "A planetary shield: a field around the planet. It opens no fire at all — it holds the fire on itself, and it has to be brought down before troops can land.",
+        "ru": "Планетарный щит: поле вокруг планеты. Огня не открывает вовсе — держит его на себе, и сбить его нужно прежде, чем высаживать десант."
+      },
+      "space": 60,
+      "cost": 0,
+      "structure": 900,
+      "command": 0,
+      "hit_chance_percent": 100,
+      "system_factor": 30,
+      "sort_order": 11,
+      "platform": true,
+      "unarmed": true
+    },
+
+    {
+      "code": "amoeba-body",
+      "name": { "en": "Space Amoeba", "ru": "Космическая амёба" },
+      "description": {
+        "en": "The body of a space amoeba: a soft giant that engulfs whatever it catches.",
+        "ru": "Тело космической амёбы: мягкий исполин, обволакивающий всё, до чего дотянется."
+      },
+      "space": 80,
+      "cost": 0,
+      "structure": 150,
+      "command": 0,
+      "hit_chance_percent": 60,
+      "system_factor": 3,
+      "sort_order": 101,
+      "monster": true
+    },
+    {
+      "code": "crystal-body",
+      "name": { "en": "Space Crystal", "ru": "Космический кристалл" },
+      "description": {
+        "en": "The body of a space crystal: slow, but its facets shrug off a hit.",
+        "ru": "Тело космического кристалла: медлителен, но грани его держат удар."
+      },
+      "space": 90,
+      "cost": 0,
+      "structure": 300,
+      "command": 0,
+      "hit_chance_percent": 70,
+      "system_factor": 4,
+      "sort_order": 102,
+      "monster": true
+    },
+    {
+      "code": "eel-body",
+      "name": { "en": "Space Eel", "ru": "Космический угорь" },
+      "description": {
+        "en": "The body of a space eel: fast and hard to hit for its size.",
+        "ru": "Тело космического угря: быстр и для своего размера увёртлив."
+      },
+      "space": 110,
+      "cost": 0,
+      "structure": 380,
+      "command": 0,
+      "hit_chance_percent": 45,
+      "system_factor": 4,
+      "sort_order": 103,
+      "monster": true
+    },
+    {
+      "code": "hydra-body",
+      "name": { "en": "Hydra", "ru": "Гидра" },
+      "description": {
+        "en": "The body of a hydra: every head strikes on its own.",
+        "ru": "Тело гидры: каждая голова бьёт сама по себе."
+      },
+      "space": 150,
+      "cost": 0,
+      "structure": 560,
+      "command": 0,
+      "hit_chance_percent": 75,
+      "system_factor": 5,
+      "sort_order": 104,
+      "monster": true
+    },
+    {
+      "code": "dragon-body",
+      "name": { "en": "Space Dragon", "ru": "Космический дракон" },
+      "description": {
+        "en": "The body of a space dragon: scales no young empire's guns will open.",
+        "ru": "Тело космического дракона: чешуя, которую пушкам молодой империи не вскрыть."
+      },
+      "space": 200,
+      "cost": 0,
+      "structure": 900,
+      "command": 0,
+      "hit_chance_percent": 80,
+      "system_factor": 6,
+      "sort_order": 105,
+      "monster": true
+    },
+    {
+      "code": "guardian-body",
+      "name": { "en": "Guardian", "ru": "Страж" },
+      "description": {
+        "en": "The body of the Guardian: the mightiest creature of the galaxy, and it moves from its star for nothing.",
+        "ru": "Тело Стража: сильнейшее существо галактики, и со своей звезды оно не сходит ни для чего."
+      },
+      "space": 400,
+      "cost": 0,
+      "structure": 1600,
+      "command": 0,
+      "hit_chance_percent": 90,
+      "system_factor": 8,
+      "sort_order": 106,
+      "monster": true
+    }
+  ],
+  "components": [
+    {
+      "code": "nuclear-drive",
+      "name": { "en": "Nuclear Drive", "ru": "Ядерный двигатель" },
+      "description": {
+        "en": "The simplest engine, the empire has it from the first turn.",
+        "ru": "Простейший двигатель, есть у империи с первого хода."
+      },
+      "slot": "ENGINE",
+      "space": 4,
+      "cost": 12,
+      "effects": [
+        {
+          "type": "SPEED",
+          "amount": 2
+        },
+        {
+          "type": "COMBAT_SPEED",
+          "amount": 12
+        }
+      ],
+      "sort_order": 1
+    },
+    {
+      "code": "fusion-drive",
+      "name": { "en": "Fusion Drive", "ru": "Термоядерный двигатель" },
+      "description": {
+        "en": "A fusion engine: faster than the nuclear one.",
+        "ru": "Термоядерный двигатель: быстрее ядерного."
+      },
+      "slot": "ENGINE",
+      "space": 4,
+      "cost": 18,
+      "required_tech": "fusion-drive",
+      "effects": [
+        {
+          "type": "SPEED",
+          "amount": 3
+        },
+        {
+          "type": "COMBAT_SPEED",
+          "amount": 16
+        }
+      ],
+      "sort_order": 2
+    },
+    {
+      "code": "ion-drive",
+      "name": { "en": "Ion Drive", "ru": "Ионный двигатель" },
+      "description": { "en": "An ion engine.", "ru": "Ионный двигатель." },
+      "slot": "ENGINE",
+      "space": 4,
+      "cost": 26,
+      "required_tech": "ion-drive",
+      "effects": [
+        {
+          "type": "SPEED",
+          "amount": 4
+        },
+        {
+          "type": "COMBAT_SPEED",
+          "amount": 20
+        }
+      ],
+      "sort_order": 3
+    },
+    {
+      "code": "anti-matter-drive",
+      "name": { "en": "Anti-Matter Drive", "ru": "Аннигиляционный двигатель" },
+      "description": { "en": "An anti-matter engine.", "ru": "Аннигиляционный двигатель." },
+      "slot": "ENGINE",
+      "space": 4,
+      "cost": 36,
+      "required_tech": "anti-matter-drive",
+      "effects": [
+        {
+          "type": "SPEED",
+          "amount": 5
+        },
+        {
+          "type": "COMBAT_SPEED",
+          "amount": 24
+        }
+      ],
+      "sort_order": 4
+    },
+    {
+      "code": "hyper-drive",
+      "name": { "en": "Hyper Drive", "ru": "Гипердвигатель" },
+      "description": { "en": "A hyper drive.", "ru": "Гипердвигатель." },
+      "slot": "ENGINE",
+      "space": 4,
+      "cost": 48,
+      "required_tech": "hyper-drive",
+      "effects": [
+        {
+          "type": "SPEED",
+          "amount": 6
+        },
+        {
+          "type": "COMBAT_SPEED",
+          "amount": 28
+        }
+      ],
+      "sort_order": 5
+    },
+    {
+      "code": "interphased-drive",
+      "name": { "en": "Interphased Drive", "ru": "Интерфазный двигатель" },
+      "description": {
+        "en": "An interphased drive, the fastest in the game.",
+        "ru": "Интерфазный двигатель, быстрейший в игре."
+      },
+      "slot": "ENGINE",
+      "space": 4,
+      "cost": 64,
+      "required_tech": "interphased-drive",
+      "effects": [
+        {
+          "type": "SPEED",
+          "amount": 7
+        },
+        {
+          "type": "COMBAT_SPEED",
+          "amount": 32
+        }
+      ],
+      "sort_order": 6
+    },
+    {
+      "code": "titanium-armor",
+      "name": { "en": "Titanium Armor", "ru": "Титановая обшивка" },
+      "description": {
+        "en": "Titanium plating, known from the first turn.",
+        "ru": "Титановая обшивка, известна с первого хода."
+      },
+      "slot": "ARMOR",
+      "space": 3,
+      "cost": 3,
+      "effects": [
+        {
+          "type": "ARMOUR",
+          "amount": 4
+        }
+      ],
+      "sort_order": 10
+    },
+    {
+      "code": "tritanium-armor",
+      "name": { "en": "Duranite Armor", "ru": "Дуранитовая броня" },
+      "description": { "en": "Duranite armour.", "ru": "Дуранитовая броня." },
+      "slot": "ARMOR",
+      "space": 3,
+      "cost": 6,
+      "required_tech": "tritanium-armor",
+      "effects": [
+        {
+          "type": "ARMOUR",
+          "amount": 8
+        }
+      ],
+      "sort_order": 11
+    },
+    {
+      "code": "zortrium-armor",
+      "name": { "en": "Korrium Armor", "ru": "Корриевая броня" },
+      "description": { "en": "Korrium armour.", "ru": "Корриевая броня." },
+      "slot": "ARMOR",
+      "space": 3,
+      "cost": 10,
+      "required_tech": "zortrium-armor",
+      "effects": [
+        {
+          "type": "ARMOUR",
+          "amount": 12
+        }
+      ],
+      "sort_order": 12
+    },
+    {
+      "code": "neutronium-armor",
+      "name": { "en": "Neutronium Armor", "ru": "Нейтрониевая броня" },
+      "description": { "en": "Neutronium armour.", "ru": "Нейтрониевая броня." },
+      "slot": "ARMOR",
+      "space": 3,
+      "cost": 16,
+      "required_tech": "neutronium-armor",
+      "effects": [
+        {
+          "type": "ARMOUR",
+          "amount": 16
+        }
+      ],
+      "sort_order": 13
+    },
+    {
+      "code": "adamantium-armor",
+      "name": { "en": "Adamant Armor", "ru": "Адамантовая броня" },
+      "description": {
+        "en": "Adamant armour, the toughest there is.",
+        "ru": "Адамантовая броня, прочнейшая."
+      },
+      "slot": "ARMOR",
+      "space": 3,
+      "cost": 24,
+      "required_tech": "adamantium-armor",
+      "effects": [
+        {
+          "type": "ARMOUR",
+          "amount": 24
+        }
+      ],
+      "sort_order": 14
+    },
+    {
+      "code": "class-i-shield",
+      "name": { "en": "Class I Shield", "ru": "Щит I класса" },
+      "description": { "en": "A class I shield.", "ru": "Щит первого класса." },
+      "slot": "SHIELD",
+      "space": 5,
+      "cost": 10,
+      "required_tech": "class-i-shield",
+      "effects": [
+        {
+          "type": "SHIELD",
+          "amount": 2
+        }
+      ],
+      "sort_order": 20
+    },
+    {
+      "code": "class-iii-shield",
+      "name": { "en": "Class III Shield", "ru": "Щит III класса" },
+      "description": { "en": "A class III shield.", "ru": "Щит третьего класса." },
+      "slot": "SHIELD",
+      "space": 5,
+      "cost": 20,
+      "required_tech": "class-iii-shield",
+      "effects": [
+        {
+          "type": "SHIELD",
+          "amount": 6
+        }
+      ],
+      "sort_order": 21
+    },
+    {
+      "code": "class-v-shield",
+      "name": { "en": "Class V Shield", "ru": "Щит V класса" },
+      "description": { "en": "A class V shield.", "ru": "Щит пятого класса." },
+      "slot": "SHIELD",
+      "space": 5,
+      "cost": 32,
+      "required_tech": "class-v-shields",
+      "effects": [
+        {
+          "type": "SHIELD",
+          "amount": 10
+        }
+      ],
+      "sort_order": 22
+    },
+    {
+      "code": "class-vii-shield",
+      "name": { "en": "Class VII Shield", "ru": "Щит VII класса" },
+      "description": { "en": "A class VII shield.", "ru": "Щит седьмого класса." },
+      "slot": "SHIELD",
+      "space": 5,
+      "cost": 48,
+      "required_tech": "class-vii-shield",
+      "effects": [
+        {
+          "type": "SHIELD",
+          "amount": 14
+        }
+      ],
+      "sort_order": 23
+    },
+    {
+      "code": "class-x-shield",
+      "name": { "en": "Class X Shield", "ru": "Щит X класса" },
+      "description": {
+        "en": "A class X shield, the best in the game.",
+        "ru": "Щит десятого класса, лучший в игре."
+      },
+      "slot": "SHIELD",
+      "space": 5,
+      "cost": 70,
+      "required_tech": "class-x-shield",
+      "effects": [
+        {
+          "type": "SHIELD",
+          "amount": 20
+        }
+      ],
+      "sort_order": 24
+    },
+    {
+      "code": "electronic-computer",
+      "name": { "en": "Electronic Computer", "ru": "Электронный компьютер" },
+      "description": { "en": "A simple targeting computer.", "ru": "Простой прицельный компьютер." },
+      "slot": "COMPUTER",
+      "space": 2,
+      "cost": 6,
+      "required_tech": "electronic-computer",
+      "effects": [
+        {
+          "type": "ATTACK_PERCENT",
+          "amount": 25
+        }
+      ],
+      "sort_order": 30
+    },
+    {
+      "code": "optronic-computer",
+      "name": { "en": "Optronic Computer", "ru": "Оптронный компьютер" },
+      "description": { "en": "An optronic computer.", "ru": "Оптронный компьютер." },
+      "slot": "COMPUTER",
+      "space": 2,
+      "cost": 12,
+      "required_tech": "optronic-computer",
+      "effects": [
+        {
+          "type": "ATTACK_PERCENT",
+          "amount": 50
+        }
+      ],
+      "sort_order": 31
+    },
+    {
+      "code": "positronic-computer",
+      "name": { "en": "Positronic Computer", "ru": "Позитронный компьютер" },
+      "description": { "en": "A positronic computer.", "ru": "Позитронный компьютер." },
+      "slot": "COMPUTER",
+      "space": 2,
+      "cost": 20,
+      "required_tech": "positronic-computer",
+      "effects": [
+        {
+          "type": "ATTACK_PERCENT",
+          "amount": 75
+        }
+      ],
+      "sort_order": 32
+    },
+    {
+      "code": "cybertronic-computer",
+      "name": { "en": "Neurotronic Computer", "ru": "Нейротронный компьютер" },
+      "description": { "en": "A neurotronic computer.", "ru": "Нейротронный компьютер." },
+      "slot": "COMPUTER",
+      "space": 2,
+      "cost": 30,
+      "required_tech": "cybertronic-computer",
+      "effects": [
+        {
+          "type": "ATTACK_PERCENT",
+          "amount": 100
+        }
+      ],
+      "sort_order": 33
+    },
+    {
+      "code": "moleculartronic-computer",
+      "name": { "en": "Moleculartronic Computer", "ru": "Молекулярный компьютер" },
+      "description": {
+        "en": "A moleculartronic computer, the finest sight there is.",
+        "ru": "Молекулярный компьютер, лучший прицел."
+      },
+      "slot": "COMPUTER",
+      "space": 2,
+      "cost": 45,
+      "required_tech": "moleculartronic-computer",
+      "effects": [
+        {
+          "type": "ATTACK_PERCENT",
+          "amount": 125
+        }
+      ],
+      "sort_order": 34
+    },
+    {
+      "code": "ecm-jammer",
+      "name": { "en": "ECM Jammer", "ru": "Постановщик помех" },
+      "description": {
+        "en": "It throws the guidance of enemy missiles off: they miss far more often. Beams and projectiles are unaffected — jamming means nothing to them.",
+        "ru": "Сбивает наведение чужих ракет: они промахиваются куда чаще. На лучи и снаряды не действует — им помехи не указ."
+      },
+      "slot": "ECM",
+      "space": 2,
+      "cost": 8,
+      "required_tech": "ecm-jammer",
+      "effects": [
+        {
+          "type": "MISSILE_EVASION",
+          "amount": 70
+        }
+      ],
+      "sort_order": 40
+    },
+    {
+      "code": "multi-wave-ecm-jammer",
+      "name": { "en": "Multi-Wave ECM Jammer", "ru": "Многоволновой постановщик помех" },
+      "description": { "en": "A multi-wave jammer.", "ru": "Многоволновой постановщик помех." },
+      "slot": "ECM",
+      "space": 2,
+      "cost": 16,
+      "required_tech": "multi-wave-ecm-jammer",
+      "effects": [
+        {
+          "type": "DEFENSE",
+          "amount": 30
+        }
+      ],
+      "sort_order": 41
+    },
+    {
+      "code": "wide-area-jammer",
+      "name": { "en": "Wide Area Jammer", "ru": "Широкополосный постановщик помех" },
+      "description": { "en": "A wide area jammer.", "ru": "Широкополосный постановщик помех." },
+      "slot": "ECM",
+      "space": 2,
+      "cost": 28,
+      "required_tech": "wide-area-jammer",
+      "effects": [
+        {
+          "type": "DEFENSE",
+          "amount": 45
+        }
+      ],
+      "sort_order": 42
+    },
+    {
+      "_note": "РАЗМЕР ОРУЖИЯ — ОРИГИНАЛА (п. 8): у лучей со снарядами база 10 клеток, и гнездо НЕ растёт вместе с корпусом. Источник — разбор оригинала («Most beam weapons have a base size requirement of 10») и снимок окна дизайна docs/moo2/ship-design.png: линкор на 250 клеток несёт десять ракетных гнёзд по 21 клетке с тремя модификациями, то есть гнездо стоит около восьми клеток на любом корпусе. Размеры ракет и торпед оригинал не публиковал: ядерная (10) сверена со снимком, лестница над ней — реконструкция. УРОН ТОЖЕ ОРИГИНАЛА (StrategyWiki, разделы дерева): у оружия с разбросом взята верхняя граница (лазер 1-4, плазма 6-30), потому что наш бой разыгрывает попадание, но не силу удара; выстрел в залпе ОДИН, больше даёт только модификация (AF втрое, MIRV вчетверо); а плазменная пушка и Копьё новы обволакивают цель сами собой («naturally enveloping»), и это признак envelops, а не лишние выстрелы.",
+      "code": "mass-driver",
+      "name": { "en": "Mass Driver", "ru": "Масс-драйвер" },
+      "description": {
+        "en": "A kinetic gun: the empire has it from the first turn, as in MOO II.",
+        "ru": "Кинетическая пушка: есть у империи с первого хода, как в MOO II."
+      },
+      "slot": "WEAPON",
+      "space": 10,
+      "cost": 4,
+      "weapon_kind": "PROJECTILE",
+      "effects": [
+        {
+          "type": "WEAPON_DAMAGE",
+          "amount": 6
+        },
+        {
+          "type": "WEAPON_SHOTS",
+          "amount": 1
+        }
+      ],
+      "sort_order": 50
+    },
+    {
+      "code": "laser-cannon",
+      "name": { "en": "Laser Cannon", "ru": "Лазерная пушка" },
+      "description": { "en": "A laser cannon.", "ru": "Лазерная пушка." },
+      "slot": "WEAPON",
+      "space": 10,
+      "cost": 3,
+      "weapon_kind": "BEAM",
+      "required_tech": "laser-cannon",
+      "effects": [
+        {
+          "type": "WEAPON_DAMAGE",
+          "amount": 4
+        },
+        {
+          "type": "WEAPON_SHOTS",
+          "amount": 1
+        }
+      ],
+      "sort_order": 51
+    },
+    {
+      "code": "fusion-beam",
+      "name": { "en": "Fusion Beam", "ru": "Термоядерный луч" },
+      "description": { "en": "A fusion beam.", "ru": "Термоядерный луч." },
+      "slot": "WEAPON",
+      "space": 10,
+      "cost": 12,
+      "weapon_kind": "BEAM",
+      "required_tech": "fusion-beam",
+      "effects": [
+        {
+          "type": "WEAPON_DAMAGE",
+          "amount": 6
+        },
+        {
+          "type": "WEAPON_SHOTS",
+          "amount": 1
+        }
+      ],
+      "sort_order": 52
+    },
+    {
+      "code": "ion-pulse-cannon",
+      "name": { "en": "Ion Pulse Cannon", "ru": "Ионная импульсная пушка" },
+      "description": { "en": "An ion pulse cannon.", "ru": "Ионная импульсная пушка." },
+      "slot": "WEAPON",
+      "space": 20,
+      "cost": 16,
+      "weapon_kind": "BEAM",
+      "required_tech": "ion-pulse-cannon",
+      "effects": [
+        {
+          "type": "WEAPON_DAMAGE",
+          "amount": 10
+        },
+        {
+          "type": "WEAPON_SHOTS",
+          "amount": 1
+        }
+      ],
+      "sort_order": 53
+    },
+    {
+      "code": "neutron-blaster",
+      "name": { "en": "Neutron Blaster", "ru": "Нейтронный бластер" },
+      "description": { "en": "A neutron blaster.", "ru": "Нейтронный бластер." },
+      "slot": "WEAPON",
+      "space": 10,
+      "cost": 20,
+      "weapon_kind": "BEAM",
+      "required_tech": "neutron-blaster",
+      "effects": [
+        {
+          "type": "WEAPON_DAMAGE",
+          "amount": 12
+        },
+        {
+          "type": "WEAPON_SHOTS",
+          "amount": 1
+        }
+      ],
+      "sort_order": 54
+    },
+    {
+      "code": "gauss-cannon",
+      "name": { "en": "Gauss Cannon", "ru": "Гаусс-пушка" },
+      "description": { "en": "A gauss cannon.", "ru": "Гаусс-пушка." },
+      "slot": "WEAPON",
+      "space": 10,
+      "cost": 24,
+      "weapon_kind": "PROJECTILE",
+      "required_tech": "gauss-cannon",
+      "effects": [
+        {
+          "type": "WEAPON_DAMAGE",
+          "amount": 18
+        },
+        {
+          "type": "WEAPON_SHOTS",
+          "amount": 1
+        }
+      ],
+      "sort_order": 55
+    },
+    {
+      "code": "graviton-beam",
+      "name": { "en": "Graviton Beam", "ru": "Гравитонный луч" },
+      "description": { "en": "A graviton beam.", "ru": "Гравитонный луч." },
+      "slot": "WEAPON",
+      "space": 15,
+      "cost": 28,
+      "weapon_kind": "BEAM",
+      "required_tech": "graviton-beam",
+      "effects": [
+        {
+          "type": "WEAPON_DAMAGE",
+          "amount": 15
+        },
+        {
+          "type": "WEAPON_SHOTS",
+          "amount": 1
+        }
+      ],
+      "sort_order": 56
+    },
+    {
+      "code": "phasor",
+      "name": { "en": "Resonator Cannon", "ru": "Резонаторная пушка" },
+      "description": { "en": "A resonator cannon.", "ru": "Резонаторная пушка." },
+      "slot": "WEAPON",
+      "space": 10,
+      "cost": 36,
+      "weapon_kind": "BEAM",
+      "required_tech": "phasors",
+      "effects": [
+        {
+          "type": "WEAPON_DAMAGE",
+          "amount": 20
+        },
+        {
+          "type": "WEAPON_SHOTS",
+          "amount": 1
+        }
+      ],
+      "sort_order": 57
+    },
+    {
+      "code": "plasma-cannon",
+      "name": { "en": "Plasma Cannon", "ru": "Плазменная пушка" },
+      "description": { "en": "A plasma cannon: its blow envelops the target from all four sides at once.", "ru": "Плазменная пушка: её удар охватывает цель со всех четырёх сторон разом." },
+      "slot": "WEAPON",
+      "envelops": true,
+      "space": 10,
+      "cost": 52,
+      "weapon_kind": "BEAM",
+      "required_tech": "plasma-cannon",
+      "effects": [
+        {
+          "type": "WEAPON_DAMAGE",
+          "amount": 30
+        },
+        {
+          "type": "WEAPON_SHOTS",
+          "amount": 1
+        }
+      ],
+      "sort_order": 58,
+      "modifications": [
+        "heavy-mount",
+        "armor-piercing",
+        "shield-piercing",
+        "continuous",
+        "no-range-penalty",
+        "auto-fire"
+      ]
+    },
+    {
+      "code": "disruptor-cannon",
+      "name": { "en": "Disruptor Cannon", "ru": "Дисраптор" },
+      "description": { "en": "A disruptor cannon.", "ru": "Дисраптор." },
+      "slot": "WEAPON",
+      "space": 20,
+      "cost": 70,
+      "weapon_kind": "BEAM",
+      "required_tech": "disruptor-cannon",
+      "effects": [
+        {
+          "type": "WEAPON_DAMAGE",
+          "amount": 40
+        },
+        {
+          "type": "WEAPON_SHOTS",
+          "amount": 1
+        }
+      ],
+      "sort_order": 59,
+      "modifications": [
+        "heavy-mount",
+        "armor-piercing",
+        "shield-piercing",
+        "continuous",
+        "no-range-penalty",
+        "auto-fire",
+        "enveloping"
+      ]
+    },
+    {
+      "code": "mauler-device",
+      "name": { "en": "Pulverizer", "ru": "Дробитель" },
+      "description": {
+        "en": "A pulverizer: it always hits, but it is dear and bulky.",
+        "ru": "Дробитель: бьёт всегда, но дорог и громоздок."
+      },
+      "slot": "WEAPON",
+      "space": 50,
+      "cost": 110,
+      "weapon_kind": "BEAM",
+      "required_tech": "mauler-device",
+      "effects": [
+        {
+          "type": "WEAPON_DAMAGE",
+          "amount": 100
+        },
+        {
+          "type": "WEAPON_SHOTS",
+          "amount": 1
+        }
+      ],
+      "sort_order": 60,
+      "modifications": [
+        "heavy-mount",
+        "armor-piercing",
+        "shield-piercing",
+        "continuous",
+        "no-range-penalty",
+        "auto-fire",
+        "enveloping"
+      ]
+    },
+    {
+      "code": "stellar-converter",
+      "name": { "en": "Nova Lance", "ru": "Копьё новы" },
+      "description": {
+        "en": "A nova lance, the heaviest gun in the game: its blow envelops the target from all four sides at once.",
+        "ru": "Копьё новы, тяжелейшее орудие игры: его удар охватывает цель со всех четырёх сторон разом."
+      },
+      "slot": "WEAPON",
+      "envelops": true,
+      "space": 50,
+      "cost": 200,
+      "weapon_kind": "BEAM",
+      "required_tech": "stellar-converter",
+      "effects": [
+        {
+          "type": "WEAPON_DAMAGE",
+          "amount": 400
+        },
+        {
+          "type": "WEAPON_SHOTS",
+          "amount": 1
+        }
+      ],
+      "sort_order": 61,
+      "modifications": []
+    },
+    {
+      "code": "nuclear-missile",
+      "name": { "en": "Nuclear Missile", "ru": "Ядерная ракета" },
+      "description": { "en": "A nuclear missile.", "ru": "Ядерная ракета." },
+      "slot": "WEAPON",
+      "space": 10,
+      "cost": 6,
+      "weapon_kind": "MISSILE",
+      "required_tech": "nuclear-missile",
+      "effects": [
+        {
+          "type": "WEAPON_DAMAGE",
+          "amount": 8
+        },
+        {
+          "type": "WEAPON_SHOTS",
+          "amount": 1
+        }
+      ],
+      "sort_order": 70
+    },
+    {
+      "code": "merculite-missile",
+      "name": { "en": "Vulcanite Missile", "ru": "Вулканитовая ракета" },
+      "description": { "en": "A vulcanite missile.", "ru": "Вулканитовая ракета." },
+      "slot": "WEAPON",
+      "space": 15,
+      "cost": 14,
+      "weapon_kind": "MISSILE",
+      "required_tech": "merculite-missile",
+      "effects": [
+        {
+          "type": "WEAPON_DAMAGE",
+          "amount": 14
+        },
+        {
+          "type": "WEAPON_SHOTS",
+          "amount": 1
+        }
+      ],
+      "sort_order": 71
+    },
+    {
+      "code": "pulson-missile",
+      "name": { "en": "Pulsewave Missile", "ru": "Пульсовая ракета" },
+      "description": { "en": "A pulsewave missile.", "ru": "Пульсовая ракета." },
+      "slot": "WEAPON",
+      "space": 20,
+      "cost": 24,
+      "weapon_kind": "MISSILE",
+      "required_tech": "pulson-missile",
+      "effects": [
+        {
+          "type": "WEAPON_DAMAGE",
+          "amount": 20
+        },
+        {
+          "type": "WEAPON_SHOTS",
+          "amount": 1
+        }
+      ],
+      "sort_order": 72
+    },
+    {
+      "code": "zeon-missile",
+      "name": { "en": "Aeon Missile", "ru": "Эоновая ракета" },
+      "description": { "en": "An aeon missile.", "ru": "Эоновая ракета." },
+      "slot": "WEAPON",
+      "space": 25,
+      "cost": 40,
+      "weapon_kind": "MISSILE",
+      "required_tech": "zeon-missile",
+      "effects": [
+        {
+          "type": "WEAPON_DAMAGE",
+          "amount": 30
+        },
+        {
+          "type": "WEAPON_SHOTS",
+          "amount": 1
+        }
+      ],
+      "sort_order": 73
+    },
+    {
+      "code": "anti-matter-torpedoes",
+      "name": { "en": "Anti-Matter Torpedoes", "ru": "Аннигиляционные торпеды" },
+      "description": { "en": "Anti-matter torpedoes.", "ru": "Аннигиляционные торпеды." },
+      "slot": "WEAPON",
+      "space": 40,
+      "cost": 60,
+      "weapon_kind": "MISSILE",
+      "required_tech": "anti-matter-torpedoes",
+      "effects": [
+        {
+          "type": "WEAPON_DAMAGE",
+          "amount": 25
+        },
+        {
+          "type": "WEAPON_SHOTS",
+          "amount": 1
+        }
+      ],
+      "sort_order": 80
+    },
+    {
+      "code": "proton-torpedo",
+      "name": { "en": "Proton Torpedo", "ru": "Протонные торпеды" },
+      "description": { "en": "Proton torpedoes.", "ru": "Протонные торпеды." },
+      "slot": "WEAPON",
+      "space": 50,
+      "cost": 80,
+      "weapon_kind": "MISSILE",
+      "required_tech": "proton-torpedo",
+      "effects": [
+        {
+          "type": "WEAPON_DAMAGE",
+          "amount": 40
+        },
+        {
+          "type": "WEAPON_SHOTS",
+          "amount": 1
+        }
+      ],
+      "sort_order": 81
+    },
+    {
+      "code": "plasma-torpedo",
+      "name": { "en": "Plasma Torpedo", "ru": "Плазменные торпеды" },
+      "description": { "en": "Plasma torpedoes.", "ru": "Плазменные торпеды." },
+      "slot": "WEAPON",
+      "space": 60,
+      "cost": 120,
+      "weapon_kind": "MISSILE",
+      "required_tech": "plasma-torpedo",
+      "effects": [
+        {
+          "type": "WEAPON_DAMAGE",
+          "amount": 120
+        },
+        {
+          "type": "WEAPON_SHOTS",
+          "amount": 1
+        }
+      ],
+      "sort_order": 82
+    },
+    {
+      "code": "battle-pods",
+      "name": { "en": "Battle Pods", "ru": "Боевые отсеки" },
+      "description": {
+        "en": "Battle pods: half again as much useful room in the hull.",
+        "ru": "Боевые отсеки: полезного места в корпусе становится в полтора раза больше."
+      },
+      "slot": "SPECIAL",
+      "space": 2,
+      "cost": 10,
+      "required_tech": "battle-pods",
+      "effects": [
+        {
+          "type": "SPACE_PERCENT",
+          "amount": 50
+        }
+      ],
+      "sort_order": 90
+    },
+    {
+      "code": "reinforced-hull",
+      "name": { "en": "Reinforced Hull", "ru": "Усиленный корпус" },
+      "description": {
+        "en": "A reinforced hull: half again as much structure.",
+        "ru": "Усиленный корпус: прочность выше наполовину."
+      },
+      "slot": "SPECIAL",
+      "space": 3,
+      "cost": 8,
+      "required_tech": "reinforced-hull",
+      "effects": [
+        {
+          "type": "STRUCTURE_PERCENT",
+          "amount": 50
+        }
+      ],
+      "sort_order": 91
+    },
+    {
+      "code": "heavy-armor",
+      "name": { "en": "Heavy Armor", "ru": "Тяжёлая броня" },
+      "description": {
+        "en": "Heavy armour: doubles the ship's armour points.",
+        "ru": "Тяжёлая броня: удваивает броневые очки корабля."
+      },
+      "slot": "SPECIAL",
+      "space": 3,
+      "cost": 12,
+      "required_tech": "heavy-armor",
+      "effects": [
+        {
+          "type": "ARMOUR_PERCENT",
+          "amount": 100
+        }
+      ],
+      "sort_order": 92
+    },
+    {
+      "code": "augmented-engines",
+      "name": { "en": "Augmented Engines", "ru": "Форсированные двигатели" },
+      "description": {
+        "en": "The engine runs overloaded: the ship is five cells faster in battle and one parsec farther between the stars.",
+        "ru": "Двигатель работает с перегрузкой: корабль и в бою быстрее на пять клеток, и между звёздами на парсек."
+      },
+      "slot": "SPECIAL",
+      "space": 2,
+      "cost": 10,
+      "required_tech": "augmented-engines",
+      "effects": [
+        {
+          "type": "SPEED",
+          "amount": 1
+        },
+        {
+          "type": "COMBAT_SPEED",
+          "amount": 5
+        }
+      ],
+      "sort_order": 93
+    },
+    {
+      "code": "inertial-stabilizer",
+      "name": { "en": "Inertial Stabilizer", "ru": "Инерционный стабилизатор" },
+      "description": {
+        "en": "An inertial stabilizer: dodging fire comes easier.",
+        "ru": "Инерционный стабилизатор: уходить от огня легче."
+      },
+      "slot": "SPECIAL",
+      "space": 3,
+      "cost": 20,
+      "required_tech": "inertial-stabilizer",
+      "effects": [
+        {
+          "type": "DEFENSE",
+          "amount": 20
+        }
+      ],
+      "sort_order": 94
+    },
+    {
+      "code": "battle-scanner",
+      "name": { "en": "Battle Scanner", "ru": "Боевой сканер" },
+      "description": {
+        "en": "A battle scanner: the volley is more accurate.",
+        "ru": "Боевой сканер: залп точнее."
+      },
+      "slot": "SPECIAL",
+      "space": 2,
+      "cost": 12,
+      "required_tech": "battle-scanner",
+      "effects": [
+        {
+          "type": "ATTACK_PERCENT",
+          "amount": 15
+        }
+      ],
+      "sort_order": 95
+    },
+    {
+      "code": "structural-analyzer",
+      "name": { "en": "Structural Analyzer", "ru": "Структурный анализатор" },
+      "description": {
+        "en": "A structural analyzer: it strikes at the weak spots.",
+        "ru": "Структурный анализатор: бьёт по слабым местам."
+      },
+      "slot": "SPECIAL",
+      "space": 3,
+      "cost": 24,
+      "required_tech": "structural-analyzer",
+      "effects": [
+        {
+          "type": "ATTACK_PERCENT",
+          "amount": 25
+        }
+      ],
+      "sort_order": 96
+    },
+    {
+      "code": "troop-pods",
+      "name": { "en": "Troop Pods", "ru": "Десантные отсеки" },
+      "description": {
+        "en": "Troop pods: the ship carries marines — s. 12.",
+        "ru": "Десантные отсеки: корабль везёт морскую пехоту — п. 12."
+      },
+      "slot": "SPECIAL",
+      "space": 2,
+      "cost": 6,
+      "required_tech": "troop-pods",
+      "effects": [
+        {
+          "type": "TROOPS",
+          "amount": 2
+        }
+      ],
+      "sort_order": 97
+    },
+
+    {
+      "code": "monster-claws",
+      "name": { "en": "Claws and Teeth", "ru": "Когти и зубы" },
+      "description": {
+        "en": "What a space monster strikes with. It is no gun: the creature carries as many of these as its strength deserves — s. 11.1.",
+        "ru": "То, чем бьёт космическое чудище. Это не пушка: несёт их существо столько, сколько заслуживает его сила — п. 11.1."
+      },
+      "slot": "WEAPON",
+      "space": 6,
+      "cost": 0,
+      "weapon_kind": "PROJECTILE",
+      "modifications": [],
+      "effects": [
+        { "type": "WEAPON_DAMAGE", "amount": 25 },
+        { "type": "WEAPON_SHOTS", "amount": 1 }
+      ],
+      "sort_order": 110,
+      "monster": true
+    },
+    {
+      "code": "monster-hide",
+      "name": { "en": "Hide and Scales", "ru": "Шкура и чешуя" },
+      "description": {
+        "en": "A space monster's own armour: it grew that way, and no technology makes it better — s. 11.1.",
+        "ru": "Собственная броня космического чудища: оно таким выросло, и никакая технология её не улучшит — п. 11.1."
+      },
+      "slot": "ARMOR",
+      "space": 4,
+      "cost": 0,
+      "effects": [
+        { "type": "ARMOUR", "amount": 12 }
+      ],
+      "sort_order": 111,
+      "monster": true
+    },
+    {
+      "code": "monster-fins",
+      "name": { "en": "Fins and Flippers", "ru": "Плавники и ласты" },
+      "description": {
+        "en": "How a space monster moves about the battlefield. Between stars it does not travel at all: a monster guards its own system and leaves it for nothing — s. 11.1.",
+        "ru": "Чем космическое чудище движется по полю боя. Между звёздами оно не ходит вовсе: чудище сторожит свою систему и не покидает её ни для чего — п. 11.1."
+      },
+      "slot": "ENGINE",
+      "space": 4,
+      "cost": 0,
+      "effects": [
+        { "type": "COMBAT_SPEED", "amount": 14 }
+      ],
+      "sort_order": 112,
+      "monster": true
+    }
+  ],
+  "weapon_modifications": [
+    {
+      "code": "heavy-mount",
+      "name": { "en": "Heavy Mount (HV)", "ru": "Тяжёлое орудие (HV)" },
+      "description": {
+        "en": "The mount is half again as strong and reaches twice as far; cost and space double. Such a gun does not fire at missiles: it is far too slow to turn.",
+        "ru": "Установка мощнее наполовину и бьёт вдвое дальше; цена и место — вдвое больше. По ракетам такое орудие не стреляет: оно слишком неповоротливо."
+      },
+      "applies_to": [
+        "BEAM",
+        "PROJECTILE"
+      ],
+      "damage_percent": 50,
+      "attack_percent": 0,
+      "shots_percent": 0,
+      "range_percent": 100,
+      "cost_percent": 100,
+      "space_percent": 100,
+      "pierces_armour": false,
+      "pierces_shield": false,
+      "envelops": false,
+      "no_range_penalty": false,
+      "halves_evasion": false,
+      "missile_armour_percent": 0,
+      "missile_speed": 0,
+      "hits_engine": false,
+      "required_tech": null
+    },
+    {
+      "code": "point-defense",
+      "name": { "en": "Point Defense (PD)", "ru": "Ближняя оборона (PD)" },
+      "description": {
+        "en": "Half the cost and half the space, but also half the range and half the power. In return it hits a quarter more often and meets enemy missiles on approach by itself.",
+        "ru": "Вдвое дешевле и компактнее, но и дальность с мощностью вдвое меньше. Зато бьёт на четверть метче и сама встречает чужие ракеты на подлёте."
+      },
+      "applies_to": [
+        "BEAM",
+        "PROJECTILE"
+      ],
+      "damage_percent": -50,
+      "attack_percent": 25,
+      "shots_percent": 0,
+      "range_percent": -50,
+      "cost_percent": -50,
+      "space_percent": -50,
+      "pierces_armour": false,
+      "pierces_shield": false,
+      "envelops": false,
+      "no_range_penalty": false,
+      "halves_evasion": false,
+      "missile_armour_percent": 0,
+      "missile_speed": 0,
+      "hits_engine": false,
+      "required_tech": null
+    },
+    {
+      "code": "armor-piercing",
+      "name": { "en": "Armor Piercing (AP)", "ru": "Бронебойное (AP)" },
+      "description": {
+        "en": "The fire goes clean through armour of any kind and strikes the hull itself. Cost and space grow by half.",
+        "ru": "Огонь проходит броню любого вида насквозь и бьёт прямо в корпус. Цена и место — на половину больше."
+      },
+      "applies_to": [
+        "BEAM",
+        "PROJECTILE"
+      ],
+      "damage_percent": 0,
+      "attack_percent": 0,
+      "shots_percent": 0,
+      "range_percent": 0,
+      "cost_percent": 50,
+      "space_percent": 50,
+      "pierces_armour": true,
+      "pierces_shield": false,
+      "envelops": false,
+      "no_range_penalty": false,
+      "halves_evasion": false,
+      "missile_armour_percent": 0,
+      "missile_speed": 0,
+      "hits_engine": false,
+      "required_tech": null
+    },
+    {
+      "code": "shield-piercing",
+      "name": { "en": "Shield Piercing (SP)", "ru": "Щитопробивное (SP)" },
+      "description": {
+        "en": "Deflector shields are no obstacle to such fire at all. Cost and space grow by half.",
+        "ru": "Бортовые щиты для такого огня не преграда вовсе. Цена и место — на половину больше."
+      },
+      "applies_to": [
+        "BEAM"
+      ],
+      "damage_percent": 0,
+      "attack_percent": 0,
+      "shots_percent": 0,
+      "range_percent": 0,
+      "cost_percent": 50,
+      "space_percent": 50,
+      "pierces_armour": false,
+      "pierces_shield": true,
+      "envelops": false,
+      "no_range_penalty": false,
+      "halves_evasion": false,
+      "missile_armour_percent": 0,
+      "missile_speed": 0,
+      "hits_engine": false,
+      "required_tech": null
+    },
+    {
+      "code": "continuous",
+      "name": { "en": "Continuous (CO)", "ru": "Непрерывное (CO)" },
+      "description": {
+        "en": "The beam does not die between shots and so hits a quarter more often. Cost and space grow by half.",
+        "ru": "Луч не гаснет между выстрелами и оттого попадает на четверть чаще. Цена и место — на половину больше."
+      },
+      "applies_to": [
+        "BEAM"
+      ],
+      "damage_percent": 0,
+      "attack_percent": 25,
+      "shots_percent": 0,
+      "range_percent": 0,
+      "cost_percent": 50,
+      "space_percent": 50,
+      "pierces_armour": false,
+      "pierces_shield": false,
+      "envelops": false,
+      "no_range_penalty": false,
+      "halves_evasion": false,
+      "missile_armour_percent": 0,
+      "missile_speed": 0,
+      "hits_engine": false,
+      "required_tech": null
+    },
+    {
+      "code": "no-range-penalty",
+      "name": { "en": "No Range Dissipation (NR)", "ru": "Без потери на дальности (NR)" },
+      "description": {
+        "en": "Distance no longer weakens the blow: full damage at any range. Cost and space grow by a quarter.",
+        "ru": "Расстояние до цели больше не ослабляет удар: на любой дистанции урон полный. Цена и место — на четверть больше."
+      },
+      "applies_to": [
+        "BEAM"
+      ],
+      "damage_percent": 0,
+      "attack_percent": 0,
+      "shots_percent": 0,
+      "range_percent": 0,
+      "cost_percent": 25,
+      "space_percent": 25,
+      "pierces_armour": false,
+      "pierces_shield": false,
+      "envelops": false,
+      "no_range_penalty": true,
+      "halves_evasion": false,
+      "missile_armour_percent": 0,
+      "missile_speed": 0,
+      "hits_engine": false,
+      "required_tech": null
+    },
+    {
+      "code": "auto-fire",
+      "name": { "en": "Auto-Fire (AF)", "ru": "Автоматическое (AF)" },
+      "description": {
+        "en": "The gun fires three times a volley, but every shot is a fifth less accurate. Cost and space grow by half.",
+        "ru": "Орудие бьёт трижды за залп, но каждый выстрел на пятую часть менее меток. Цена и место — на половину больше."
+      },
+      "applies_to": [
+        "BEAM",
+        "PROJECTILE"
+      ],
+      "damage_percent": 0,
+      "attack_percent": -20,
+      "shots_percent": 200,
+      "range_percent": 0,
+      "cost_percent": 50,
+      "space_percent": 50,
+      "pierces_armour": false,
+      "pierces_shield": false,
+      "envelops": false,
+      "no_range_penalty": false,
+      "halves_evasion": false,
+      "missile_armour_percent": 0,
+      "missile_speed": 0,
+      "hits_engine": false,
+      "required_tech": null
+    },
+    {
+      "code": "enveloping",
+      "name": { "en": "Enveloping (ENV)", "ru": "Обволакивающее (ENV)" },
+      "description": {
+        "en": "The blow envelops the target from all four sides at once, and each side takes the full force of the shot. Cost and space double.",
+        "ru": "Удар охватывает цель со всех четырёх сторон разом, и каждая получает полную силу выстрела. Цена и место — вдвое больше."
+      },
+      "applies_to": [
+        "BEAM"
+      ],
+      "damage_percent": 0,
+      "attack_percent": 0,
+      "shots_percent": 0,
+      "range_percent": 0,
+      "cost_percent": 100,
+      "space_percent": 100,
+      "pierces_armour": false,
+      "pierces_shield": false,
+      "envelops": true,
+      "no_range_penalty": false,
+      "halves_evasion": false,
+      "missile_armour_percent": 0,
+      "missile_speed": 0,
+      "hits_engine": false,
+      "required_tech": null
+    },
+    {
+      "code": "heavily-armored",
+      "name": { "en": "Heavily Armored (ARM)", "ru": "Бронированные (ARM)" },
+      "description": {
+        "en": "The missiles take twice the damage: shooting them down with point defence is twice as hard. Cost and space grow by a quarter.",
+        "ru": "Ракеты держат вдвое больше повреждений: сбить их ближней обороной вдвое труднее. Цена и место — на четверть больше."
+      },
+      "applies_to": [
+        "MISSILE"
+      ],
+      "damage_percent": 0,
+      "attack_percent": 0,
+      "shots_percent": 0,
+      "range_percent": 0,
+      "cost_percent": 25,
+      "space_percent": 25,
+      "pierces_armour": false,
+      "pierces_shield": false,
+      "envelops": false,
+      "no_range_penalty": false,
+      "halves_evasion": false,
+      "missile_armour_percent": 100,
+      "missile_speed": 0,
+      "hits_engine": false,
+      "required_tech": null
+    },
+    {
+      "code": "fast-missile",
+      "name": { "en": "Fast Missile Racks (FST)", "ru": "Быстрые (FST)" },
+      "description": {
+        "en": "The missiles fly four units faster and are harder to intercept. Cost and space grow by a quarter.",
+        "ru": "Ракеты летят на четыре единицы быстрее, и перехватить их труднее. Цена и место — на четверть больше."
+      },
+      "applies_to": [
+        "MISSILE"
+      ],
+      "damage_percent": 0,
+      "attack_percent": 0,
+      "shots_percent": 0,
+      "range_percent": 0,
+      "cost_percent": 25,
+      "space_percent": 25,
+      "pierces_armour": false,
+      "pierces_shield": false,
+      "envelops": false,
+      "no_range_penalty": false,
+      "halves_evasion": false,
+      "missile_armour_percent": 0,
+      "missile_speed": 4,
+      "hits_engine": false,
+      "required_tech": null
+    },
+    {
+      "code": "overloaded",
+      "name": { "en": "Overloaded (OVR)", "ru": "Перегруженные (OVR)" },
+      "description": {
+        "en": "The missile's charge is half again as strong; cost and space grow by as much.",
+        "ru": "Заряд ракеты сильнее наполовину; цена и место растут на столько же."
+      },
+      "applies_to": [
+        "MISSILE"
+      ],
+      "damage_percent": 50,
+      "attack_percent": 0,
+      "shots_percent": 0,
+      "range_percent": 0,
+      "cost_percent": 50,
+      "space_percent": 50,
+      "pierces_armour": false,
+      "pierces_shield": false,
+      "envelops": false,
+      "no_range_penalty": false,
+      "halves_evasion": false,
+      "missile_armour_percent": 0,
+      "missile_speed": 0,
+      "hits_engine": false,
+      "required_tech": null
+    },
+    {
+      "code": "eccm",
+      "name": { "en": "ECCM (ECCM)", "ru": "Помехозащита (ECCM)" },
+      "description": {
+        "en": "It halves the target's evasion of missiles: enemy jamming throws the guidance off far less. Cost and space grow by a quarter.",
+        "ru": "Вдвое снижает уклонение цели от ракет: чужие помехи сбивают наведение куда хуже. Цена и место — на четверть больше."
+      },
+      "applies_to": [
+        "MISSILE"
+      ],
+      "damage_percent": 0,
+      "attack_percent": 0,
+      "shots_percent": 0,
+      "range_percent": 0,
+      "cost_percent": 25,
+      "space_percent": 25,
+      "pierces_armour": false,
+      "pierces_shield": false,
+      "envelops": false,
+      "no_range_penalty": false,
+      "halves_evasion": true,
+      "missile_armour_percent": 0,
+      "missile_speed": 0,
+      "hits_engine": false,
+      "required_tech": null
+    },
+    {
+      "code": "mirv",
+      "name": { "en": "MIRV (MIRV)", "ru": "Разделяющиеся (MIRV)" },
+      "description": {
+        "en": "The missile carries four independent warheads at once — four times the shots. Cost and space double.",
+        "ru": "Ракета несёт сразу четыре самостоятельные боеголовки — вчетверо больше выстрелов. Цена и место — вдвое больше."
+      },
+      "applies_to": [
+        "MISSILE"
+      ],
+      "damage_percent": 0,
+      "attack_percent": 0,
+      "shots_percent": 300,
+      "range_percent": 0,
+      "cost_percent": 100,
+      "space_percent": 100,
+      "pierces_armour": false,
+      "pierces_shield": false,
+      "envelops": false,
+      "no_range_penalty": false,
+      "halves_evasion": false,
+      "missile_armour_percent": 0,
+      "missile_speed": 0,
+      "hits_engine": false,
+      "required_tech": null
+    },
+    {
+      "code": "emissions-guidance",
+      "name": { "en": "Emissions Guidance (EMG)", "ru": "Наведение по излучению (EMG)" },
+      "description": {
+        "en": "Having broken through the shield, the missile strikes the engine itself: the ship loses its move for the rest of the battle. Cost and space grow fourfold. Requires its own technology.",
+        "ru": "Пробившись сквозь щит, ракета бьёт прямо по двигателю: корабль теряет ход до конца боя. Цена и место — вчетверо больше. Требует своей технологии."
+      },
+      "applies_to": [
+        "MISSILE"
+      ],
+      "damage_percent": 0,
+      "attack_percent": 0,
+      "shots_percent": 0,
+      "range_percent": 0,
+      "cost_percent": 300,
+      "space_percent": 300,
+      "pierces_armour": false,
+      "pierces_shield": false,
+      "envelops": false,
+      "no_range_penalty": false,
+      "halves_evasion": false,
+      "missile_armour_percent": 0,
+      "missile_speed": 0,
+      "hits_engine": true,
+      "required_tech": "emissions-guidance-system"
+    }
+  ]
+}

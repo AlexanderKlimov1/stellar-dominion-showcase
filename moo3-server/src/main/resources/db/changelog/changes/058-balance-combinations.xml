@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+      Проверенные связки — этап 2, п. 2.16 (balance-metrics-works.txt).
+
+      Связок из полусотни сторон больше двадцати тысяч, и перебирать их незачем: смысл
+      имеют НЕ ВСЕ, а считанные — те, о которых есть догадка, зачем игрок берёт эти
+      стороны вместе. Такие догадки и копятся здесь: что проверяем, зачем (словами) и что
+      прогон ответил в последний раз.
+
+      Своей таблицей, а не выводом из прогонов: догадка живёт ДО прогона, а прогонов у
+      одной связки бывает несколько — на разных ценах и разной длины. Вывести из прогонов
+      можно результат, но не замысел.
+    -->
+    <changeSet id="058-balance-combinations" author="moo3">
+        <renameColumn tableName="balance_run" oldColumnName="pair_traits"
+                      newColumnName="combination_traits"/>
+
+        <createTable tableName="balance_combination">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <!-- Коды сторон связки: две или три. -->
+            <column name="traits" type="jsonb">
+                <constraints nullable="false"/>
+            </column>
+            <!-- Зачем эта связка вообще проверяется — словами, от руки. -->
+            <column name="note" type="varchar(500)"/>
+            <column name="created_at" type="timestamptz">
+                <constraints nullable="false"/>
+            </column>
+            <!-- Что ответил последний прогон, проверявший эту связку. -->
+            <column name="checked_at" type="timestamptz"/>
+            <column name="run_id" type="uuid"/>
+            <column name="verdict" type="varchar(20)"/>
+            <column name="extra" type="double precision"/>
+            <column name="error" type="double precision"/>
+            <column name="carriers" type="integer"/>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>

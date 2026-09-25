@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+      Оракул сборок — этап 3 (balance-metrics-works.txt).
+
+      Этап 2 назначает цены по СЛУЧАЙНЫМ сборкам, а игрок случайной не играет: он ищет
+      сильнейшую. Честные в среднем цены могут оставить в таблице комбинацию, которая бьёт
+      всё остальное, и заметить её случайными сборками нельзя — она встречается среди них
+      раз на тысячу. Оракул ищет её нарочно.
+
+      Прогон оракула — тот же прогон партий, поэтому живёт в той же таблице: у него те же
+      галактика, число империй, зерно и счётчик сыгранных партий, а отличает его род
+      (kind) и то, что вместо приговоров ценам он оставляет ЛАДДЕР сборок.
+    -->
+    <changeSet id="059-balance-oracle" author="moo3">
+        <addColumn tableName="balance_run">
+            <!-- MEASURE — приговоры ценам (этап 2), ORACLE — поиск сильнейших сборок. -->
+            <column name="kind" type="varchar(20)" defaultValue="MEASURE">
+                <constraints nullable="false"/>
+            </column>
+            <!-- Сколько сборок в первом поколении поиска. -->
+            <column name="population" type="integer"/>
+            <!-- Ладдер сборок с ответом на оба условия плана. -->
+            <column name="ladder" type="jsonb"/>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

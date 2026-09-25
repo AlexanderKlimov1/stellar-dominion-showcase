@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+      Счётчик того, чем империя за партию пользовалась, — этап 1 балансировки
+      (balance-metrics-works.txt).
+
+      Ценность стороны расы измерима ровно настолько, насколько работает механика, к
+      которой эта сторона привязана: телепаты без единого подчинения и военачальники без
+      единого боя стоят ноль не потому, что они слабы, а потому, что игра их не тронула.
+      Отличить «слабо» от «не случилось» можно только счётчиком.
+
+      Часть событий видна и так — бои лежат в space_battle, договоры в diplomacy_relation,
+      лидеры в player_leader, — но десант, подчинение, кража и перелёт следа не оставляют:
+      они меняют мир и исчезают. Поэтому счётчик один на все, строкой на «партия — империя
+      — что случилось».
+    -->
+    <changeSet id="054-empire-activity" author="moo3">
+        <createTable tableName="empire_activity">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="game_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="player_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="code" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="times" type="integer" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint tableName="empire_activity"
+                             columnNames="player_id, code"
+                             constraintName="uq_empire_activity_player_code"/>
+
+        <createIndex tableName="empire_activity" indexName="ix_empire_activity_game">
+            <column name="game_id"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

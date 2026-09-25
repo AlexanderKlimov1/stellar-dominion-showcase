@@ -1,0 +1,1595 @@
+{
+  "game": "Stellar Dominion",
+  "version": "1.0",
+  "description": "Technology tree of Stellar Dominion: eight subjects, each a straight ladder of levels",
+  "notes": {
+    "code": "Codes may read like OLD names (zortrium-armor for Korrium Armor): renaming changed the names only, because the code is what old games hold. The code identifies the technology: it is what the database stores for every level a player has researched, and what the other catalogues reference (a building's required_tech, a ship component's, a leader's techs). It used to be derived from the English name, which made the NAME the identifier — renaming a technology silently broke old games. Now the code is written here and the name is free to change and to be translated.",
+    "recommended": "Codes of the technologies of THIS level that the source recommends. An unknown code is refused when the file is read: a typo used to mean, silently, 'no recommendation at all'.",
+    "comment": "Why there is no recommendation on this level — a note from the source for whoever reads the file. The game never asks for it.",
+    "starting_levels": "Levels every race has from the first turn, written as \"category:order\" references."
+  },
+  "tech_categories": {
+    "engineering": {
+      "name": { "en": "Engineering", "ru": "Инженерия" },
+      "description": { "en": "Construction and manufacturing technologies", "ru": "Строительство и производство" },
+      "levels": [
+        {
+          "cost": 80,
+          "cumulative_cost": 80,
+          "level_name": { "en": "Advanced Engineering", "ru": "Продвинутая инженерия" },
+          "technologies": [
+            {
+              "code": "anti-missile-rockets",
+              "name": { "en": "Anti-Missile Rockets", "ru": "Противоракеты" },
+              "description": { "en": "Defensive missile system", "ru": "Ракеты сбивают чужие ракеты на подлёте" }
+            },
+            {
+              "code": "fighter-bays",
+              "name": { "en": "Fighter Bays", "ru": "Отсеки истребителей" },
+              "description": { "en": "Ship-mounted fighter craft", "ru": "Истребители на борту корабля" }
+            },
+            {
+              "code": "reinforced-hull",
+              "name": { "en": "Reinforced Hull", "ru": "Усиленный корпус" },
+              "description": { "en": "Stronger ship hull", "ru": "Корпус корабля прочнее" }
+            }
+          ],
+          "recommended": ["reinforced-hull"]
+        },
+        {
+          "cost": 150,
+          "cumulative_cost": 230,
+          "level_name": { "en": "Advanced Construction", "ru": "Продвинутое строительство" },
+          "technologies": [
+            {
+              "code": "automated-factory",
+              "name": { "en": "Automated Factory", "ru": "Автоматический завод" },
+              "description": { "en": "Improved production", "ru": "Производство колонии выше" }
+            },
+            {
+              "code": "missile-base",
+              "name": { "en": "Missile Base", "ru": "Ракетная база" },
+              "description": { "en": "Planetary missile defense", "ru": "Ракетная оборона планеты" }
+            },
+            {
+              "code": "heavy-armor",
+              "name": { "en": "Heavy Armor", "ru": "Тяжёлая броня" },
+              "description": { "en": "Enhanced ship armor", "ru": "Броня корабля вдвое крепче" }
+            }
+          ],
+          "recommended": ["automated-factory"]
+        },
+        {
+          "cost": 250,
+          "cumulative_cost": 480,
+          "level_name": { "en": "Capsule Construction", "ru": "Капсульное строительство" },
+          "technologies": [
+            {
+              "code": "battle-pods",
+              "name": { "en": "Battle Pods", "ru": "Боевые отсеки" },
+              "description": { "en": "Enhanced ground combat", "ru": "Полезного места в корпусе больше" }
+            },
+            {
+              "code": "troop-pods",
+              "name": { "en": "Troop Pods", "ru": "Десантные отсеки" },
+              "description": { "en": "Improved troop transport", "ru": "Корабль везёт больше пехоты" }
+            },
+            {
+              "code": "survival-pods",
+              "name": { "en": "Survival Pods", "ru": "Спасательные капсулы" },
+              "description": { "en": "Crew escape system", "ru": "Экипаж уцелевает при гибели корабля" }
+            }
+          ],
+          "recommended": ["battle-pods"]
+        },
+        {
+          "cost": 400,
+          "cumulative_cost": 880,
+          "level_name": { "en": "Astro Engineering", "ru": "Астроинженерия" },
+          "technologies": [
+            {
+              "code": "space-port",
+              "name": { "en": "Space Port", "ru": "Космопорт" },
+              "description": { "en": "Improved ship production", "ru": "Стройка кораблей и доход колонии выше" }
+            },
+            {
+              "code": "armor-barracks",
+              "name": { "en": "Armor Barracks", "ru": "Бронеказармы" },
+              "description": { "en": "Enhanced ground defenses", "ru": "Оборона колонии крепче" }
+            },
+            {
+              "code": "fighter-garrison",
+              "name": { "en": "Fighter Garrison", "ru": "Гарнизон истребителей" },
+              "description": { "en": "Planetary fighter defense", "ru": "Истребители на поверхности планеты" }
+            }
+          ],
+          "recommended": ["space-port", "fighter-garrison"]
+        },
+        {
+          "cost": 650,
+          "cumulative_cost": 1530,
+          "level_name": { "en": "Robotics", "ru": "Робототехника" },
+          "technologies": [
+            {
+              "code": "robo-miners",
+              "name": { "en": "Robo-Miners", "ru": "Робошахтёры" },
+              "description": { "en": "Automated mining", "ru": "Добыча без лишних рабочих рук" }
+            },
+            {
+              "code": "battlestation",
+              "name": { "en": "Battlestation", "ru": "Боевая станция" },
+              "description": { "en": "Orbital defense platform", "ru": "Орбитальная платформа обороны" }
+            },
+            {
+              "code": "powered-armor",
+              "name": { "en": "Powered Armor", "ru": "Силовая броня" },
+              "description": { "en": "Advanced ground combat", "ru": "Пехота крепче в бою" }
+            }
+          ],
+          "recommended": ["robo-miners"]
+        },
+        {
+          "cost": 900,
+          "cumulative_cost": 2430,
+          "level_name": { "en": "Servo Mechanics", "ru": "Сервомеханика" },
+          "technologies": [
+            {
+              "code": "fast-missile-racks",
+              "name": { "en": "Fast Missile Racks", "ru": "Быстрые пусковые" },
+              "description": { "en": "Improved missile fire rate", "ru": "Ракеты уходят чаще" }
+            },
+            {
+              "code": "advanced-damage-control",
+              "name": { "en": "Advanced Damage Control", "ru": "Продвинутая ремонтная служба" },
+              "description": { "en": "Better ship repair", "ru": "Корабли чинятся лучше" }
+            },
+            {
+              "code": "assault-shuttles",
+              "name": { "en": "Assault Shuttles", "ru": "Штурмовые шаттлы" },
+              "description": { "en": "Enhanced invasion", "ru": "Высадка десанта успешнее" }
+            }
+          ],
+          "recommended": ["advanced-damage-control", "fast-missile-racks"]
+        },
+        {
+          "cost": 1150,
+          "cumulative_cost": 3580,
+          "level_name": { "en": "Astro Construction", "ru": "Астростроительство" },
+          "technologies": [
+            {
+              "code": "titan-construction",
+              "name": { "en": "Titan Construction", "ru": "Строительство титанов" },
+              "description": { "en": "Larger ship sizes", "ru": "Корпуса крупнее линкора" }
+            },
+            {
+              "code": "ground-batteries",
+              "name": { "en": "Ground Batteries", "ru": "Наземные батареи" },
+              "description": { "en": "Planetary defense", "ru": "Тяжёлые орудия планетарной обороны" }
+            },
+            {
+              "code": "battleoids",
+              "name": { "en": "Battle Walkers", "ru": "Боевые шагоходы" },
+              "description": { "en": "Giant ground units", "ru": "Огромные наземные машины" }
+            }
+          ],
+          "recommended": ["titan-construction", "ground-batteries"]
+        },
+        {
+          "cost": 1500,
+          "cumulative_cost": 5080,
+          "level_name": { "en": "Advanced Manufacturing", "ru": "Продвинутое производство" },
+          "technologies": [
+            {
+              "code": "recyclotron",
+              "name": { "en": "Reclaimer Plant", "ru": "Переработчик" },
+              "description": { "en": "Resource recycling", "ru": "Переработка мусора колонии" }
+            },
+            {
+              "code": "automated-repair-unit",
+              "name": { "en": "Automated Repair Unit", "ru": "Автоматический ремонт" },
+              "description": { "en": "Ship repair in battle", "ru": "Корабль чинится прямо в бою" }
+            },
+            {
+              "code": "artificial-planet-construction",
+              "name": { "en": "Artificial Planet Construction", "ru": "Строительство искусственных планет" },
+              "description": { "en": "Build artificial planets", "ru": "Планета, построенная руками" }
+            }
+          ],
+          "recommended": ["automated-repair-unit", "recyclotron"]
+        },
+        {
+          "cost": 2000,
+          "cumulative_cost": 7080,
+          "level_name": { "en": "Advanced Robotics", "ru": "Продвинутая робототехника" },
+          "technologies": [
+            {
+              "code": "robotic-factory",
+              "name": { "en": "Robotic Factory", "ru": "Роботизированный завод" },
+              "description": { "en": "Maximum production", "ru": "Наибольшее производство колонии" }
+            },
+            {
+              "code": "bomber-bays",
+              "name": { "en": "Bomber Bays", "ru": "Отсеки бомбардировщиков" },
+              "description": { "en": "Ship-mounted bombers", "ru": "Бомбардировщики на борту корабля" }
+            }
+          ],
+          "recommended": ["robotic-factory"]
+        },
+        {
+          "cost": 3500,
+          "cumulative_cost": 10580,
+          "level_name": { "en": "Tectonic Engineering", "ru": "Тектоническая инженерия" },
+          "technologies": [
+            {
+              "code": "deep-core-mine",
+              "name": { "en": "Deep Core Mine", "ru": "Глубинный рудник" },
+              "description": { "en": "Maximum planetary mining", "ru": "Наибольшая добыча на планете" }
+            },
+            {
+              "code": "core-waste-dump",
+              "name": { "en": "Core Waste Dump", "ru": "Свалка в ядре планеты" },
+              "description": { "en": "Waste disposal", "ru": "Отходы уходят в ядро планеты" }
+            }
+          ],
+          "recommended": ["deep-core-mine"]
+        },
+        {
+          "cost": 6000,
+          "cumulative_cost": 16580,
+          "level_name": { "en": "Superscalar Construction", "ru": "Суперскалярное строительство" },
+          "technologies": [
+            {
+              "code": "star-fortress",
+              "name": { "en": "Star Fortress", "ru": "Звёздная крепость" },
+              "description": { "en": "Ultimate defense platform", "ru": "Сильнейшая орбитальная платформа" }
+            },
+            {
+              "code": "advanced-city-planning",
+              "name": { "en": "Advanced City Planning", "ru": "Продвинутая застройка" },
+              "description": { "en": "Maximum population", "ru": "Планета вмещает больше жителей" }
+            },
+            {
+              "code": "heavy-fighters",
+              "name": { "en": "Heavy Fighters", "ru": "Тяжёлые истребители" },
+              "description": { "en": "Advanced fighter craft", "ru": "Истребители крепче и сильнее" }
+            }
+          ],
+          "recommended": ["advanced-city-planning"]
+        },
+        {
+          "cost": 7500,
+          "cumulative_cost": 24080,
+          "level_name": { "en": "Planetoid Construction", "ru": "Планетоидное строительство" },
+          "technologies": [
+            {
+              "code": "doom-star-construction",
+              "name": { "en": "Leviathan Construction", "ru": "Строительство левиафанов" },
+              "description": { "en": "Ultimate weapon platform", "ru": "Крупнейший корпус игры" }
+            },
+            {
+              "code": "artemis-system-net",
+              "name": { "en": "Hunters' Net", "ru": "Сеть охотников" },
+              "description": { "en": "System-wide defense", "ru": "Минное поле вокруг системы" }
+            }
+          ],
+          "recommended": ["doom-star-construction"]
+        }
+      ]
+    },
+    "power": {
+      "name": { "en": "Power", "ru": "Энергетика" },
+      "description": { "en": "Propulsion and power generation technologies", "ru": "Двигатели и выработка энергии" },
+      "levels": [
+        {
+          "cost": 50,
+          "cumulative_cost": 50,
+          "level_name": { "en": "Nuclear Fission", "ru": "Ядерное расщепление" },
+          "general": true,
+          "technologies": [
+            {
+              "code": "freighters",
+              "name": { "en": "Freighters", "ru": "Грузовой флот" },
+              "description": { "en": "Improved cargo capacity", "ru": "Больше грузовиков для еды и жителей" }
+            },
+            {
+              "code": "nuclear-drive",
+              "name": { "en": "Nuclear Drive", "ru": "Ядерный двигатель" },
+              "description": { "en": "Basic ship engine", "ru": "Простейший двигатель корабля" }
+            },
+            {
+              "code": "nuclear-bomb",
+              "name": { "en": "Nuclear Bomb", "ru": "Ядерная бомба" },
+              "description": { "en": "Basic planetary bomb", "ru": "Простейшая бомба для планет" }
+            }
+          ],
+          "recommended": [], "comment": "All technologies - general level"
+        },
+        {
+          "cost": 80,
+          "cumulative_cost": 130,
+          "level_name": { "en": "Cold Fusion", "ru": "Холодный синтез" },
+          "general": true,
+          "technologies": [
+            {
+              "code": "colony-ship",
+              "name": { "en": "Colony Ship", "ru": "Колониальный корабль" },
+              "description": { "en": "Colonization vessel", "ru": "Корабль для новой колонии" }
+            },
+            {
+              "code": "outpost-ship",
+              "name": { "en": "Outpost Ship", "ru": "Корабль-застава" },
+              "description": { "en": "Outpost establishment", "ru": "Корабль для заставы" }
+            },
+            {
+              "code": "transport",
+              "name": { "en": "Transport", "ru": "Транспорт" },
+              "description": { "en": "Population transport", "ru": "Перевозка жителей и десанта" }
+            }
+          ],
+          "recommended": [], "comment": "All technologies - general level"
+        },
+        {
+          "cost": 250,
+          "cumulative_cost": 380,
+          "level_name": { "en": "Advanced Fusion", "ru": "Продвинутый синтез" },
+          "technologies": [
+            {
+              "code": "fusion-drive",
+              "name": { "en": "Fusion Drive", "ru": "Термоядерный двигатель" },
+              "description": { "en": "Improved engine", "ru": "Двигатель быстрее ядерного" }
+            },
+            {
+              "code": "fusion-bomb",
+              "name": { "en": "Fusion Bomb", "ru": "Термоядерная бомба" },
+              "description": { "en": "Advanced bomb", "ru": "Бомба сильнее ядерной" }
+            },
+            {
+              "code": "augmented-engines",
+              "name": { "en": "Augmented Engines", "ru": "Форсированные двигатели" },
+              "description": { "en": "Engine enhancement", "ru": "Корабль быстрее и в бою, и в пути" }
+            }
+          ],
+          "recommended": [], "comment": "Depends on strategy"
+        },
+        {
+          "cost": 900,
+          "cumulative_cost": 1280,
+          "level_name": { "en": "Ion Fission", "ru": "Ионное расщепление" },
+          "technologies": [
+            {
+              "code": "ion-drive",
+              "name": { "en": "Ion Drive", "ru": "Ионный двигатель" },
+              "description": { "en": "Advanced engine", "ru": "Двигатель ещё быстрее" }
+            },
+            {
+              "code": "ion-pulse-cannon",
+              "name": { "en": "Ion Pulse Cannon", "ru": "Ионная импульсная пушка" },
+              "description": { "en": "Ion weapon", "ru": "Импульсное оружие корабля" }
+            },
+            {
+              "code": "shield-capacitor",
+              "name": { "en": "Shield Capacitor", "ru": "Накопитель щита" },
+              "description": { "en": "Shield enhancement", "ru": "Щит держит больше" }
+            }
+          ],
+          "recommended": ["ion-drive", "shield-capacitor"]
+        },
+        {
+          "cost": 2000,
+          "cumulative_cost": 3280,
+          "level_name": { "en": "Anti-Matter Fission", "ru": "Аннигиляционное расщепление" },
+          "technologies": [
+            {
+              "code": "anti-matter-drive",
+              "name": { "en": "Anti-Matter Drive", "ru": "Аннигиляционный двигатель" },
+              "description": { "en": "Superior engine", "ru": "Двигатель на антиматерии" }
+            },
+            {
+              "code": "anti-matter-torpedoes",
+              "name": { "en": "Anti-Matter Torpedoes", "ru": "Аннигиляционные торпеды" },
+              "description": { "en": "Powerful torpedoes", "ru": "Мощные торпеды" }
+            },
+            {
+              "code": "anti-matter-bomb",
+              "name": { "en": "Anti-Matter Bomb", "ru": "Аннигиляционная бомба" },
+              "description": { "en": "Devastating bomb", "ru": "Разрушительная бомба" }
+            }
+          ],
+          "recommended": ["anti-matter-torpedoes", "anti-matter-drive"]
+        },
+        {
+          "cost": 2750,
+          "cumulative_cost": 6030,
+          "level_name": { "en": "Matter-Energy Conversion", "ru": "Превращение материи в энергию" },
+          "technologies": [
+            {
+              "code": "transporters",
+              "name": { "en": "Matter Transmitters", "ru": "Телепорты" },
+              "description": { "en": "Instant troop deployment", "ru": "Десант высаживается мгновенно" }
+            },
+            {
+              "code": "food-replicators",
+              "name": { "en": "Matter Synthesizers", "ru": "Синтезаторы пищи" },
+              "description": { "en": "Eliminate food requirement", "ru": "Еда больше не нужна" }
+            }
+          ],
+          "recommended": ["transporters"]
+        },
+        {
+          "cost": 3500,
+          "cumulative_cost": 9530,
+          "level_name": { "en": "High Energy Distribution", "ru": "Распределение высоких энергий" },
+          "technologies": [
+            {
+              "code": "high-energy-focus",
+              "name": { "en": "High Energy Focus", "ru": "Фокусировка высоких энергий" },
+              "description": { "en": "Beam weapon booster", "ru": "Лучевое оружие сильнее" }
+            },
+            {
+              "code": "energy-absorber",
+              "name": { "en": "Energy Absorber", "ru": "Поглотитель энергии" },
+              "description": { "en": "Energy weapon defense", "ru": "Защита от энергетического оружия" }
+            },
+            {
+              "code": "megafluxers",
+              "name": { "en": "Compact Frames", "ru": "Компактные рамы" },
+              "description": { "en": "Power enhancement", "ru": "Места в корпусе больше" }
+            }
+          ],
+          "recommended": ["high-energy-focus", "megafluxers"]
+        },
+        {
+          "cost": 4500,
+          "cumulative_cost": 14030,
+          "level_name": { "en": "Hyper-Dimensional Fission", "ru": "Гиперпространственное расщепление" },
+          "technologies": [
+            {
+              "code": "proton-torpedo",
+              "name": { "en": "Proton Torpedo", "ru": "Протонные торпеды" },
+              "description": { "en": "Advanced torpedoes", "ru": "Торпеды сильнее" }
+            },
+            {
+              "code": "hyper-drive",
+              "name": { "en": "Hyper Drive", "ru": "Гипердвигатель" },
+              "description": { "en": "Fast engine", "ru": "Очень быстрый двигатель" }
+            },
+            {
+              "code": "hyper-x-capacitors",
+              "name": { "en": "Surge Capacitors", "ru": "Импульсные накопители" },
+              "description": { "en": "Advanced capacitors", "ru": "Оружие бьёт чаще" }
+            }
+          ],
+          "recommended": [], "comment": "Depends on strategy"
+        },
+        {
+          "cost": 10000,
+          "cumulative_cost": 24030,
+          "level_name": { "en": "Interphased Fission", "ru": "Интерфазное расщепление" },
+          "technologies": [
+            {
+              "code": "interphased-drive",
+              "name": { "en": "Interphased Drive", "ru": "Интерфазный двигатель" },
+              "description": { "en": "Ultimate engine", "ru": "Быстрейший двигатель игры" }
+            },
+            {
+              "code": "plasma-torpedo",
+              "name": { "en": "Plasma Torpedo", "ru": "Плазменные торпеды" },
+              "description": { "en": "Most powerful torpedoes", "ru": "Сильнейшие торпеды" }
+            },
+            {
+              "code": "neutronium-bomb",
+              "name": { "en": "Neutronium Bomb", "ru": "Нейтрониевая бомба" },
+              "description": { "en": "Ultimate bomb", "ru": "Сильнейшая бомба" }
+            }
+          ],
+          "recommended": ["interphased-drive", "plasma-torpedo"]
+        }
+      ]
+    },
+    "chemistry": {
+      "name": { "en": "Chemistry", "ru": "Химия" },
+      "description": { "en": "Materials and chemical technologies", "ru": "Материалы и химия" },
+      "levels": [
+        {
+          "cost": 50,
+          "cumulative_cost": 50,
+          "level_name": { "en": "Chemistry", "ru": "Химия" },
+          "general": true,
+          "technologies": [
+            {
+              "code": "nuclear-missile",
+              "name": { "en": "Nuclear Missile", "ru": "Ядерная ракета" },
+              "description": { "en": "Basic missile weapon", "ru": "Простейшее ракетное оружие" }
+            },
+            {
+              "code": "standard-fuel-cells",
+              "name": { "en": "Standard Fuel Cells", "ru": "Обычные топливные элементы" },
+              "description": { "en": "Basic fuel efficiency", "ru": "Простейшая дальность полёта" }
+            },
+            {
+              "code": "extended-fuel-tanks",
+              "name": { "en": "Extended Fuel Tanks", "ru": "Дополнительные баки" },
+              "description": { "en": "Increased fuel capacity", "ru": "Флот летает дальше" }
+            },
+            {
+              "code": "titanium-armor",
+              "name": { "en": "Titanium Armor", "ru": "Титановая обшивка" },
+              "description": { "en": "Basic improved armor", "ru": "Простейшая улучшенная броня" }
+            }
+          ],
+          "recommended": [], "comment": "All technologies - general level"
+        },
+        {
+          "cost": 250,
+          "cumulative_cost": 300,
+          "level_name": { "en": "Advanced Metallurgy", "ru": "Продвинутая металлургия" },
+          "technologies": [
+            {
+              "code": "deuterium-fuel-cells",
+              "name": { "en": "Deuterium Fuel Cells", "ru": "Дейтериевые элементы" },
+              "description": { "en": "Improved fuel cells", "ru": "Дальность полёта выше" }
+            },
+            {
+              "code": "tritanium-armor",
+              "name": { "en": "Duranite Armor", "ru": "Дуранитовая броня" },
+              "description": { "en": "Advanced armor", "ru": "Броня крепче" }
+            }
+          ],
+          "recommended": [], "comment": "Depends on map"
+        },
+        {
+          "cost": 650,
+          "cumulative_cost": 950,
+          "level_name": { "en": "Advanced Chemistry", "ru": "Продвинутая химия" },
+          "technologies": [
+            {
+              "code": "merculite-missile",
+              "name": { "en": "Vulcanite Missile", "ru": "Вулканитовая ракета" },
+              "description": { "en": "Advanced missile", "ru": "Ракета сильнее ядерной" }
+            },
+            {
+              "code": "pollution-processor",
+              "name": { "en": "Pollution Processor", "ru": "Переработчик отходов" },
+              "description": { "en": "Reduces pollution", "ru": "Загрязнение вдвое ниже" }
+            }
+          ],
+          "recommended": [], "comment": "Depends on strategy"
+        },
+        {
+          "cost": 1150,
+          "cumulative_cost": 2100,
+          "level_name": { "en": "Molecular Compression", "ru": "Молекулярное сжатие" },
+          "technologies": [
+            {
+              "code": "pulson-missile",
+              "name": { "en": "Pulsewave Missile", "ru": "Пульсовая ракета" },
+              "description": { "en": "Powerful missile", "ru": "Мощная ракета" }
+            },
+            {
+              "code": "atmospheric-renewer",
+              "name": { "en": "Atmospheric Renewer", "ru": "Атмосферный преобразователь" },
+              "description": { "en": "Terraforming device", "ru": "Воздух очищается сам" }
+            },
+            {
+              "code": "iridium-fuel-cells",
+              "name": { "en": "Iridium Fuel Cells", "ru": "Иридиевые элементы" },
+              "description": { "en": "Superior fuel cells", "ru": "Дальность ещё выше" }
+            }
+          ],
+          "recommended": ["iridium-fuel-cells", "atmospheric-renewer"]
+        },
+        {
+          "cost": 2000,
+          "cumulative_cost": 4100,
+          "level_name": { "en": "Nano Technology", "ru": "Нанотехнология" },
+          "technologies": [
+            {
+              "code": "nano-disassemblers",
+              "name": { "en": "Nano Disassemblers", "ru": "Наноразборщики" },
+              "description": { "en": "Nanotech weapon", "ru": "Планета терпит больше промышленности" }
+            },
+            {
+              "code": "microlite-construction",
+              "name": { "en": "Lightframe Construction", "ru": "Лёгкие корпуса" },
+              "description": { "en": "Advanced materials", "ru": "Корпуса легче и дешевле" }
+            },
+            {
+              "code": "zortrium-armor",
+              "name": { "en": "Korrium Armor", "ru": "Корриевая броня" },
+              "description": { "en": "Superior armor", "ru": "Броня намного крепче" }
+            }
+          ],
+          "recommended": ["zortrium-armor"]
+        },
+        {
+          "cost": 4500,
+          "cumulative_cost": 8600,
+          "level_name": { "en": "Molecular Manipulation", "ru": "Молекулярные манипуляции" },
+          "technologies": [
+            {
+              "code": "zeon-missile",
+              "name": { "en": "Aeon Missile", "ru": "Эоновая ракета" },
+              "description": { "en": "Ultimate missile", "ru": "Сильнейшая ракета" }
+            },
+            {
+              "code": "neutronium-armor",
+              "name": { "en": "Neutronium Armor", "ru": "Нейтрониевая броня" },
+              "description": { "en": "Extremely strong armor", "ru": "Очень крепкая броня" }
+            },
+            {
+              "code": "uridium-fuel-cells",
+              "name": { "en": "Ytterbium Fuel Cells", "ru": "Иттербиевые элементы" },
+              "description": { "en": "Ultimate fuel cells", "ru": "Дальность почти без предела" }
+            }
+          ],
+          "recommended": [], "comment": "Depends on strategy"
+        },
+        {
+          "cost": 10000,
+          "cumulative_cost": 18600,
+          "level_name": { "en": "Molecular Control", "ru": "Молекулярное управление" },
+          "technologies": [
+            {
+              "code": "thorium-fuel-cells",
+              "name": { "en": "Thorium Fuel Cells", "ru": "Ториевые элементы" },
+              "description": { "en": "Perfect fuel cells", "ru": "Топливо больше не ограничивает" }
+            },
+            {
+              "code": "adamantium-armor",
+              "name": { "en": "Adamant Armor", "ru": "Адамантовая броня" },
+              "description": { "en": "Ultimate armor", "ru": "Прочнейшая броня игры" }
+            }
+          ],
+          "recommended": ["adamantium-armor"]
+        }
+      ]
+    },
+    "sociology": {
+      "name": { "en": "Sociology", "ru": "Социология" },
+      "description": { "en": "Social and economic technologies", "ru": "Общество и хозяйство" },
+      "levels": [
+        {
+          "cost": 150,
+          "cumulative_cost": 150,
+          "level_name": { "en": "Military Tactics", "ru": "Военная тактика" },
+          "technologies": [
+            {
+              "code": "space-academy",
+              "name": { "en": "Space Academy", "ru": "Космическая академия" },
+              "description": { "en": "Improved officer training", "ru": "Экипажи учатся быстрее" }
+            }
+          ],
+          "recommended": ["space-academy"]
+        },
+        {
+          "cost": 650,
+          "cumulative_cost": 800,
+          "level_name": { "en": "Xeno Relations", "ru": "Ксенология" },
+          "technologies": [
+            {
+              "code": "xeno-psychology",
+              "name": { "en": "Xeno Psychology", "ru": "Ксенопсихология" },
+              "description": { "en": "Better diplomacy", "ru": "Переговоры идут легче" }
+            },
+            {
+              "code": "alien-management-center",
+              "name": { "en": "Alien Management Center", "ru": "Центр управления чужими" },
+              "description": { "en": "Improved alien relations", "ru": "Подданные ассимилируются быстрее" }
+            }
+          ],
+          "recommended": ["alien-management-center"]
+        },
+        {
+          "cost": 1150,
+          "cumulative_cost": 1950,
+          "level_name": { "en": "Macro Economics", "ru": "Макроэкономика" },
+          "technologies": [
+            {
+              "code": "stock-exchange",
+              "name": { "en": "Stock Exchange", "ru": "Фондовая биржа" },
+              "description": { "en": "Economic boost", "ru": "Доход колонии вдвое выше" }
+            }
+          ],
+          "recommended": ["stock-exchange"]
+        },
+        {
+          "cost": 2000,
+          "cumulative_cost": 3950,
+          "level_name": { "en": "Teaching Methods", "ru": "Методы обучения" },
+          "technologies": [
+            {
+              "code": "astro-university",
+              "name": { "en": "Astro University", "ru": "Астроуниверситет" },
+              "description": { "en": "Advanced research", "ru": "Каждый житель работает лучше" }
+            }
+          ],
+          "recommended": ["astro-university"]
+        },
+        {
+          "cost": 4500,
+          "cumulative_cost": 8450,
+          "level_name": { "en": "Advanced Government", "ru": "Развитое правление" },
+          "technologies": [
+            {
+              "code": "confederation",
+              "name": { "en": "Confederation", "ru": "Конфедерация" },
+              "description": { "en": "Government type", "ru": "Развитый строй: феодализм становится союзом равных" }
+            },
+            {
+              "code": "imperium",
+              "name": { "en": "Imperium", "ru": "Империум" },
+              "description": { "en": "Government type", "ru": "Развитый строй: диктатура становится империей" }
+            },
+            {
+              "code": "federation",
+              "name": { "en": "Federation", "ru": "Федерация" },
+              "description": { "en": "Government type", "ru": "Развитый строй: демократия становится федерацией" }
+            },
+            {
+              "code": "galactic-unification",
+              "name": { "en": "Galactic Unification", "ru": "Галактическое единство" },
+              "description": { "en": "Ultimate government", "ru": "Развитый строй: объединение становится галактическим" }
+            }
+          ],
+          "recommended": ["confederation", "imperium", "federation", "galactic-unification"]
+        },
+        {
+          "cost": 6000,
+          "cumulative_cost": 14450,
+          "level_name": { "en": "Galactic Economics", "ru": "Галактическая экономика" },
+          "technologies": [
+            {
+              "code": "galactic-currency-exchange",
+              "name": { "en": "Galactic Currency Exchange", "ru": "Галактическая валютная биржа" },
+              "description": { "en": "Economic optimization", "ru": "Доход империи выше" }
+            }
+          ],
+          "recommended": ["galactic-currency-exchange"]
+        }
+      ]
+    },
+    "computers": {
+      "name": { "en": "Computers", "ru": "Компьютеры" },
+      "description": { "en": "Computing and AI technologies", "ru": "Вычисления и искусственный разум" },
+      "levels": [
+        {
+          "cost": 50,
+          "cumulative_cost": 50,
+          "level_name": { "en": "Electronics", "ru": "Электроника" },
+          "technologies": [
+            {
+              "code": "electronic-computer",
+              "name": { "en": "Electronic Computer", "ru": "Электронный компьютер" },
+              "description": { "en": "Basic ship computer", "ru": "Простейший прицельный компьютер" }
+            }
+          ],
+          "recommended": ["electronic-computer"]
+        },
+        {
+          "cost": 150,
+          "cumulative_cost": 200,
+          "level_name": { "en": "Optronics", "ru": "Оптроника" },
+          "technologies": [
+            {
+              "code": "research-laboratory",
+              "name": { "en": "Research Laboratory", "ru": "Исследовательская лаборатория" },
+              "description": { "en": "Improved research", "ru": "Наука колонии выше" }
+            },
+            {
+              "code": "optronic-computer",
+              "name": { "en": "Optronic Computer", "ru": "Оптронный компьютер" },
+              "description": { "en": "Advanced computer", "ru": "Прицел точнее" }
+            },
+            {
+              "code": "dauntless-guidance-system",
+              "name": { "en": "Steadfast Guidance System", "ru": "Система наведения «Стойкость»" },
+              "description": { "en": "Missile guidance", "ru": "Ракеты не теряют цель" }
+            }
+          ],
+          "recommended": ["research-laboratory"]
+        },
+        {
+          "cost": 400,
+          "cumulative_cost": 600,
+          "level_name": { "en": "Artificial Intelligence", "ru": "Искусственный разум" },
+          "technologies": [
+            {
+              "code": "neural-scanner",
+              "name": { "en": "Neural Scanner", "ru": "Нейросканер" },
+              "description": { "en": "Detection system", "ru": "Допрос пленных раскрывает чужие тайны" }
+            },
+            {
+              "code": "scout-lab",
+              "name": { "en": "Scout Lab", "ru": "Лаборатория разведчика" },
+              "description": { "en": "Scout enhancement", "ru": "Разведчик узнаёт о системе больше" }
+            },
+            {
+              "code": "security-stations",
+              "name": { "en": "Security Stations", "ru": "Посты охраны" },
+              "description": { "en": "Counter-intelligence", "ru": "Абордаж отбивать легче" }
+            }
+          ],
+          "recommended": ["neural-scanner"]
+        },
+        {
+          "cost": 900,
+          "cumulative_cost": 1500,
+          "level_name": { "en": "Positronics", "ru": "Позитроника" },
+          "technologies": [
+            {
+              "code": "positronic-computer",
+              "name": { "en": "Positronic Computer", "ru": "Позитронный компьютер" },
+              "description": { "en": "Superior computer", "ru": "Прицел намного точнее" }
+            },
+            {
+              "code": "supercomputer",
+              "name": { "en": "Supercomputer", "ru": "Суперкомпьютер" },
+              "description": { "en": "Ultimate computer", "ru": "Наука колонии намного выше" }
+            },
+            {
+              "code": "holo-simulator",
+              "name": { "en": "Holo Simulator", "ru": "Голосимулятор" },
+              "description": { "en": "Combat training", "ru": "Экипажи учатся быстрее" }
+            }
+          ],
+          "recommended": ["supercomputer"]
+        },
+        {
+          "cost": 1500,
+          "cumulative_cost": 3000,
+          "level_name": { "en": "Artificial Consciousness", "ru": "Искусственное сознание" },
+          "technologies": [
+            {
+              "code": "emissions-guidance-system",
+              "name": { "en": "Emissions Guidance System", "ru": "Наведение по излучению" },
+              "description": { "en": "Advanced guidance", "ru": "Ракета бьёт по двигателю" }
+            },
+            {
+              "code": "rangemaster-targeting-unit",
+              "name": { "en": "Longsight Targeting Unit", "ru": "Прицельный блок «Дальновид»" },
+              "description": { "en": "Targeting system", "ru": "Дальность оружия выше" }
+            },
+            {
+              "code": "cyber-security-link",
+              "name": { "en": "Cyber Security Link", "ru": "Кибербезопасная связь" },
+              "description": { "en": "Network security", "ru": "Чужим агентам работать труднее" }
+            }
+          ],
+          "recommended": ["emissions-guidance-system", "cyber-security-link"]
+        },
+        {
+          "cost": 2750,
+          "cumulative_cost": 5750,
+          "level_name": { "en": "Neurotronics", "ru": "Нейротроника" },
+          "technologies": [
+            {
+              "code": "cybertronic-computer",
+              "name": { "en": "Neurotronic Computer", "ru": "Нейротронный компьютер" },
+              "description": { "en": "Ultimate computer", "ru": "Прицел почти совершенный" }
+            },
+            {
+              "code": "autolab",
+              "name": { "en": "Automated Lab", "ru": "Автоматическая лаборатория" },
+              "description": { "en": "Automated research", "ru": "Наука без учёных" }
+            },
+            {
+              "code": "structural-analyzer",
+              "name": { "en": "Structural Analyzer", "ru": "Структурный анализатор" },
+              "description": { "en": "Ship analysis", "ru": "Оружие бьёт по слабым местам" }
+            }
+          ],
+          "recommended": ["autolab"]
+        },
+        {
+          "cost": 3500,
+          "cumulative_cost": 9250,
+          "level_name": { "en": "Cybertechnics", "ru": "Кибертехника" },
+          "technologies": [
+            {
+              "code": "android-farmers",
+              "name": { "en": "Android Farmers", "ru": "Андроиды-фермеры" },
+              "description": { "en": "Automated farming", "ru": "Еда без жителей" }
+            },
+            {
+              "code": "android-workers",
+              "name": { "en": "Android Workers", "ru": "Андроиды-рабочие" },
+              "description": { "en": "Automated production", "ru": "Производство без жителей" }
+            },
+            {
+              "code": "android-scientists",
+              "name": { "en": "Android Scientists", "ru": "Андроиды-учёные" },
+              "description": { "en": "Automated research", "ru": "Наука без жителей" }
+            }
+          ],
+          "recommended": ["android-scientists", "android-workers"]
+        },
+        {
+          "cost": 4500,
+          "cumulative_cost": 13750,
+          "level_name": { "en": "Galactic Networking", "ru": "Галактические сети" },
+          "technologies": [
+            {
+              "code": "virtual-reality-network",
+              "name": { "en": "Virtual Reality Network", "ru": "Сеть виртуальной реальности" },
+              "description": { "en": "Entertainment network", "ru": "Настроение колоний выше" }
+            },
+            {
+              "code": "galactic-cybernet",
+              "name": { "en": "Galactic Cybernet", "ru": "Галактическая сеть" },
+              "description": { "en": "Empire-wide network", "ru": "Наука империи намного выше" }
+            }
+          ],
+          "recommended": ["virtual-reality-network", "galactic-cybernet"]
+        },
+        {
+          "cost": 6000,
+          "cumulative_cost": 19750,
+          "level_name": { "en": "Moleculartronics", "ru": "Молекулярная электроника" },
+          "technologies": [
+            {
+              "code": "pleasure-dome",
+              "name": { "en": "Elysium Dome", "ru": "Купол Элизия" },
+              "description": { "en": "Ultimate entertainment", "ru": "Настроение колоний наивысшее" }
+            },
+            {
+              "code": "moleculartronic-computer",
+              "name": { "en": "Moleculartronic Computer", "ru": "Молекулярный компьютер" },
+              "description": { "en": "Perfect computer", "ru": "Совершенный прицел" }
+            },
+            {
+              "code": "achilles-targeting-unit",
+              "name": { "en": "Weakpoint Targeting Unit", "ru": "Прицельный блок «Уязвимость»" },
+              "description": { "en": "Perfect targeting", "ru": "Оружие бьёт в уязвимые места" }
+            }
+          ],
+          "recommended": ["achilles-targeting-unit"]
+        }
+      ]
+    },
+    "biology": {
+      "name": { "en": "Biology", "ru": "Биология" },
+      "description": { "en": "Biological and genetic technologies", "ru": "Биология и генетика" },
+      "levels": [
+        {
+          "cost": 80,
+          "cumulative_cost": 80,
+          "level_name": { "en": "Astro Biology", "ru": "Астробиология" },
+          "technologies": [
+            {
+              "code": "hydroponic-farm",
+              "name": { "en": "Hydroponic Farm", "ru": "Гидропонная ферма" },
+              "description": { "en": "Improved farming", "ru": "Еда без фермеров" }
+            },
+            {
+              "code": "biospheres",
+              "name": { "en": "Biospheres", "ru": "Биосферы" },
+              "description": { "en": "Environmental control", "ru": "Планета вмещает больше жителей" }
+            }
+          ],
+          "recommended": [], "comment": "Depends on map"
+        },
+        {
+          "cost": 400,
+          "cumulative_cost": 480,
+          "level_name": { "en": "Advanced Biology", "ru": "Продвинутая биология" },
+          "technologies": [
+            {
+              "code": "cloning-center",
+              "name": { "en": "Cloning Center", "ru": "Центр клонирования" },
+              "description": { "en": "Population growth", "ru": "Население растёт быстрее" }
+            },
+            {
+              "code": "soil-enrichment",
+              "name": { "en": "Soil Enrichment", "ru": "Обогащение почвы" },
+              "description": { "en": "Better farming", "ru": "Фермеры дают больше еды" }
+            },
+            {
+              "code": "death-spores",
+              "name": { "en": "Death Spores", "ru": "Споры смерти" },
+              "description": { "en": "Biological weapon", "ru": "Биологическое оружие против колоний" }
+            }
+          ],
+          "recommended": ["cloning-center", "soil-enrichment"]
+        },
+        {
+          "cost": 900,
+          "cumulative_cost": 1380,
+          "level_name": { "en": "Genetic Engineering", "ru": "Генная инженерия" },
+          "technologies": [
+            {
+              "code": "telepathic-training",
+              "name": { "en": "Telepathic Training", "ru": "Телепатическая подготовка" },
+              "description": { "en": "Psionic abilities", "ru": "Раса овладевает телепатией" }
+            },
+            {
+              "code": "microbiotics",
+              "name": { "en": "Microbiotics", "ru": "Микробиотика" },
+              "description": { "en": "Health improvement", "ru": "Население растёт быстрее и живёт дольше" }
+            }
+          ],
+          "recommended": ["telepathic-training", "microbiotics"]
+        },
+        {
+          "cost": 1150,
+          "cumulative_cost": 2530,
+          "level_name": { "en": "Genetic Mutations", "ru": "Генетические мутации" },
+          "technologies": [
+            {
+              "code": "terraforming",
+              "name": { "en": "Terraforming", "ru": "Терраформирование" },
+              "description": { "en": "Planet modification", "ru": "Климат планеты улучшается" }
+            }
+          ],
+          "recommended": ["terraforming"]
+        },
+        {
+          "cost": 1500,
+          "cumulative_cost": 4030,
+          "level_name": { "en": "Macro Genetics", "ru": "Макрогенетика" },
+          "technologies": [
+            {
+              "code": "subterranean-farms",
+              "name": { "en": "Subterranean Farms", "ru": "Подземные фермы" },
+              "description": { "en": "Underground farming", "ru": "Много еды без фермеров" }
+            },
+            {
+              "code": "weather-controller",
+              "name": { "en": "Weather Controller", "ru": "Управление погодой" },
+              "description": { "en": "Climate control", "ru": "Фермеры дают намного больше еды" }
+            }
+          ],
+          "recommended": [], "comment": "Depends on map"
+        },
+        {
+          "cost": 2750,
+          "cumulative_cost": 6780,
+          "level_name": { "en": "Evolutionary Genetics", "ru": "Эволюционная генетика" },
+          "technologies": [
+            {
+              "code": "psionics",
+              "name": { "en": "Psionics", "ru": "Псионика" },
+              "description": { "en": "Psionic abilities", "ru": "Телепатические способности сильнее" }
+            },
+            {
+              "code": "heightened-intelligence",
+              "name": { "en": "Heightened Intelligence", "ru": "Повышенный разум" },
+              "description": { "en": "Intelligence boost", "ru": "Наука империи выше" }
+            }
+          ],
+          "recommended": ["psionics", "heightened-intelligence"]
+        },
+        {
+          "cost": 4500,
+          "cumulative_cost": 11280,
+          "level_name": { "en": "Artificial Life", "ru": "Искусственная жизнь" },
+          "technologies": [
+            {
+              "code": "bio-terminator",
+              "name": { "en": "Bioplague", "ru": "Биочума" },
+              "description": { "en": "Biological weapon", "ru": "Сильнейшее биологическое оружие" }
+            },
+            {
+              "code": "universal-antidote",
+              "name": { "en": "Universal Antidote", "ru": "Универсальный антидот" },
+              "description": { "en": "Disease immunity", "ru": "Биологическое оружие не действует" }
+            }
+          ],
+          "recommended": ["universal-antidote"]
+        },
+        {
+          "cost": 7500,
+          "cumulative_cost": 18780,
+          "level_name": { "en": "Trans Genetics", "ru": "Трансгенетика" },
+          "technologies": [
+            {
+              "code": "biomorphic-fungi",
+              "name": { "en": "Biomorphic Fungi", "ru": "Биоморфные грибы" },
+              "description": { "en": "Advanced farming", "ru": "Еда на любой планете" }
+            },
+            {
+              "code": "gaia-transformation",
+              "name": { "en": "Gaia Transformation", "ru": "Превращение в Гею" },
+              "description": { "en": "Ultimate terraforming", "ru": "Наилучший климат планеты" }
+            },
+            {
+              "code": "evolutionary-mutation",
+              "name": { "en": "Evolutionary Mutation", "ru": "Эволюционная мутация" },
+              "description": { "en": "Species evolution", "ru": "Раса получает лишнюю сторону" }
+            }
+          ],
+          "recommended": ["evolutionary-mutation"]
+        }
+      ]
+    },
+    "physics": {
+      "name": { "en": "Physics", "ru": "Физика" },
+      "description": { "en": "Physics and weapons technologies", "ru": "Физика и оружие" },
+      "levels": [
+        {
+          "cost": 50,
+          "cumulative_cost": 50,
+          "level_name": { "en": "Physics", "ru": "Физика" },
+          "general": true,
+          "technologies": [
+            {
+              "code": "laser-cannon",
+              "name": { "en": "Laser Cannon", "ru": "Лазерная пушка" },
+              "description": { "en": "Basic beam weapon", "ru": "Простейшее лучевое оружие" }
+            },
+            {
+              "code": "laser-rifle",
+              "name": { "en": "Laser Rifle", "ru": "Лазерная винтовка" },
+              "description": { "en": "Basic ground weapon", "ru": "Простейшее оружие пехоты" }
+            },
+            {
+              "code": "space-scanner",
+              "name": { "en": "Space Scanner", "ru": "Космический сканер" },
+              "description": { "en": "Detection system", "ru": "Видно чужое присутствие в системах" }
+            }
+          ],
+          "recommended": [], "comment": "All technologies - general level"
+        },
+        {
+          "cost": 150,
+          "cumulative_cost": 200,
+          "level_name": { "en": "Fusion Physics", "ru": "Физика синтеза" },
+          "technologies": [
+            {
+              "code": "fusion-beam",
+              "name": { "en": "Fusion Beam", "ru": "Термоядерный луч" },
+              "description": { "en": "Advanced beam weapon", "ru": "Луч сильнее лазера" }
+            },
+            {
+              "code": "fusion-rifle",
+              "name": { "en": "Fusion Rifle", "ru": "Термоядерная винтовка" },
+              "description": { "en": "Advanced ground weapon", "ru": "Пехота вооружена лучше" }
+            }
+          ],
+          "recommended": [], "comment": "Depends on strategy"
+        },
+        {
+          "cost": 250,
+          "cumulative_cost": 450,
+          "level_name": { "en": "Tachyon Physics", "ru": "Тахионная физика" },
+          "technologies": [
+            {
+              "code": "tachyon-communications",
+              "name": { "en": "Tachyon Communications", "ru": "Тахионная связь" },
+              "description": { "en": "FTL communication", "ru": "Приказы доходят дальше" }
+            },
+            {
+              "code": "tachyon-scanner",
+              "name": { "en": "Tachyon Scanner", "ru": "Тахионный сканер" },
+              "description": { "en": "Advanced detection", "ru": "Сканер видит дальше" }
+            },
+            {
+              "code": "battle-scanner",
+              "name": { "en": "Battle Scanner", "ru": "Боевой сканер" },
+              "description": { "en": "Combat detection", "ru": "Залп точнее" }
+            }
+          ],
+          "recommended": ["battle-scanner", "tachyon-communications"]
+        },
+        {
+          "cost": 900,
+          "cumulative_cost": 1350,
+          "level_name": { "en": "Neutrino Physics", "ru": "Нейтринная физика" },
+          "technologies": [
+            {
+              "code": "neutron-blaster",
+              "name": { "en": "Neutron Blaster", "ru": "Нейтронный бластер" },
+              "description": { "en": "Powerful beam weapon", "ru": "Мощный луч" }
+            },
+            {
+              "code": "neutron-scanner",
+              "name": { "en": "Neutron Scanner", "ru": "Нейтронный сканер" },
+              "description": { "en": "Superior detection", "ru": "Сканер видит намного дальше" }
+            }
+          ],
+          "recommended": ["neutron-blaster", "neutron-scanner"]
+        },
+        {
+          "cost": 1150,
+          "cumulative_cost": 2500,
+          "level_name": { "en": "Artificial Gravity", "ru": "Искусственная гравитация" },
+          "technologies": [
+            {
+              "code": "tractor-beam",
+              "name": { "en": "Tractor Beam", "ru": "Захватный луч" },
+              "description": { "en": "Ship capture", "ru": "Чужой корабль можно взять на абордаж" }
+            },
+            {
+              "code": "graviton-beam",
+              "name": { "en": "Graviton Beam", "ru": "Гравитонный луч" },
+              "description": { "en": "Gravity weapon", "ru": "Луч, ломающий корпус" }
+            },
+            {
+              "code": "gravity-generator",
+              "name": { "en": "Gravity Generator", "ru": "Генератор гравитации" },
+              "description": { "en": "Artificial gravity", "ru": "Тяжесть планеты расе не помеха" }
+            }
+          ],
+          "recommended": [], "comment": "Depends on strategy"
+        },
+        {
+          "cost": 1500,
+          "cumulative_cost": 4000,
+          "level_name": { "en": "Subspace Physics", "ru": "Физика подпространства" },
+          "technologies": [
+            {
+              "code": "subspace-communications",
+              "name": { "en": "Subspace Communications", "ru": "Подпространственная связь" },
+              "description": { "en": "Empire-wide comms", "ru": "Связь по всей империи" }
+            },
+            {
+              "code": "jump-gate",
+              "name": { "en": "Jump Gate", "ru": "Прыжковые врата" },
+              "description": { "en": "FTL travel gate", "ru": "Флот идёт быстрее" }
+            }
+          ],
+          "recommended": ["subspace-communications"]
+        },
+        {
+          "cost": 2000,
+          "cumulative_cost": 6000,
+          "level_name": { "en": "Multi-Phased Physics", "ru": "Многофазная физика" },
+          "technologies": [
+            {
+              "code": "phasors",
+              "name": { "en": "Resonators", "ru": "Резонаторы" },
+              "description": { "en": "Advanced beam weapon", "ru": "Продвинутое лучевое оружие" }
+            },
+            {
+              "code": "phasor-rifle",
+              "name": { "en": "Resonator Rifle", "ru": "Резонаторная винтовка" },
+              "description": { "en": "Advanced ground weapon", "ru": "Пехота вооружена намного лучше" }
+            },
+            {
+              "code": "multi-phased-shields",
+              "name": { "en": "Multi-Phased Shields", "ru": "Многофазные щиты" },
+              "description": { "en": "Improved shields", "ru": "Щиты держат больше" }
+            }
+          ],
+          "recommended": [], "comment": "Depends on strategy"
+        },
+        {
+          "cost": 3500,
+          "cumulative_cost": 9500,
+          "level_name": { "en": "Plasma Physics", "ru": "Физика плазмы" },
+          "technologies": [
+            {
+              "code": "plasma-cannon",
+              "name": { "en": "Plasma Cannon", "ru": "Плазменная пушка" },
+              "description": { "en": "Plasma weapon", "ru": "Плазменное оружие" }
+            },
+            {
+              "code": "plasma-rifle",
+              "name": { "en": "Plasma Rifle", "ru": "Плазменная винтовка" },
+              "description": { "en": "Plasma ground weapon", "ru": "Сильнейшее оружие пехоты" }
+            },
+            {
+              "code": "plasma-web",
+              "name": { "en": "Plasma Web", "ru": "Плазменная сеть" },
+              "description": { "en": "Area denial", "ru": "Оружие, опутывающее корабль" }
+            }
+          ],
+          "recommended": [], "comment": "Depends on strategy"
+        },
+        {
+          "cost": 4500,
+          "cumulative_cost": 14000,
+          "level_name": { "en": "Multi-Dimensional Physics", "ru": "Многомерная физика" },
+          "technologies": [
+            {
+              "code": "disruptor-cannon",
+              "name": { "en": "Disruptor Cannon", "ru": "Дисраптор" },
+              "description": { "en": "Ultimate beam weapon", "ru": "Сильнейшее лучевое оружие" }
+            },
+            {
+              "code": "dimensional-portal",
+              "name": { "en": "Dimensional Portal", "ru": "Пространственный портал" },
+              "description": { "en": "A road to the worlds Beyond", "ru": "Дорога в миры из-за Предела" }
+            }
+          ],
+          "recommended": ["dimensional-portal", "disruptor-cannon"]
+        },
+        {
+          "cost": 6000,
+          "cumulative_cost": 20000,
+          "level_name": { "en": "Hyper-Dimensional Physics", "ru": "Гиперпространственная физика" },
+          "technologies": [
+            {
+              "code": "hyperspace-communications",
+              "name": { "en": "Hyperspace Communications", "ru": "Гиперпространственная связь" },
+              "description": { "en": "Ultimate comms", "ru": "Флот меняет курс в пути" }
+            },
+            {
+              "code": "mauler-device",
+              "name": { "en": "Pulverizer", "ru": "Дробитель" },
+              "description": { "en": "Ultimate weapon", "ru": "Оружие, которое не промахивается" }
+            },
+            {
+              "code": "sensors",
+              "name": { "en": "Sensors", "ru": "Сенсоры" },
+              "description": { "en": "Perfect detection", "ru": "Совершенная разведка" }
+            }
+          ],
+          "recommended": [], "comment": "Depends on strategy"
+        },
+        {
+          "cost": 15000,
+          "cumulative_cost": 35000,
+          "level_name": { "en": "Temporal Physics", "ru": "Физика времени" },
+          "technologies": [
+            {
+              "code": "time-warp-facilitator",
+              "name": { "en": "Temporal Accelerator", "ru": "Ускоритель времени" },
+              "description": { "en": "Time manipulation", "ru": "Корабль ходит в бою дважды" }
+            },
+            {
+              "code": "stellar-converter",
+              "name": { "en": "Nova Lance", "ru": "Копьё новы" },
+              "description": { "en": "Destroy stars", "ru": "Оружие, разрушающее планеты" }
+            },
+            {
+              "code": "star-gate",
+              "name": { "en": "Void Gate", "ru": "Врата пустоты" },
+              "description": { "en": "Instant travel", "ru": "Флот переносится мгновенно" }
+            }
+          ],
+          "recommended": ["time-warp-facilitator"]
+        }
+      ]
+    },
+    "force_fields": {
+      "name": { "en": "Force Fields", "ru": "Силовые поля" },
+      "description": { "en": "Shield and field technologies", "ru": "Щиты и поля" },
+      "levels": [
+        {
+          "cost": 250,
+          "cumulative_cost": 250,
+          "level_name": { "en": "Advanced Magnetism", "ru": "Продвинутый магнетизм" },
+          "technologies": [
+            {
+              "code": "class-i-shield",
+              "name": { "en": "Class I Shield", "ru": "Щит I класса" },
+              "description": { "en": "Basic shields", "ru": "Простейший щит корабля" }
+            },
+            {
+              "code": "mass-driver",
+              "name": { "en": "Mass Driver", "ru": "Масс-драйвер" },
+              "description": { "en": "Kinetic weapon", "ru": "Кинетическое оружие" }
+            },
+            {
+              "code": "ecm-jammer",
+              "name": { "en": "ECM Jammer", "ru": "Постановщик помех" },
+              "description": { "en": "Electronic countermeasures", "ru": "Чужие ракеты теряют цель" }
+            }
+          ],
+          "recommended": ["ecm-jammer"]
+        },
+        {
+          "cost": 650,
+          "cumulative_cost": 900,
+          "level_name": { "en": "Gravitic Fields", "ru": "Гравитационные поля" },
+          "technologies": [
+            {
+              "code": "anti-grav-harness",
+              "name": { "en": "Anti-Grav Harness", "ru": "Антигравитационная сбруя" },
+              "description": { "en": "Anti-gravity", "ru": "Пехота передвигается быстрее" }
+            },
+            {
+              "code": "inertial-stabilizer",
+              "name": { "en": "Inertial Stabilizer", "ru": "Инерционный стабилизатор" },
+              "description": { "en": "Stabilization", "ru": "Корабль уходит от огня легче" }
+            },
+            {
+              "code": "gyro-destabilizer",
+              "name": { "en": "Spin Destabilizer", "ru": "Раскручиватель" },
+              "description": { "en": "Weapon disruption", "ru": "Оружие срывает корабль с курса" }
+            }
+          ],
+          "recommended": ["inertial-stabilizer"]
+        },
+        {
+          "cost": 900,
+          "cumulative_cost": 1800,
+          "level_name": { "en": "Magneto Gravitics", "ru": "Магнитогравитика" },
+          "technologies": [
+            {
+              "code": "class-iii-shield",
+              "name": { "en": "Class III Shield", "ru": "Щит III класса" },
+              "description": { "en": "Improved shields", "ru": "Щит крепче" }
+            },
+            {
+              "code": "radiation-shield",
+              "name": { "en": "Radiation Shield", "ru": "Противорадиационный щит" },
+              "description": { "en": "Radiation protection", "ru": "Колония терпит радиацию" }
+            },
+            {
+              "code": "warp-dissipater",
+              "name": { "en": "Warp Dissipater", "ru": "Рассеиватель искривления" },
+              "description": { "en": "Warp disruption", "ru": "Чужой флот не уйдёт из боя" }
+            }
+          ],
+          "recommended": ["class-iii-shield"]
+        },
+        {
+          "cost": 1500,
+          "cumulative_cost": 3300,
+          "level_name": { "en": "Electromagnetic Refraction", "ru": "Электромагнитное преломление" },
+          "technologies": [
+            {
+              "code": "stealth-field",
+              "name": { "en": "Stealth Field", "ru": "Поле скрытности" },
+              "description": { "en": "Ship stealth", "ru": "Корабли не видны на карте" }
+            },
+            {
+              "code": "personal-shield",
+              "name": { "en": "Personal Shield", "ru": "Личный щит" },
+              "description": { "en": "Ground unit shields", "ru": "Пехота под щитом" }
+            },
+            {
+              "code": "stealth-suit",
+              "name": { "en": "Stealth Suit", "ru": "Костюм скрытности" },
+              "description": { "en": "Ground unit stealth", "ru": "Агенты работают незаметнее" }
+            }
+          ],
+          "recommended": ["personal-shield", "stealth-suit"]
+        },
+        {
+          "cost": 2000,
+          "cumulative_cost": 5300,
+          "level_name": { "en": "Warp Fields", "ru": "Поля искривления" },
+          "technologies": [
+            {
+              "code": "pulsar",
+              "name": { "en": "Pulsar", "ru": "Пульсар" },
+              "description": { "en": "Area weapon", "ru": "Оружие бьёт по всем, кто рядом" }
+            },
+            {
+              "code": "warp-interdictor",
+              "name": { "en": "Warp Interdictor", "ru": "Запиратель искривления" },
+              "description": { "en": "Prevent warp", "ru": "Чужой флот не войдёт в систему" }
+            },
+            {
+              "code": "lightning-field",
+              "name": { "en": "Lightning Field", "ru": "Поле молний" },
+              "description": { "en": "Defensive field", "ru": "Ракеты сбиваются сами" }
+            }
+          ],
+          "recommended": ["lightning-field"]
+        },
+        {
+          "cost": 2750,
+          "cumulative_cost": 8050,
+          "level_name": { "en": "Subspace Fields", "ru": "Подпространственные поля" },
+          "technologies": [
+            {
+              "code": "class-v-shields",
+              "name": { "en": "Class V Shields", "ru": "Щит V класса" },
+              "description": { "en": "Advanced shields", "ru": "Щит намного крепче" }
+            },
+            {
+              "code": "multi-wave-ecm-jammer",
+              "name": { "en": "Multi-Wave ECM Jammer", "ru": "Многоволновой постановщик помех" },
+              "description": { "en": "Advanced ECM", "ru": "Помехи сильнее" }
+            },
+            {
+              "code": "gauss-cannon",
+              "name": { "en": "Gauss Cannon", "ru": "Гаусс-пушка" },
+              "description": { "en": "Gauss weapon", "ru": "Мощное кинетическое оружие" }
+            }
+          ],
+          "recommended": ["gauss-cannon", "class-v-shields"]
+        },
+        {
+          "cost": 3500,
+          "cumulative_cost": 11550,
+          "level_name": { "en": "Distortion Fields", "ru": "Поля искажения" },
+          "technologies": [
+            {
+              "code": "cloaking-device",
+              "name": { "en": "Cloaking Device", "ru": "Устройство маскировки" },
+              "description": { "en": "Ship cloaking", "ru": "Корабль невидим до выстрела" }
+            },
+            {
+              "code": "stasis-field",
+              "name": { "en": "Stasis Field", "ru": "Поле стазиса" },
+              "description": { "en": "Time stop field", "ru": "Чужой корабль замирает" }
+            },
+            {
+              "code": "hard-shields",
+              "name": { "en": "Hard Shields", "ru": "Твёрдые щиты" },
+              "description": { "en": "Superior shields", "ru": "Щит держит любой удар лучше" }
+            }
+          ],
+          "recommended": ["stasis-field", "hard-shields"]
+        },
+        {
+          "cost": 4500,
+          "cumulative_cost": 16050,
+          "level_name": { "en": "Quantum Fields", "ru": "Квантовые поля" },
+          "technologies": [
+            {
+              "code": "class-vii-shield",
+              "name": { "en": "Class VII Shield", "ru": "Щит VII класса" },
+              "description": { "en": "Ultimate shields", "ru": "Почти лучший щит" }
+            },
+            {
+              "code": "planetary-flux-shield",
+              "name": { "en": "Planetary Flux Shield", "ru": "Планетарный щит" },
+              "description": { "en": "Planetary defense", "ru": "Поле вокруг планеты" }
+            },
+            {
+              "code": "wide-area-jammer",
+              "name": { "en": "Wide Area Jammer", "ru": "Широкополосный постановщик помех" },
+              "description": { "en": "Area ECM", "ru": "Помехи на весь флот" }
+            }
+          ],
+          "recommended": ["class-vii-shield", "planetary-flux-shield"]
+        },
+        {
+          "cost": 7500,
+          "cumulative_cost": 23550,
+          "level_name": { "en": "Transwarp Fields", "ru": "Трансварповые поля" },
+          "technologies": [
+            {
+              "code": "displacement-device",
+              "name": { "en": "Blink Field", "ru": "Поле смещения" },
+              "description": { "en": "Teleportation", "ru": "Часть выстрелов проходит мимо" }
+            },
+            {
+              "code": "subspace-teleporter",
+              "name": { "en": "Subspace Teleporter", "ru": "Подпространственный телепортер" },
+              "description": { "en": "Subspace teleport", "ru": "Корабль прыгает по полю боя" }
+            },
+            {
+              "code": "inertial-nullifier",
+              "name": { "en": "Inertial Nullifier", "ru": "Инерционный нейтрализатор" },
+              "description": { "en": "Nullify inertia", "ru": "Корабль уходит от огня почти всегда" }
+            }
+          ],
+          "recommended": ["inertial-nullifier", "subspace-teleporter"]
+        },
+        {
+          "cost": 15000,
+          "cumulative_cost": 38550,
+          "level_name": { "en": "Temporal Fields", "ru": "Временные поля" },
+          "technologies": [
+            {
+              "code": "class-x-shield",
+              "name": { "en": "Class X Shield", "ru": "Щит X класса" },
+              "description": { "en": "Perfect shields", "ru": "Лучший щит игры" }
+            },
+            {
+              "code": "planetary-barrier-shield",
+              "name": { "en": "Planetary Barrier Shield", "ru": "Планетарный барьер" },
+              "description": { "en": "Ultimate planetary defense", "ru": "Десант не высадить вовсе" }
+            },
+            {
+              "code": "phasing-cloak",
+              "name": { "en": "Phasing Cloak", "ru": "Фазовая маскировка" },
+              "description": { "en": "Perfect cloaking", "ru": "Совершенная невидимость" }
+            }
+          ],
+          "recommended": ["phasing-cloak"]
+        }
+      ]
+    }
+  },
+  "starting_levels": {
+    "description": "Levels every race has from the first turn, as \"category:order\" references. A reference, not a name: names are translated, a level is identified by its place in the tree.",
+    "all_races": [
+      "power:1",
+      "chemistry:1",
+      "physics:1"
+    ]
+  },
+  "notes": {
+    "tech_system": "Восемь разделов без взаимных зависимостей; внутри раздела уровни идут лестницей, боковых ветвей нет.",
+    "creative_races": "Изобретательная раса получает уровень целиком; остальные выбирают одну технологию уровня (ResearchService.grant).",
+    "research_costs": "Цены в очках исследования; накопленная цена считается от старта партии.",
+    "exotic_techs": "Часть технологий не исследуется, а достаётся особыми путями (находки, лидеры)."
+  }
+}
