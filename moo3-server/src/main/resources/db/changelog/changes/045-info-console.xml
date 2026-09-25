@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+        Постройки в летописи империй — п. 11.1, график окна Info MOO II.
+
+        Руководство оригинала называет четыре величины графика: население, постройки,
+        флот и технологии, — и говорит, чем меряются постройки: «each building adds the
+        production cost of that building». Трёх из четырёх летопись уже держала, а
+        построек не считала вовсе, и кнопка графика оригинала оставалась бы без линии.
+
+        Считается тем же проходом по колониям, что и остальное: здания колонии уже
+        загружены контекстом хода, и лишней выборки замер не делает.
+    -->
+    <changeSet id="045-01-empire-history-buildings" author="moo3">
+        <addColumn tableName="empire_history">
+            <column name="buildings" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

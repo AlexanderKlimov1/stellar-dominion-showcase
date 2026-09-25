@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+        Имя игрока и почта вместо логина — п. 3.1.
+
+        Логин и почта раньше были разными полями, и это давало две беды разом: игрок
+        запоминал два имени вместо одного, а в интерфейсе стоял логин — служебная строка,
+        которую никто не выбирал для чужих глаз. Теперь логин и есть почта, а имя заведено
+        отдельно и служит только для показа: в главном меню и в списке записей.
+
+        Старым записям имя достаётся от прежнего логина: он и был тем, чем игрок
+        назывался. Логин при этом становится почтой — кроме администратора, у которого
+        почты нет вовсе: он заводится сервером и регистрацию не проходит.
+    -->
+    <changeSet id="046-01-account-name" author="moo3">
+        <addColumn tableName="account">
+            <column name="name" type="VARCHAR(64)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="046-02-account-name-from-login" author="moo3">
+        <update tableName="account">
+            <column name="name" valueComputed="login"/>
+            <where>name IS NULL</where>
+        </update>
+    </changeSet>
+
+    <!--
+        Логин раньше был коротким именем в 32 знака, а теперь это почтовый адрес: у него
+        своя длина, та же, что у колонки почты.
+    -->
+    <changeSet id="046-03-account-login-wider" author="moo3">
+        <modifyDataType tableName="account" columnName="login" newDataType="VARCHAR(255)"/>
+        <addNotNullConstraint tableName="account" columnName="login" columnDataType="VARCHAR(255)"/>
+    </changeSet>
+
+    <changeSet id="046-04-account-login-is-email" author="moo3">
+        <update tableName="account">
+            <column name="login" valueComputed="email"/>
+            <where>email IS NOT NULL AND email &lt;&gt; '' AND login &lt;&gt; email</where>
+        </update>
+    </changeSet>
+
+    <changeSet id="046-05-account-name-required" author="moo3">
+        <addNotNullConstraint tableName="account" columnName="name" columnDataType="VARCHAR(64)"/>
+    </changeSet>
+
+</databaseChangeLog>

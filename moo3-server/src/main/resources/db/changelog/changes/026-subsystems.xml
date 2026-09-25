@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+        Шпионаж — п. 13.
+
+        Империя копит очки разведки каждый ход, и копилка переживает и ход, и сохранение
+        партии, поэтому лежит колонкой на игроке. Операции, которые будут её тратить,
+        появятся вместе с дипломатией — им понадобятся свои таблицы, этой хватит.
+
+        Наземному бою (п. 12), кораблям (п. 8) и правительству (п. 14) своих колонок не
+        нужно: бой меняет владельца и население планеты, характеристики кораблей считаются
+        из каталога и расы, а правительство это особенность расы в player.race_traits.
+    -->
+    <changeSet id="026-01-add-player-espionage-points" author="moo3">
+        <addColumn tableName="player">
+            <column name="espionage_points" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

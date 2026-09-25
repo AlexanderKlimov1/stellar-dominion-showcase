@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+      Размер текста интерфейса живёт в учётной записи — п. 11.1, там же, где язык (п. 3.5).
+
+      Причина та же и проверена на языке: настройка, лежащая только в localStorage, теряется
+      на второй машине, и игрок, однажды выбравший крупный шрифт, получает мелкий заново.
+      Хранится ПРОЦЕНТАМИ (100, 115, 130, 150), а не готовым кеглем: кегли в игре разные, а
+      общий у них один множитель, и он же стоит в корне стилей переменной moo3-text-scale.
+      (Записать её здесь с двумя дефисами нельзя: внутри комментария XML их не бывает.)
+
+      Колонка не обязательная: пусто значит «игрок размера не называл» — сотня, прежний
+      размер. Пустой она остаётся и у администратора, которого заводит первый запуск
+      сервера: никакого браузера, а значит и настройки, там нет.
+    -->
+    <changeSet id="069-account-text-scale" author="moo3">
+        <addColumn tableName="account">
+            <column name="text_scale" type="integer"/>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

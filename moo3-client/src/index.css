@@ -1,0 +1,217 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /*
+    Тема текста: шесть ступеней яркости и три состояния. Числа — sRGB через пробел, как
+    требует `rgb(var(--x) / <alpha-value>)` в `tailwind.config.js`: так у ролей работают
+    модификаторы прозрачности.
+
+    Контраст на основном фоне (#05070f) измерен и подписан у каждой ступени. Всё, кроме
+    `off`, проходит 4,5 : 1 даже на самой светлой панели (#121829); `off` — это
+    НЕДОСТУПНОЕ, а не текст, и к нему требование читаемости не относится вовсе.
+  */
+  :root {
+    --ink-bright: 238 244 255; /* 18,2 : 1 — заголовки и числа, на которые смотрят */
+    --ink: 204 216 234; /*        14,0 : 1 — основной текст */
+    --ink-soft: 163 180 204; /*    9,5 : 1 — второстепенный */
+    --ink-dim: 138 155 180; /*     7,1 : 1 — подписи полей и столбцов */
+    --ink-faint: 115 131 156; /*   5,2 : 1 — примечания, единицы, сноски */
+    --ink-off: 85 99 122; /*       3,3 : 1 — недоступное и выключенное */
+    --accent: 127 212 255;
+    --danger: 251 138 138;
+    --warn: 251 191 36;
+    --good: 74 222 128;
+
+    /*
+      Масштаб текста — п. 11.1. Всё в игре меряется в `rem`, поэтому одна эта величина
+      правит кегль, отступы и высоту панелей разом. Ставит её `applyTextScale` по выбору
+      игрока; 1 значит «как было».
+    */
+    --moo3-text-scale: 1;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  /* Корень шкалы: 16 пикселей при стократном масштабе — отсюда растёт весь интерфейс. */
+  html {
+    font-size: calc(16px * var(--moo3-text-scale));
+  }
+
+  body {
+    @apply bg-space-950 text-ink font-mono antialiased;
+    margin: 0;
+    overflow: hidden;
+  }
+}
+
+@layer components {
+  /* Меню, HUD и дерево технологий — текстовые ссылки (п. 11.1). */
+  .link {
+    @apply cursor-pointer text-ink underline decoration-dotted underline-offset-4
+           hover:text-accent disabled:cursor-not-allowed disabled:text-ink-off disabled:no-underline;
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    text-align: left;
+  }
+
+  .link-active {
+    @apply text-accent no-underline;
+  }
+
+  .panel {
+    @apply border border-space-600 bg-space-900/95 p-4 shadow-lg shadow-black/60;
+  }
+
+  .panel-title {
+    @apply mb-3 text-12 uppercase tracking-[0.2em] text-ink-dim;
+  }
+
+  .field {
+    @apply w-full border border-space-600 bg-space-800 px-2 py-1 text-ink-bright
+           outline-none focus:border-accent;
+  }
+}
+
+/*
+  Гибель корабля в тактическом бою — п. 8: прямоугольник разлетается кусками и гаснет.
+  Куда лететь каждому куску, задаёт он сам переменными --fly-x, --fly-y и --spin, а сами
+  кадры общие — так браузер считает десяток обломков одной анимацией.
+*/
+@keyframes moo3-debris {
+  from {
+    transform: translate(0, 0) rotate(0deg);
+    opacity: 1;
+  }
+  to {
+    transform: translate(var(--fly-x), var(--fly-y)) rotate(var(--spin));
+    opacity: 0;
+  }
+}
+
+/* Вспышка на месте погибшего корабля: расходится и гаснет быстрее обломков. */
+@keyframes moo3-flash {
+  from {
+    opacity: 0.55;
+    transform: scale(0.4);
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.6);
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+}
+
+/*
+  Выстрелы в тактическом бою — п. 8. Луч вспыхивает и гаснет на месте, снаряд летит от
+  ствола к цели (куда именно — говорит он сам переменными --fly-x и --fly-y), след ракеты
+  проявляется и гаснет вслед за ней. Сама ракета идёт по дуге средствами SVG.
+*/
+@keyframes moo3-beam {
+  0% {
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes moo3-projectile {
+  from {
+    transform: translate(0, 0);
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  to {
+    transform: translate(var(--fly-x), var(--fly-y));
+    opacity: 0;
+  }
+}
+
+@keyframes moo3-missile-trail {
+  0% {
+    opacity: 0;
+  }
+  40% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/*
+  Излучение чёрной дыры в центре Галактики (демонстрационная сцена «Млечный Путь»).
+
+  Светится не сама дыра, а вещество вокруг неё, поэтому разгорается и гаснет кольцо, а
+  не чёрный кружок. Пузыри Ферми дышат вдвое медленнее кольца: это след давней вспышки,
+  а не сама вспышка, и быстрое мигание врало бы о том, что там происходит.
+*/
+@keyframes moo3-accretion {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes moo3-fermi {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 0.85;
+  }
+}
+
+/*
+  Лучи выброса и аккреционный диск («Млечный Путь»).
+
+  Дымка, луч и ядро дышат РАЗНЫМИ сроками: совпади они — свечение мигало бы разом, как
+  лампочка, а так один слой ещё разгорается, когда другой уже гаснет, и луч выглядит
+  живым. Вещество диска течёт разметкой: едет смещение пунктира, а не сам круг, — круг
+  посчитан проекцией и поворачиваться в плоскости экрана не должен.
+*/
+@keyframes moo3-jet {
+  0%,
+  100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes moo3-jet-haze {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 0.95;
+  }
+}
+
+@keyframes moo3-accretion-flow {
+  to {
+    stroke-dashoffset: -104;
+  }
+}

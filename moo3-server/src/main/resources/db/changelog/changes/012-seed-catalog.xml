@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+        Заглушки по пунктам 5, 6, 8 и 10: спецификация даёт только заголовки разделов,
+        поэтому здесь минимальный набор строк, достаточный для запуска игры на 8 игроков.
+        Детализация добавляется новыми changeSet без изменения структуры таблиц.
+    -->
+
+    <!-- п. 5 — расы. Восемь рас, по одной на каждый слот галактики (п. 3.2). -->
+    <changeSet id="012-01-seed-race" author="moo3">
+        <insert tableName="race">
+            <column name="code" value="HUMANS"/>
+            <column name="name" value="Humans"/>
+            <column name="description" value="Заглушка расы, детализация в п. 5 и п. 7."/>
+            <column name="home_climate_code" value="TERRAN"/>
+            <column name="color" value="#4fa3ff"/>
+            <column name="sort_order" valueNumeric="1"/>
+        </insert>
+        <insert tableName="race">
+            <column name="code" value="PSILONS"/>
+            <column name="name" value="Psilons"/>
+            <column name="description" value="Заглушка расы, детализация в п. 5 и п. 7."/>
+            <column name="home_climate_code" value="TERRAN"/>
+            <column name="color" value="#ff5f5f"/>
+            <column name="sort_order" valueNumeric="2"/>
+        </insert>
+        <insert tableName="race">
+            <column name="code" value="KLACKONS"/>
+            <column name="name" value="Klackons"/>
+            <column name="description" value="Заглушка расы, детализация в п. 5 и п. 7."/>
+            <column name="home_climate_code" value="TERRAN"/>
+            <column name="color" value="#57d977"/>
+            <column name="sort_order" valueNumeric="3"/>
+        </insert>
+        <insert tableName="race">
+            <column name="code" value="SILICOIDS"/>
+            <column name="name" value="Silicoids"/>
+            <column name="description" value="Заглушка расы, детализация в п. 5 и п. 7."/>
+            <column name="home_climate_code" value="BARREN"/>
+            <column name="color" value="#ffd447"/>
+            <column name="sort_order" valueNumeric="4"/>
+        </insert>
+        <insert tableName="race">
+            <column name="code" value="MRRSHAN"/>
+            <column name="name" value="Mrrshan"/>
+            <column name="description" value="Заглушка расы, детализация в п. 5 и п. 7."/>
+            <column name="home_climate_code" value="ARID"/>
+            <column name="color" value="#b56cff"/>
+            <column name="sort_order" valueNumeric="5"/>
+        </insert>
+        <insert tableName="race">
+            <column name="code" value="BULRATHI"/>
+            <column name="name" value="Bulrathi"/>
+            <column name="description" value="Заглушка расы, детализация в п. 5 и п. 7."/>
+            <column name="home_climate_code" value="TUNDRA"/>
+            <column name="color" value="#ff9a3c"/>
+            <column name="sort_order" valueNumeric="6"/>
+        </insert>
+        <insert tableName="race">
+            <column name="code" value="SAKKRA"/>
+            <column name="name" value="Sakkra"/>
+            <column name="description" value="Заглушка расы, детализация в п. 5 и п. 7."/>
+            <column name="home_climate_code" value="SWAMP"/>
+            <column name="color" value="#47e3d5"/>
+            <column name="sort_order" valueNumeric="7"/>
+        </insert>
+        <insert tableName="race">
+            <column name="code" value="DARLOKS"/>
+            <column name="name" value="Darloks"/>
+            <column name="description" value="Заглушка расы, детализация в п. 5 и п. 7."/>
+            <column name="home_climate_code" value="OCEAN"/>
+            <column name="color" value="#ff7bd5"/>
+            <column name="sort_order" valueNumeric="8"/>
+        </insert>
+    </changeSet>
+
+    <!-- п. 6 — способности. -->
+    <changeSet id="012-02-seed-ability" author="moo3">
+        <insert tableName="ability">
+            <column name="code" value="ABILITY_1"/>
+            <column name="name" value="Способность 1"/>
+            <column name="description" value="Заглушка, детализация в п. 6."/>
+            <column name="pick_cost" valueNumeric="1"/>
+            <column name="sort_order" valueNumeric="1"/>
+        </insert>
+        <insert tableName="ability">
+            <column name="code" value="ABILITY_2"/>
+            <column name="name" value="Способность 2"/>
+            <column name="description" value="Заглушка, детализация в п. 6."/>
+            <column name="pick_cost" valueNumeric="2"/>
+            <column name="sort_order" valueNumeric="2"/>
+        </insert>
+        <insert tableName="ability">
+            <column name="code" value="ABILITY_3"/>
+            <column name="name" value="Способность 3"/>
+            <column name="description" value="Заглушка, детализация в п. 6."/>
+            <column name="pick_cost" valueNumeric="3"/>
+            <column name="sort_order" valueNumeric="3"/>
+        </insert>
+    </changeSet>
+
+    <!-- п. 10 — здания. -->
+    <changeSet id="012-03-seed-building" author="moo3">
+        <insert tableName="building">
+            <column name="code" value="BUILDING_1"/>
+            <column name="name" value="Здание 1"/>
+            <column name="description" value="Заглушка, детализация в п. 10."/>
+            <column name="cost" valueNumeric="60"/>
+            <column name="upkeep" valueNumeric="1"/>
+            <column name="sort_order" valueNumeric="1"/>
+        </insert>
+        <insert tableName="building">
+            <column name="code" value="BUILDING_2"/>
+            <column name="name" value="Здание 2"/>
+            <column name="description" value="Заглушка, детализация в п. 10."/>
+            <column name="cost" valueNumeric="120"/>
+            <column name="upkeep" valueNumeric="2"/>
+            <column name="sort_order" valueNumeric="2"/>
+        </insert>
+        <insert tableName="building">
+            <column name="code" value="BUILDING_3"/>
+            <column name="name" value="Здание 3"/>
+            <column name="description" value="Заглушка, детализация в п. 10."/>
+            <column name="cost" valueNumeric="240"/>
+            <column name="upkeep" valueNumeric="3"/>
+            <column name="sort_order" valueNumeric="3"/>
+        </insert>
+    </changeSet>
+
+    <!-- п. 8 — корпуса кораблей и вооружение. -->
+    <changeSet id="012-04-seed-ship-hull" author="moo3">
+        <insert tableName="ship_hull">
+            <column name="code" value="FRIGATE"/>
+            <column name="name" value="Frigate"/>
+            <column name="description" value="Заглушка, детализация в п. 8."/>
+            <column name="space" valueNumeric="30"/>
+            <column name="cost" valueNumeric="16"/>
+            <column name="sort_order" valueNumeric="1"/>
+        </insert>
+        <insert tableName="ship_hull">
+            <column name="code" value="DESTROYER"/>
+            <column name="name" value="Destroyer"/>
+            <column name="description" value="Заглушка, детализация в п. 8."/>
+            <column name="space" valueNumeric="60"/>
+            <column name="cost" valueNumeric="42"/>
+            <column name="sort_order" valueNumeric="2"/>
+        </insert>
+        <insert tableName="ship_hull">
+            <column name="code" value="CRUISER"/>
+            <column name="name" value="Cruiser"/>
+            <column name="description" value="Заглушка, детализация в п. 8."/>
+            <column name="space" valueNumeric="120"/>
+            <column name="cost" valueNumeric="110"/>
+            <column name="sort_order" valueNumeric="3"/>
+        </insert>
+        <insert tableName="ship_hull">
+            <column name="code" value="BATTLESHIP"/>
+            <column name="name" value="Battleship"/>
+            <column name="description" value="Заглушка, детализация в п. 8."/>
+            <column name="space" valueNumeric="250"/>
+            <column name="cost" valueNumeric="280"/>
+            <column name="sort_order" valueNumeric="4"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="012-05-seed-weapon" author="moo3">
+        <insert tableName="weapon">
+            <column name="code" value="MASS_DRIVER"/>
+            <column name="name" value="Mass Driver"/>
+            <column name="description" value="Заглушка, детализация в п. 8."/>
+            <column name="damage" valueNumeric="6"/>
+            <column name="shots" valueNumeric="1"/>
+            <column name="cost" valueNumeric="4"/>
+            <column name="sort_order" valueNumeric="1"/>
+        </insert>
+        <insert tableName="weapon">
+            <column name="code" value="LASER_CANNON"/>
+            <column name="name" value="Laser Cannon"/>
+            <column name="description" value="Заглушка, детализация в п. 8."/>
+            <column name="damage" valueNumeric="4"/>
+            <column name="shots" valueNumeric="1"/>
+            <column name="cost" valueNumeric="3"/>
+            <column name="sort_order" valueNumeric="2"/>
+        </insert>
+        <insert tableName="weapon">
+            <column name="code" value="FUSION_BEAM"/>
+            <column name="name" value="Fusion Beam"/>
+            <column name="description" value="Заглушка, детализация в п. 8."/>
+            <column name="damage" valueNumeric="10"/>
+            <column name="shots" valueNumeric="1"/>
+            <column name="cost" valueNumeric="12"/>
+            <column name="sort_order" valueNumeric="3"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

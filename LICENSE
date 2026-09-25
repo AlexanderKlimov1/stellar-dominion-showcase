@@ -1,0 +1,54 @@
+Stellar Dominion
+Copyright (c) 2026 Александр Климов. Все права защищены.
+
+ИСХОДНЫЙ КОД ОТКРЫТ ДЛЯ ЧТЕНИЯ, НО НЕ ДЛЯ ИСПОЛЬЗОВАНИЯ
+
+Настоящим разрешается: просматривать, читать и изучать этот исходный код —
+в том числе для оценки квалификации автора, — а также цитировать из него
+фрагменты с указанием авторства.
+
+Настоящим НЕ разрешается без письменного согласия автора: использовать этот
+код или любую его часть в своих работах, копировать, изменять, объединять,
+публиковать, распространять, передавать по сублицензии и продавать, а также
+создавать производные произведения.
+
+Код предоставляется «как есть», без каких-либо гарантий, явных или
+подразумеваемых. Автор не несёт ответственности за любые последствия его
+использования.
+
+О ЧУЖИХ ПРАВАХ
+
+Это самостоятельная реализация пошаговой стратегии, вдохновлённая игрой
+Master of Orion II: Battle at Antares. Названия Master of Orion и Orion, а
+также иные упомянутые товарные знаки принадлежат их правообладателям; автор
+с ними не связан и ими не поддерживается. Кода, изображений, звуков и иных
+материалов оригинальной игры этот репозиторий не содержит: имена рас,
+технологий и компонентов заменены своими (см. docs/renaming.md).
+
+
+--- English translation; the Russian text above is the original ---
+
+Stellar Dominion
+Copyright (c) 2026 Alexander Klimov. All rights reserved.
+
+SOURCE AVAILABLE FOR READING, NOT FOR USE
+
+Permission is hereby granted to view, read and study this source code —
+including for the purpose of evaluating the author's skills — and to quote
+excerpts from it with attribution.
+
+Permission is NOT granted, without the author's written consent, to use this
+code or any part of it in your own work, nor to copy, modify, merge, publish,
+distribute, sublicense or sell it, nor to create derivative works.
+
+The code is provided "as is", without warranty of any kind, express or
+implied. The author is not liable for any consequences of its use.
+
+THIRD-PARTY RIGHTS
+
+This is an independent implementation of a turn-based strategy game inspired
+by Master of Orion II: Battle at Antares. Master of Orion, Orion and other
+trademarks mentioned belong to their respective owners; the author is not
+affiliated with or endorsed by them. This repository contains no code, images,
+sounds or other assets from the original game: names of races, technologies
+and components have been replaced with original ones (see docs/renaming.md).

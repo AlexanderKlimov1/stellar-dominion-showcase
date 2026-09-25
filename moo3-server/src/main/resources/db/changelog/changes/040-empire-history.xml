@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+        Летопись империй — п. 11.1, для экрана «Инфо».
+
+        В MOO II окно Information открывается графиком, на котором своя империя стоит
+        рядом с соперниками. График нельзя посчитать задним числом: население и флот
+        прошлых ходов нигде не хранятся, а пересчитать их не из чего. Поэтому каждый ход
+        оставляет по строке на игрока — снимок пяти величин.
+
+        Строка маленькая и пишется раз в ход на игрока: на партии в восемь империй это
+        восемь строк за ход, за триста ходов — две с половиной тысячи. Отдельной таблицей,
+        а не колонками игрока: величины нужны все сразу и только на одном экране.
+    -->
+    <changeSet id="040-01-empire-history" author="moo3">
+        <createTable tableName="empire_history">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_empire_history" nullable="false"/>
+            </column>
+            <column name="game_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="player_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <!-- Ход, за который снят замер: тот, что только что посчитан. -->
+            <column name="turn" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <!-- Население в тысячах — в тех же единицах, что и у колонии. -->
+            <column name="population_k" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="colonies" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="production" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="research" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="fleet_power" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="technologies" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="credits" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="empire_history" baseColumnNames="game_id"
+                                 constraintName="fk_empire_history_game"
+                                 referencedTableName="game" referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+        <!-- Читается всегда одинаково: вся летопись партии по ходам, отсюда и индекс. -->
+        <createIndex tableName="empire_history" indexName="ix_empire_history_game_turn">
+            <column name="game_id"/>
+            <column name="turn"/>
+        </createIndex>
+        <!-- Ход считается под замком партии, но замер за один ход должен быть один. -->
+        <addUniqueConstraint tableName="empire_history" columnNames="player_id, turn"
+                             constraintName="uq_empire_history_player_turn"/>
+    </changeSet>
+
+</databaseChangeLog>

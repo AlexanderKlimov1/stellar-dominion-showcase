@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+        Учётные записи игроков — п. 3.1: до партии игрок называет себя.
+
+        Учётная запись и игрок партии — разные вещи и разные таблицы: запись живёт между
+        партиями, а игрок — только внутри своей. Связывать их жёстко нельзя: один человек
+        играет много партий, а старые партии переживают удаление записи.
+
+        Пароль лежит хешем (BCrypt), в открытом виде его нет нигде — кроме файла
+        администратора, который создаётся один раз при первом запуске и лежит рядом с
+        игрой: это цена того, что администратор регистрации не проходит.
+    -->
+    <changeSet id="041-01-account" author="moo3">
+        <createTable tableName="account">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_account" nullable="false"/>
+            </column>
+            <!-- Логин: им входят и его же видно в лобби. -->
+            <column name="login" type="VARCHAR(32)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uq_account_login"/>
+            </column>
+            <!-- Почта: на неё уходит ссылка подтверждения. У администратора её нет. -->
+            <column name="email" type="VARCHAR(255)"/>
+            <column name="password_hash" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="role" type="VARCHAR(16)">
+                <constraints nullable="false"/>
+            </column>
+            <!-- Подтверждена ли почта: до этого вход закрыт (кроме администратора). -->
+            <column name="confirmed" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="confirm_token" type="VARCHAR(64)"/>
+            <column name="confirm_expires_at" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="created_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- Почта уникальна среди заполненных: на одну почту одна запись. -->
+        <createIndex tableName="account" indexName="uq_account_email" unique="true">
+            <column name="email"/>
+        </createIndex>
+        <createIndex tableName="account" indexName="ix_account_confirm_token">
+            <column name="confirm_token"/>
+        </createIndex>
+    </changeSet>
+
+    <!--
+        Сеансы: вход выдаёт пропуск, он же лежит у клиента и приходит заголовком.
+        Отдельной таблицей, а не колонкой у записи: человек играет с двух окон, и вход
+        со второго не должен выбрасывать из первого.
+    -->
+    <changeSet id="041-02-account-session" author="moo3">
+        <createTable tableName="account_session">
+            <column name="token" type="VARCHAR(64)">
+                <constraints primaryKey="true" primaryKeyName="pk_account_session" nullable="false"/>
+            </column>
+            <column name="account_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="expires_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="account_session" baseColumnNames="account_id"
+                                 constraintName="fk_account_session_account"
+                                 referencedTableName="account" referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+        <createIndex tableName="account_session" indexName="ix_account_session_account">
+            <column name="account_id"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

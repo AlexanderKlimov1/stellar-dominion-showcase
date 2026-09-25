@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+        Готовые расы перестали быть заглушками — п. 5 и п. 7.
+
+        Набор сторон каждой расы лежит теперь в `resources/Races/race-traits.json` рядом
+        с самими сторонами и их ценой: коды не могут разъехаться со списком, на который
+        ссылаются, а правка расы не требует миграции. Здесь остаётся то, что расе
+        принадлежит как строке справочника, — описание и климат родного мира.
+
+        Описание вместо «заглушки»: в списке выбора расы игрок читает именно его, и
+        сказать ему нужно то же, что говорит MOO II, — чем эта раса живёт.
+
+        Климат у всех земной. Это не упрощение, а сам оригинал: в MOO II любой родной
+        мир земного типа, среднего размера и с обычным запасом минералов, а разницу
+        делают стороны расы. Разнообразие климатов здесь было выдумкой на время, пока
+        сторон не было; теперь его создают водные (Trilarian), неприхотливые (Silicoid)
+        и подземные (Sakkra) — и создают так же, как в оригинале.
+    -->
+    <changeSet id="038-01-moo2-race-homeworlds" author="moo3">
+        <update tableName="race">
+            <column name="home_climate_code" value="TERRAN"/>
+        </update>
+    </changeSet>
+
+    <changeSet id="038-02-moo2-race-descriptions" author="moo3">
+        <update tableName="race">
+            <column name="description" value="Демократия и обаяние. Богатеют и исследуют быстрее прочих, а соседи охотно идут с ними на договор."/>
+            <where>code = 'HUMANS'</where>
+        </update>
+        <update tableName="race">
+            <column name="description" value="Великие учёные и изобретатели. Уровень дерева даёт им все технологии разом, а родной мир велик, хоть и малой тяжести."/>
+            <where>code = 'PSILONS'</where>
+        </update>
+        <update tableName="race">
+            <column name="description" value="Улей: объединение, хорошие фермеры и промышленники, большой родной мир. Но выбирать, что изучать, за них будет случай."/>
+            <where>code = 'KLACKONS'</where>
+        </update>
+        <update tableName="race">
+            <column name="description" value="Живые камни: не едят вовсе, живут на любой планете и никому не нравятся. Растут вдвое медленнее прочих."/>
+            <where>code = 'SILICOIDS'</where>
+        </update>
+        <update tableName="race">
+            <column name="description" value="Мастера тайной войны: великие шпионы, чьи корабли не видны на карте."/>
+            <where>code = 'DARLOKS'</where>
+        </update>
+        <update tableName="race">
+            <column name="description" value="Птицы-пилоты: лучшая в галактике защита кораблей и родной мир, усыпанный наследием ушедшей цивилизации."/>
+            <where>code = 'ALKARI'</where>
+        </update>
+        <update tableName="race">
+            <column name="description" value="Медведи большой тяжести: крепкий десант и меткие канониры. Тяжёлые миры им нипочём."/>
+            <where>code = 'BULRATHI'</where>
+        </update>
+        <update tableName="race">
+            <column name="description" value="Телепаты-провидцы: видят всю галактику, подчиняют колонии без десанта и метко стреляют. Феодальный строй роняет их науку вдвое."/>
+            <where>code = 'ELERIAN'</where>
+        </update>
+        <update tableName="race">
+            <column name="description" value="Торговцы и счастливчики: вдвое больший налог, двойная выручка с товаров и удача на их стороне. Выросли в малой тяжести."/>
+            <where>code = 'GNOLAM'</where>
+        </update>
+        <update tableName="race">
+            <column name="description" value="Киборги: едят вполовину меньше, но проедают руду, и великие промышленники сверх того."/>
+            <where>code = 'MEKLAR'</where>
+        </update>
+        <update tableName="race">
+            <column name="description" value="Кошки-канониры: лучший залп в галактике, богатый родной мир и военачальники во главе флота."/>
+            <where>code = 'MRRSHAN'</where>
+        </update>
+        <update tableName="race">
+            <column name="description" value="Ящеры: плодовиты вдвое, хорошие фермеры, живут под поверхностью и родной мир их велик. Феодалы и плохие шпионы."/>
+            <where>code = 'SAKKRA'</where>
+        </update>
+        <update tableName="race">
+            <column name="description" value="Водный народ: мокрые миры вмещают их втрое, а корабли складывают пространство и проходят два лишних парсека за ход."/>
+            <where>code = 'TRILARIAN'</where>
+        </update>
+    </changeSet>
+
+</databaseChangeLog>

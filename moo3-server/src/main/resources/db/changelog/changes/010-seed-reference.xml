@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!-- п. 4.2 / 4.2.1 — star_count без специальной звезды Orion, она добавляется генератором -->
+    <changeSet id="010-01-seed-galaxy-size" author="moo3">
+        <insert tableName="ref_galaxy_size">
+            <column name="code" value="SMALL"/>
+            <column name="label" value="Small"/>
+            <column name="width_gre" valueNumeric="100"/>
+            <column name="height_gre" valueNumeric="100"/>
+            <column name="star_count" valueNumeric="32"/>
+            <column name="sort_order" valueNumeric="1"/>
+        </insert>
+        <insert tableName="ref_galaxy_size">
+            <column name="code" value="MEDIUM"/>
+            <column name="label" value="Medium"/>
+            <column name="width_gre" valueNumeric="200"/>
+            <column name="height_gre" valueNumeric="300"/>
+            <column name="star_count" valueNumeric="48"/>
+            <column name="sort_order" valueNumeric="2"/>
+        </insert>
+        <insert tableName="ref_galaxy_size">
+            <column name="code" value="LARGE"/>
+            <column name="label" value="Large"/>
+            <column name="width_gre" valueNumeric="300"/>
+            <column name="height_gre" valueNumeric="450"/>
+            <column name="star_count" valueNumeric="64"/>
+            <column name="sort_order" valueNumeric="3"/>
+        </insert>
+        <insert tableName="ref_galaxy_size">
+            <column name="code" value="HUGE"/>
+            <column name="label" value="Huge"/>
+            <column name="width_gre" valueNumeric="400"/>
+            <column name="height_gre" valueNumeric="600"/>
+            <column name="star_count" valueNumeric="80"/>
+            <column name="sort_order" valueNumeric="4"/>
+        </insert>
+    </changeSet>
+
+    <!-- п. 4.1.1 / 4.1.1.1 -->
+    <changeSet id="010-02-seed-planet-size" author="moo3">
+        <insert tableName="ref_planet_size">
+            <column name="code" value="TINY"/>
+            <column name="label" value="Tiny"/>
+            <column name="base_population" valueNumeric="6"/>
+            <column name="sort_order" valueNumeric="1"/>
+        </insert>
+        <insert tableName="ref_planet_size">
+            <column name="code" value="SMALL"/>
+            <column name="label" value="Small"/>
+            <column name="base_population" valueNumeric="12"/>
+            <column name="sort_order" valueNumeric="2"/>
+        </insert>
+        <insert tableName="ref_planet_size">
+            <column name="code" value="MEDIUM"/>
+            <column name="label" value="Medium"/>
+            <column name="base_population" valueNumeric="18"/>
+            <column name="sort_order" valueNumeric="3"/>
+        </insert>
+        <insert tableName="ref_planet_size">
+            <column name="code" value="LARGE"/>
+            <column name="label" value="Large"/>
+            <column name="base_population" valueNumeric="24"/>
+            <column name="sort_order" valueNumeric="4"/>
+        </insert>
+        <insert tableName="ref_planet_size">
+            <column name="code" value="HUGE"/>
+            <column name="label" value="Huge"/>
+            <column name="base_population" valueNumeric="30"/>
+            <column name="sort_order" valueNumeric="5"/>
+        </insert>
+    </changeSet>
+
+    <!-- п. 4.1.2 / 4.1.2.1 — required_tech_code открывает переход ИЗ данного климата в next_climate_code -->
+    <changeSet id="010-03-seed-planet-climate" author="moo3">
+        <insert tableName="ref_planet_climate">
+            <column name="code" value="TOXIC"/>
+            <column name="label" value="Toxic"/>
+            <column name="population_multiplier_percent" valueNumeric="10"/>
+            <column name="colonizable" valueBoolean="true"/>
+            <column name="terraform_order" valueNumeric="1"/>
+            <column name="next_climate_code" value="RADIATED"/>
+            <column name="required_tech_code" value="TOXIC_WASTE_ELIMINATION"/>
+            <column name="sort_order" valueNumeric="1"/>
+        </insert>
+        <insert tableName="ref_planet_climate">
+            <column name="code" value="RADIATED"/>
+            <column name="label" value="Radiated"/>
+            <column name="population_multiplier_percent" valueNumeric="20"/>
+            <column name="colonizable" valueBoolean="true"/>
+            <column name="terraform_order" valueNumeric="2"/>
+            <column name="next_climate_code" value="BARREN"/>
+            <column name="required_tech_code" value="RADIATION_SHIELD"/>
+            <column name="sort_order" valueNumeric="2"/>
+        </insert>
+        <insert tableName="ref_planet_climate">
+            <column name="code" value="BARREN"/>
+            <column name="label" value="Barren"/>
+            <column name="population_multiplier_percent" valueNumeric="30"/>
+            <column name="colonizable" valueBoolean="true"/>
+            <column name="terraform_order" valueNumeric="3"/>
+            <column name="next_climate_code" value="DESERT"/>
+            <column name="required_tech_code" value="TERRAFORMING"/>
+            <column name="sort_order" valueNumeric="3"/>
+        </insert>
+        <insert tableName="ref_planet_climate">
+            <column name="code" value="DESERT"/>
+            <column name="label" value="Desert"/>
+            <column name="population_multiplier_percent" valueNumeric="40"/>
+            <column name="colonizable" valueBoolean="true"/>
+            <column name="terraform_order" valueNumeric="4"/>
+            <column name="next_climate_code" value="TUNDRA"/>
+            <column name="required_tech_code" value="TERRAFORMING"/>
+            <column name="sort_order" valueNumeric="4"/>
+        </insert>
+        <insert tableName="ref_planet_climate">
+            <column name="code" value="TUNDRA"/>
+            <column name="label" value="Tundra"/>
+            <column name="population_multiplier_percent" valueNumeric="50"/>
+            <column name="colonizable" valueBoolean="true"/>
+            <column name="terraform_order" valueNumeric="5"/>
+            <column name="next_climate_code" value="ARID"/>
+            <column name="required_tech_code" value="TERRAFORMING"/>
+            <column name="sort_order" valueNumeric="5"/>
+        </insert>
+        <insert tableName="ref_planet_climate">
+            <column name="code" value="ARID"/>
+            <column name="label" value="Arid"/>
+            <column name="population_multiplier_percent" valueNumeric="60"/>
+            <column name="colonizable" valueBoolean="true"/>
+            <column name="terraform_order" valueNumeric="6"/>
+            <column name="next_climate_code" value="SWAMP"/>
+            <column name="required_tech_code" value="TERRAFORMING"/>
+            <column name="sort_order" valueNumeric="6"/>
+        </insert>
+        <insert tableName="ref_planet_climate">
+            <column name="code" value="SWAMP"/>
+            <column name="label" value="Swamp"/>
+            <column name="population_multiplier_percent" valueNumeric="70"/>
+            <column name="colonizable" valueBoolean="true"/>
+            <column name="terraform_order" valueNumeric="7"/>
+            <column name="next_climate_code" value="OCEAN"/>
+            <column name="required_tech_code" value="TERRAFORMING"/>
+            <column name="sort_order" valueNumeric="7"/>
+        </insert>
+        <insert tableName="ref_planet_climate">
+            <column name="code" value="OCEAN"/>
+            <column name="label" value="Ocean"/>
+            <column name="population_multiplier_percent" valueNumeric="80"/>
+            <column name="colonizable" valueBoolean="true"/>
+            <column name="terraform_order" valueNumeric="8"/>
+            <column name="next_climate_code" value="TERRAN"/>
+            <column name="required_tech_code" value="TERRAFORMING"/>
+            <column name="sort_order" valueNumeric="8"/>
+        </insert>
+        <insert tableName="ref_planet_climate">
+            <column name="code" value="TERRAN"/>
+            <column name="label" value="Terran"/>
+            <column name="population_multiplier_percent" valueNumeric="90"/>
+            <column name="colonizable" valueBoolean="true"/>
+            <column name="terraform_order" valueNumeric="9"/>
+            <column name="next_climate_code" value="GAIA"/>
+            <column name="required_tech_code" value="GAIA_TRANSFORMATION"/>
+            <column name="sort_order" valueNumeric="9"/>
+        </insert>
+        <insert tableName="ref_planet_climate">
+            <column name="code" value="GAIA"/>
+            <column name="label" value="Gaya"/>
+            <column name="population_multiplier_percent" valueNumeric="100"/>
+            <column name="colonizable" valueBoolean="true"/>
+            <column name="terraform_order" valueNumeric="10"/>
+            <column name="sort_order" valueNumeric="10"/>
+        </insert>
+        <insert tableName="ref_planet_climate">
+            <column name="code" value="ASTEROID_BELT"/>
+            <column name="label" value="Asteroid belt"/>
+            <column name="population_multiplier_percent" valueNumeric="0"/>
+            <column name="colonizable" valueBoolean="false"/>
+            <column name="terraform_order" valueNumeric="0"/>
+            <column name="sort_order" valueNumeric="11"/>
+        </insert>
+        <insert tableName="ref_planet_climate">
+            <column name="code" value="GAS_GIANT"/>
+            <column name="label" value="Gas giant"/>
+            <column name="population_multiplier_percent" valueNumeric="0"/>
+            <column name="colonizable" valueBoolean="false"/>
+            <column name="terraform_order" valueNumeric="0"/>
+            <column name="sort_order" valueNumeric="12"/>
+        </insert>
+    </changeSet>
+
+    <!-- п. 4.1.3 — порядок и значения строго по спецификации -->
+    <changeSet id="010-04-seed-mineral-richness" author="moo3">
+        <insert tableName="ref_mineral_richness">
+            <column name="code" value="ULTRA_POOR"/>
+            <column name="label" value="Ultra poor"/>
+            <column name="production_per_worker" valueNumeric="1"/>
+            <column name="sort_order" valueNumeric="1"/>
+        </insert>
+        <insert tableName="ref_mineral_richness">
+            <column name="code" value="POOR"/>
+            <column name="label" value="Poor"/>
+            <column name="production_per_worker" valueNumeric="2"/>
+            <column name="sort_order" valueNumeric="2"/>
+        </insert>
+        <insert tableName="ref_mineral_richness">
+            <column name="code" value="RICH"/>
+            <column name="label" value="Rich"/>
+            <column name="production_per_worker" valueNumeric="3"/>
+            <column name="sort_order" valueNumeric="3"/>
+        </insert>
+        <insert tableName="ref_mineral_richness">
+            <column name="code" value="AVERAGE"/>
+            <column name="label" value="Average"/>
+            <column name="production_per_worker" valueNumeric="4"/>
+            <column name="sort_order" valueNumeric="4"/>
+        </insert>
+        <insert tableName="ref_mineral_richness">
+            <column name="code" value="ULTRA_RICH"/>
+            <column name="label" value="Ultra rich"/>
+            <column name="production_per_worker" valueNumeric="5"/>
+            <column name="sort_order" valueNumeric="5"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

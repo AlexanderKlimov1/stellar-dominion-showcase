@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+        Характер и устремление правителя ИИ — п. 15.
+
+        В MOO II окно Report меню рас представляет соседа двумя словами: «агрессивный
+        промышленник». Первое говорит, чего ждать в дипломатии, второе — куда сосед
+        вкладывается. Оба нужны игроку не меньше, чем самому ИИ, поэтому хранятся у
+        игрока и уходят в дипломатию вместе с отношениями.
+
+        Пусто у людей: характер — свойство ИИ, за человека решает человек. Поэтому
+        колонки nullable, а не с значением по умолчанию.
+    -->
+    <changeSet id="039-01-ai-character" author="moo3">
+        <addColumn tableName="player">
+            <column name="ai_personality" type="VARCHAR(32)"/>
+            <column name="ai_objective" type="VARCHAR(32)"/>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+      Балансовый прогон, заказанный из пульта администратора (balance-metrics-works.txt).
+
+      Прогон идёт десятки минут, переживает перезагрузку страницы и должен переживать
+      перезапуск сервера хотя бы как запись «оборвался» — поэтому он не живёт в памяти, а
+      лежит строкой.
+
+      Главное поле здесь — trait_costs: СНИМОК ЦЕН на миг запуска. Цены правятся из
+      соседнего экрана и из файла, и без снимка через неделю нельзя будет сказать, какие
+      именно цены мерил этот прогон. Журнал цен (п. 8 плана) требует ровно этого: правка
+      цены записывается вместе с тем, на чём она измерена.
+
+      Расы империй (race_designs) и итог (result) тоже лежат JSONB: их состав меняется
+      вместе с конструктором рас и с правилами оценки, и таблица на каждую сторону расы
+      завела бы миграцию на каждую такую правку.
+    -->
+    <changeSet id="055-balance-run" author="moo3">
+        <createTable tableName="balance_run">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamptz">
+                <constraints nullable="false"/>
+            </column>
+            <column name="finished_at" type="timestamptz"/>
+            <column name="status" type="varchar(16)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="galaxy_size" type="varchar(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="empires" type="integer">
+                <constraints nullable="false"/>
+            </column>
+            <column name="games" type="integer">
+                <constraints nullable="false"/>
+            </column>
+            <column name="turns" type="integer">
+                <constraints nullable="false"/>
+            </column>
+            <column name="seed" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+
+            <!-- Сколько партий уже сыграно: пульт показывает ход прогона, а не «ждите». -->
+            <column name="played" type="integer" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="race_designs" type="jsonb">
+                <constraints nullable="false"/>
+            </column>
+            <column name="trait_costs" type="jsonb">
+                <constraints nullable="false"/>
+            </column>
+            <column name="result" type="jsonb"/>
+            <column name="failure" type="varchar(500)"/>
+        </createTable>
+
+        <createIndex tableName="balance_run" indexName="ix_balance_run_created">
+            <column name="created_at"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

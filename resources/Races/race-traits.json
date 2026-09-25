@@ -1,0 +1,1702 @@
+{
+  "game": "Stellar Dominion",
+  "version": "3.0",
+  "description": "Custom race traits and the thirteen ready races of MOO II: what a race is made of",
+  "notes": {
+    "source": "The table of picks is MOO II's own, checked against StrategyWiki, page 'Master_of_Orion_II:_Battle_at_Antares/Race_design_options': 53 picks in 18 groups, the same thirteen ready races, the same effects. The prices of the POSITIVE picks are this game's own — see \"picks\" below.",
+    "picks": "30 picks to spend and at most 22 to win back from negative traits (21.09.2026, cycle 8). The budget was raised from 20 because five traits measured AT or ABOVE the whole budget once the race capacity bonus was repaired: Subterranean 29, Unification 26, Telepathic 23, Tolerant and Lithovore 20 each. A trait worth more than a full race cannot be priced at all, and the mirror held on the negative side: Slow Growth cost 23.6 against a ceiling of 15. The prices written for those five are a FIRST STEP towards the measured value, not the value itself: raising the budget moves the points-to-strength rate as well, so the honest prices must be measured again next cycle. MOO II had 10 and 10: its budget was 10, and Silicoids — the deepest sellers in the game — took exactly 10 picks' worth of negatives. Widening the budget to 15 while leaving the negative side at 10 makes selling your weaknesses worth less than in the original, and that is the intent.",
+    "prices": "Because the budget grew by half and the negative side did not, the positive prices had to be recomputed. They are set so that every one of the thirteen ready races still costs EXACTLY the budget with nothing left over — the same test MOO II's own table passes at 10. That was the starting point: within it the prices began as close to 1.5x the original as integers allow. They no longer are, and deliberately so — from 14.09.2026 prices move by MEASUREMENT (stage 2 of balance-metrics-works.txt: the balance panel plays hundreds of games and weighs every pick by the share of production it buys). What survives untouched is the rule that generates the prices: the EFFECT of a pick is MOO II's and never changes, only its price does, and every one of the thirteen ready races still costs EXACTLY the budget. Every move is written down in the price journal of balance-metrics-works.txt together with the measurement it rests on. Where they do not, the reason is always the same: a race that sells 10 picks' worth of weaknesses can no longer afford 1.5x prices, so the picks such races lean on (Growth +100%, Subterranean, Telepathic, +2 Science, Lithovore, Tolerant, Rich Home World, Farming +1, Trade Goods) are a point or two below the straight 1.5x line.",
+    "groups": "A group with \"multiple\": true lets several of its options stand together — that is how MOO II's special abilities work. Without the flag the group is a radio button: one option at most.",
+    "excludes": "Codes that cannot stand with this option. MOO II: Lithovore rules out every farming trait, Rich rules out Poor home world. Options of one radio group need no excludes — the group already allows only one.",
+    "effect_types": "See RaceEffectType. FOOD_*, PRODUCTION_*, RESEARCH_*, INCOME_PERCENT and GROWTH_PERCENT act on colonies exactly like buildings. The rest belong to their own subsystems: ground combat, espionage, ships, flight, exploration, research. A few are extension points and nothing reads them yet — they are marked as such in the enum.",
+    "reconstruction": "Two things had to be reconstructed. MOO II measures spying in percent, this game counts espionage points per turn, so ±10% became ±1 point and ±20% became ±2. And MOO II's '-1/2 Food' cannot be an integer here, so it is written as -25% of a farmer's output: 2 units become 1.5 exactly as in the original.",
+    "government_upgrades": "The four advanced governments of MOO II (Confederation, Imperium, Federation, Galactic Unification). They are not picks and cannot be bought in the race constructor: each arrives with its own technology of the Advanced Government level and replaces the government the race started with. That is why they live outside \"groups\" — the constructor table stays exactly the 53 picks of the original.",
+    "manual_vs_game": "Where the printed manual and the shipped game disagreed about MOO II's own prices, the game won: the manual prices Creative at 6 and Spying +10 at 2, the game at 8 and 3 (moo2mod.com, race_pick defaults of the unmodded game). The ready races proved the game right — Psilons are Dictatorship, Creative, +2 Science, Large Home World and Low-G, and that adds up to 10 only with Creative at 8. Those original prices are what the recomputation above starts from.",
+    "races": "Тринадцать готовых рас MOO II: состав, название, описание, климат родного мира и цвет на карте. Всё это лежало ВТОРОЙ копией в таблице `race`, наполняемой Liquibase, а климат — ТРЕТЬЕЙ, прямо в коде (PlayerRoster.homeClimatesByRace). Справочник, разложенный по трём местам, разъезжается молча; к тому же из базы его не поднять на пустой схеме, а балансовому прогону в памяти взяться ему неоткуда. Порядок рас в этом списке и есть порядок на экране выбора."
+  },
+  "picks": 30,
+  "anti_picks": 22,
+  "groups": [
+    {
+      "code": "government",
+      "name": {
+        "en": "Government",
+        "ru": "Правительство"
+      },
+      "description": {
+        "en": "How the empire is arranged — s. 14. The government changes several sides of life at once, and it is the weightiest group of the constructor.",
+        "ru": "Как устроена империя — п. 14. Правительство меняет сразу несколько сторон жизни, и это самая весомая группа конструктора."
+      },
+      "options": [
+        {
+          "code": "gov-feudal",
+          "name": {
+            "en": "Feudal",
+            "ru": "Феодализм"
+          },
+          "description": {
+            "en": "Ships are built a third cheaper, but a scientist works twice as badly.",
+            "ru": "Корабли строятся на треть дешевле, но учёный работает вдвое хуже."
+          },
+          "picks": -3,
+          "effects": [
+            {
+              "type": "RESEARCH_PERCENT",
+              "amount": -50
+            },
+            {
+              "type": "SHIP_COST_PERCENT",
+              "amount": -33
+            },
+            {
+              "type": "INSTANT_ASSIMILATION",
+              "amount": 1
+            }
+          ]
+        },
+        {
+          "code": "gov-dictatorship",
+          "name": {
+            "en": "Dictatorship",
+            "ru": "Диктатура"
+          },
+          "description": {
+            "en": "An ordinary empire: it adds nothing and takes nothing away, only the counter-espionage is a little stronger.",
+            "ru": "Обычная империя: ничего не прибавляет и ничего не отнимает, только контрразведка чуть крепче."
+          },
+          "picks": 0,
+          "effects": [
+            {
+              "type": "ESPIONAGE_DEFENSE_POINTS",
+              "amount": 1
+            }
+          ]
+        },
+        {
+          "code": "gov-democracy",
+          "name": {
+            "en": "Democracy",
+            "ru": "Демократия"
+          },
+          "description": {
+            "en": "A scientist and a taxpayer work half again as well, but enemy agents feel at ease.",
+            "ru": "Учёный и налогоплательщик работают в полтора раза лучше, зато чужие агенты чувствуют себя вольготнее."
+          },
+          "picks": 6,
+          "effects": [
+            {
+              "type": "RESEARCH_PERCENT",
+              "amount": 50
+            },
+            {
+              "type": "INCOME_PERCENT",
+              "amount": 50
+            },
+            {
+              "type": "ESPIONAGE_DEFENSE_POINTS",
+              "amount": -1
+            },
+            {
+              "type": "ASSIMILATION_PERCENT",
+              "amount": 100
+            }
+          ]
+        },
+        {
+          "code": "gov-unification",
+          "name": {
+            "en": "Unification",
+            "ru": "Объединение"
+          },
+          "description": {
+            "en": "A single organism: a worker and a farmer work half again as well, the counter-espionage is stronger.",
+            "ru": "Единый организм: рабочий и фермер работают в полтора раза лучше, контрразведка крепче."
+          },
+          "picks": 18,
+          "effects": [
+            {
+              "type": "PRODUCTION_PERCENT",
+              "amount": 50
+            },
+            {
+              "type": "FOOD_PERCENT",
+              "amount": 50
+            },
+            {
+              "type": "ESPIONAGE_DEFENSE_POINTS",
+              "amount": 1
+            },
+            {
+              "type": "ASSIMILATION_PERCENT",
+              "amount": -50
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "growth",
+      "name": {
+        "en": "Population growth",
+        "ru": "Рост населения"
+      },
+      "description": {
+        "en": "How fast the colonies gain colonists.",
+        "ru": "Как быстро колонии прирастают жителями."
+      },
+      "options": [
+        {
+          "code": "growth-slow",
+          "name": {
+            "en": "Slow Growing",
+            "ru": "Медленно растущие"
+          },
+          "description": {
+            "en": "Population growth is half the usual.",
+            "ru": "Прирост населения вдвое ниже обычного."
+          },
+          "picks": -16,
+          "effects": [
+            {
+              "type": "GROWTH_PERCENT",
+              "amount": -50
+            }
+          ]
+        },
+        {
+          "code": "growth-quick",
+          "name": {
+            "en": "Quick Growing",
+            "ru": "Быстро растущие"
+          },
+          "description": {
+            "en": "Population growth is half again as high.",
+            "ru": "Прирост населения выше на половину."
+          },
+          "picks": 9,
+          "effects": [
+            {
+              "type": "GROWTH_PERCENT",
+              "amount": 50
+            }
+          ]
+        },
+        {
+          "code": "growth-fast",
+          "name": {
+            "en": "Prolific",
+            "ru": "Плодовитые"
+          },
+          "description": {
+            "en": "Population growth is twice the usual.",
+            "ru": "Прирост населения вдвое выше обычного."
+          },
+          "picks": 11,
+          "effects": [
+            {
+              "type": "GROWTH_PERCENT",
+              "amount": 100
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "food",
+      "name": {
+        "en": "Food",
+        "ru": "Еда"
+      },
+      "description": {
+        "en": "How much food one farmer brings beyond the planet's climate.",
+        "ru": "Сколько еды приносит один фермер сверх климата планеты."
+      },
+      "options": [
+        {
+          "code": "food-poor",
+          "name": {
+            "en": "Poor Farmers",
+            "ru": "Плохие фермеры"
+          },
+          "description": {
+            "en": "A farmer gives a quarter less food: two units turn into one and a half.",
+            "ru": "Фермер даёт на четверть меньше еды: две единицы обращаются в полторы."
+          },
+          "picks": -8,
+          "effects": [
+            {
+              "type": "FOOD_PERCENT",
+              "amount": -25
+            }
+          ]
+        },
+        {
+          "code": "food-good",
+          "name": {
+            "en": "Good Farmers",
+            "ru": "Хорошие фермеры"
+          },
+          "description": {
+            "en": "Every farmer gives one more food.",
+            "ru": "Каждый фермер даёт на единицу еды больше."
+          },
+          "picks": 7,
+          "effects": [
+            {
+              "type": "FOOD_PER_FARMER",
+              "amount": 1
+            }
+          ]
+        },
+        {
+          "code": "food-great",
+          "name": {
+            "en": "Great Farmers",
+            "ru": "Великие фермеры"
+          },
+          "description": {
+            "en": "Every farmer gives two more food.",
+            "ru": "Каждый фермер даёт на две единицы еды больше."
+          },
+          "picks": 11,
+          "effects": [
+            {
+              "type": "FOOD_PER_FARMER",
+              "amount": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "industry",
+      "name": {
+        "en": "Industry",
+        "ru": "Промышленность"
+      },
+      "description": {
+        "en": "How much production one worker gives beyond the planet's mineral richness.",
+        "ru": "Сколько производства даёт один рабочий сверх богатства планеты минералами."
+      },
+      "options": [
+        {
+          "code": "industry-poor",
+          "name": {
+            "en": "Poor Industrialists",
+            "ru": "Плохие промышленники"
+          },
+          "description": {
+            "en": "Every worker gives one production less.",
+            "ru": "Каждый рабочий даёт на единицу производства меньше."
+          },
+          "picks": -5,
+          "effects": [
+            {
+              "type": "PRODUCTION_PER_WORKER",
+              "amount": -1
+            }
+          ]
+        },
+        {
+          "code": "industry-good",
+          "name": {
+            "en": "Good Industrialists",
+            "ru": "Хорошие промышленники"
+          },
+          "description": {
+            "en": "Every worker gives one production more.",
+            "ru": "Каждый рабочий даёт на единицу производства больше."
+          },
+          "picks": 6,
+          "effects": [
+            {
+              "type": "PRODUCTION_PER_WORKER",
+              "amount": 1
+            }
+          ]
+        },
+        {
+          "code": "industry-great",
+          "name": {
+            "en": "Great Industrialists",
+            "ru": "Великие промышленники"
+          },
+          "description": {
+            "en": "Every worker gives two production more.",
+            "ru": "Каждый рабочий даёт на две единицы производства больше."
+          },
+          "picks": 7,
+          "effects": [
+            {
+              "type": "PRODUCTION_PER_WORKER",
+              "amount": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "science",
+      "name": {
+        "en": "Science",
+        "ru": "Наука"
+      },
+      "description": {
+        "en": "How many research points one scientist gives beyond the usual three.",
+        "ru": "Сколько очков исследований даёт один учёный сверх обычных трёх."
+      },
+      "options": [
+        {
+          "code": "science-poor",
+          "name": {
+            "en": "Poor Scientists",
+            "ru": "Плохие учёные"
+          },
+          "description": {
+            "en": "Every scientist gives one research point less.",
+            "ru": "Каждый учёный даёт на очко исследований меньше."
+          },
+          "picks": -1,
+          "effects": [
+            {
+              "type": "RESEARCH_PER_SCIENTIST",
+              "amount": -1
+            }
+          ]
+        },
+        {
+          "code": "science-good",
+          "name": {
+            "en": "Good Scientists",
+            "ru": "Хорошие учёные"
+          },
+          "description": {
+            "en": "Every scientist gives one research point more.",
+            "ru": "Каждый учёный даёт на очко исследований больше."
+          },
+          "picks": 2,
+          "effects": [
+            {
+              "type": "RESEARCH_PER_SCIENTIST",
+              "amount": 1
+            }
+          ]
+        },
+        {
+          "code": "science-great",
+          "name": {
+            "en": "Great Scientists",
+            "ru": "Великие учёные"
+          },
+          "description": {
+            "en": "Every scientist gives two research points more.",
+            "ru": "Каждый учёный даёт на два очка исследований больше."
+          },
+          "picks": 6,
+          "effects": [
+            {
+              "type": "RESEARCH_PER_SCIENTIST",
+              "amount": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "money",
+      "name": {
+        "en": "Money",
+        "ru": "Деньги"
+      },
+      "description": {
+        "en": "How much higher or lower the tax income of the colonies is.",
+        "ru": "Насколько выше или ниже налоговый доход колоний."
+      },
+      "options": [
+        {
+          "code": "money-poor",
+          "name": {
+            "en": "Poor",
+            "ru": "Бедные"
+          },
+          "description": {
+            "en": "The tax from colonists is half the usual.",
+            "ru": "Налог с жителей вдвое ниже обычного."
+          },
+          "picks": -4,
+          "effects": [
+            {
+              "type": "INCOME_PERCENT",
+              "amount": -50
+            }
+          ]
+        },
+        {
+          "code": "money-trader",
+          "name": {
+            "en": "Merchants",
+            "ru": "Торговцы"
+          },
+          "description": {
+            "en": "The tax from colonists is half again as high.",
+            "ru": "Налог с жителей выше на половину."
+          },
+          "picks": 8,
+          "effects": [
+            {
+              "type": "INCOME_PERCENT",
+              "amount": 50
+            }
+          ]
+        },
+        {
+          "code": "money-rich",
+          "name": {
+            "en": "Rich",
+            "ru": "Богатые"
+          },
+          "description": {
+            "en": "The tax from colonists is twice the usual.",
+            "ru": "Налог с жителей вдвое выше обычного."
+          },
+          "picks": 11,
+          "effects": [
+            {
+              "type": "INCOME_PERCENT",
+              "amount": 100
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "ship-defense",
+      "name": {
+        "en": "Ship defence",
+        "ru": "Защита кораблей"
+      },
+      "description": {
+        "en": "How nimbly the race's ships evade beam fire — s. 8.",
+        "ru": "Насколько ловко корабли расы уходят от лучевого огня — п. 8."
+      },
+      "options": [
+        {
+          "code": "ship-defense-poor",
+          "name": {
+            "en": "Poor Pilots",
+            "ru": "Плохие пилоты"
+          },
+          "description": {
+            "en": "Ship defence is 20% lower.",
+            "ru": "Защита кораблей ниже на 20%."
+          },
+          "picks": -1,
+          "effects": [
+            {
+              "type": "SHIP_DEFENSE_PERCENT",
+              "amount": -20
+            }
+          ]
+        },
+        {
+          "code": "ship-defense-good",
+          "name": {
+            "en": "Good Pilots",
+            "ru": "Хорошие пилоты"
+          },
+          "description": {
+            "en": "Ship defence is 25% higher.",
+            "ru": "Защита кораблей выше на 25%."
+          },
+          "picks": 2,
+          "effects": [
+            {
+              "type": "SHIP_DEFENSE_PERCENT",
+              "amount": 25
+            }
+          ]
+        },
+        {
+          "code": "ship-defense-great",
+          "name": {
+            "en": "Excellent Pilots",
+            "ru": "Отличные пилоты"
+          },
+          "description": {
+            "en": "Ship defence is 50% higher.",
+            "ru": "Защита кораблей выше на 50%."
+          },
+          "picks": 3,
+          "effects": [
+            {
+              "type": "SHIP_DEFENSE_PERCENT",
+              "amount": 50
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "ship-attack",
+      "name": {
+        "en": "Ship attack",
+        "ru": "Атака кораблей"
+      },
+      "description": {
+        "en": "How accurately the race's ships shoot — s. 8.",
+        "ru": "Насколько метче стреляют корабли расы — п. 8."
+      },
+      "options": [
+        {
+          "code": "ship-attack-poor",
+          "name": {
+            "en": "Poor Gunners",
+            "ru": "Плохие канониры"
+          },
+          "description": {
+            "en": "Ship attack is 20% lower.",
+            "ru": "Атака кораблей ниже на 20%."
+          },
+          "picks": -2,
+          "effects": [
+            {
+              "type": "SHIP_ATTACK_PERCENT",
+              "amount": -20
+            }
+          ]
+        },
+        {
+          "code": "ship-attack-good",
+          "name": {
+            "en": "Good Gunners",
+            "ru": "Хорошие канониры"
+          },
+          "description": {
+            "en": "Ship attack is 20% higher.",
+            "ru": "Атака кораблей выше на 20%."
+          },
+          "picks": 1,
+          "effects": [
+            {
+              "type": "SHIP_ATTACK_PERCENT",
+              "amount": 20
+            }
+          ]
+        },
+        {
+          "code": "ship-attack-great",
+          "name": {
+            "en": "Excellent Gunners",
+            "ru": "Отличные канониры"
+          },
+          "description": {
+            "en": "Ship attack is 50% higher.",
+            "ru": "Атака кораблей выше на 50%."
+          },
+          "picks": 2,
+          "effects": [
+            {
+              "type": "SHIP_ATTACK_PERCENT",
+              "amount": 50
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "ground",
+      "name": {
+        "en": "Ground combat",
+        "ru": "Наземный бой"
+      },
+      "description": {
+        "en": "The strength of the race's troops in taking and holding colonies — s. 12.",
+        "ru": "Сила десанта расы в захвате и обороне колоний — п. 12."
+      },
+      "options": [
+        {
+          "code": "ground-poor",
+          "name": {
+            "en": "Poor Ground Troops",
+            "ru": "Плохие бойцы"
+          },
+          "description": {
+            "en": "Ground combat strength is 10% lower.",
+            "ru": "Сила наземного боя ниже на 10%."
+          },
+          "picks": -1,
+          "effects": [
+            {
+              "type": "GROUND_COMBAT_PERCENT",
+              "amount": -10
+            }
+          ]
+        },
+        {
+          "code": "ground-good",
+          "name": {
+            "en": "Good Ground Troops",
+            "ru": "Хорошие бойцы"
+          },
+          "description": {
+            "en": "Ground combat strength is 10% higher.",
+            "ru": "Сила наземного боя выше на 10%."
+          },
+          "picks": 1,
+          "effects": [
+            {
+              "type": "GROUND_COMBAT_PERCENT",
+              "amount": 10
+            }
+          ]
+        },
+        {
+          "code": "ground-great",
+          "name": {
+            "en": "Great Ground Troops",
+            "ru": "Великие бойцы"
+          },
+          "description": {
+            "en": "Ground combat strength is 20% higher: both in taking an enemy colony and in holding your own.",
+            "ru": "Сила наземного боя выше на 20%: и при захвате чужой колонии, и при обороне своей."
+          },
+          "picks": 2,
+          "effects": [
+            {
+              "type": "GROUND_COMBAT_PERCENT",
+              "amount": 20
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "espionage",
+      "name": {
+        "en": "Espionage",
+        "ru": "Шпионаж"
+      },
+      "description": {
+        "en": "How good the race's agents are — both in an enemy empire and at home — s. 13.",
+        "ru": "Насколько хороши агенты расы — и в чужой империи, и у себя дома — п. 13."
+      },
+      "options": [
+        {
+          "code": "spy-poor",
+          "name": {
+            "en": "Poor Spies",
+            "ru": "Плохие шпионы"
+          },
+          "description": {
+            "en": "The empire gathers one espionage point less a turn.",
+            "ru": "Империя набирает на очко шпионажа меньше за ход."
+          },
+          "picks": -2,
+          "effects": [
+            {
+              "type": "ESPIONAGE_POINTS",
+              "amount": -1
+            }
+          ]
+        },
+        {
+          "code": "spy-good",
+          "name": {
+            "en": "Good Spies",
+            "ru": "Хорошие шпионы"
+          },
+          "description": {
+            "en": "The empire gathers one extra espionage point a turn.",
+            "ru": "Империя набирает лишнее очко шпионажа за ход."
+          },
+          "picks": 2,
+          "effects": [
+            {
+              "type": "ESPIONAGE_POINTS",
+              "amount": 1
+            }
+          ]
+        },
+        {
+          "code": "spy-great",
+          "name": {
+            "en": "Great Spies",
+            "ru": "Великие шпионы"
+          },
+          "description": {
+            "en": "The empire gathers two extra espionage points a turn.",
+            "ru": "Империя набирает два лишних очка шпионажа за ход."
+          },
+          "picks": 3,
+          "effects": [
+            {
+              "type": "ESPIONAGE_POINTS",
+              "amount": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "gravity",
+      "name": {
+        "en": "Home world gravity",
+        "ru": "Тяжесть родного мира"
+      },
+      "description": {
+        "en": "Which gravity the race is used to — it decides where it works without a loss.",
+        "ru": "К какой силе тяжести раса привыкла — от этого зависит, где ей работается без потерь."
+      },
+      "options": [
+        {
+          "code": "grav-low",
+          "name": {
+            "en": "Low-G World",
+            "ru": "Мир малой тяжести"
+          },
+          "description": {
+            "en": "The race grew up in low gravity: low-G worlds cost it nothing, ordinary ones come harder, and its troops are 10% weaker.",
+            "ru": "Раса выросла в малой тяжести: миры малой тяжести ей нипочём, обычные даются хуже, а десант слабее на 10%."
+          },
+          "picks": -5,
+          "effects": [
+            {
+              "type": "GRAVITY_LOW",
+              "amount": 1
+            },
+            {
+              "type": "GROUND_COMBAT_PERCENT",
+              "amount": -10
+            }
+          ]
+        },
+        {
+          "code": "grav-high",
+          "name": {
+            "en": "High-G World",
+            "ru": "Мир большой тяжести"
+          },
+          "description": {
+            "en": "The race grew up in high gravity: heavy worlds cost it nothing, and its soldiers take one more blow.",
+            "ru": "Раса выросла в большой тяжести: тяжёлые миры ей нипочём, а солдат держит лишний удар."
+          },
+          "picks": 3,
+          "effects": [
+            {
+              "type": "GRAVITY_HIGH",
+              "amount": 1
+            },
+            {
+              "type": "GROUND_COMBAT_PERCENT",
+              "amount": 10
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "population-capacity",
+      "name": {
+        "en": "World capacity",
+        "ru": "Вместимость миров"
+      },
+      "description": {
+        "en": "How many colonists a planet holds. Both sides are taken together too — as they are in MOO II, when both room and food are needed.",
+        "ru": "Сколько жителей помещается на планете. Обе стороны берутся и вместе — так делают в MOO II, когда нужно и много места, и еда."
+      },
+      "multiple": true,
+      "options": [
+        {
+          "code": "aquatic",
+          "name": {
+            "en": "Aquatic",
+            "ru": "Водные"
+          },
+          "description": {
+            "en": "Wet worlds are home to the race: tundra, swamp and ocean hold far more colonists and feed them better.",
+            "ru": "Мокрые миры для расы — дом: тундра, болото и океан вмещают куда больше жителей и лучше кормят."
+          },
+          "picks": 12,
+          "effects": [
+            {
+              "type": "AQUATIC",
+              "amount": 1
+            }
+          ]
+        },
+        {
+          "code": "subterranean",
+          "name": {
+            "en": "Subterranean",
+            "ru": "Подземные"
+          },
+          "description": {
+            "en": "The race lives below the surface: the planet's capacity grows with its size — from two colonists on a tiny world to ten on a huge one.",
+            "ru": "Раса живёт под поверхностью: вместимость планеты растёт с её размером — от двух жителей на крошечной до десяти на огромной."
+          },
+          "picks": 20,
+          "effects": [
+            {
+              "type": "MAX_POPULATION_PER_SIZE",
+              "amount": 2
+            },
+            {
+              "type": "GROUND_DEFENCE_PERCENT",
+              "amount": 10
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "homeworld",
+      "name": {
+        "en": "Home world",
+        "ru": "Родной мир"
+      },
+      "description": {
+        "en": "What the home world turned out to be. The sides are independent: a large and a rich world are taken together, a rich and a poor one are not.",
+        "ru": "Каким достался родной мир. Стороны независимы: большой и богатый мир берутся вместе, богатый и бедный — нет."
+      },
+      "multiple": true,
+      "options": [
+        {
+          "code": "world-poor",
+          "name": {
+            "en": "Poor Home World",
+            "ru": "Бедный мир"
+          },
+          "description": {
+            "en": "The home world is poor in minerals: a worker gives less, and building goes hard at the start.",
+            "ru": "Родной мир беден минералами: рабочий даёт меньше, и стройка на старте идёт туго."
+          },
+          "picks": -3,
+          "excludes": [
+            "world-rich"
+          ],
+          "effects": [
+            {
+              "type": "HOME_MINERALS_STEPS",
+              "amount": -1
+            }
+          ]
+        },
+        {
+          "code": "world-large",
+          "name": {
+            "en": "Large Home World",
+            "ru": "Большой мир"
+          },
+          "description": {
+            "en": "The home world is one size larger than usual — and holds more colonists.",
+            "ru": "Родной мир на размер больше обычного — и вмещает больше жителей."
+          },
+          "picks": 6,
+          "effects": [
+            {
+              "type": "HOME_SIZE_STEPS",
+              "amount": 1
+            }
+          ]
+        },
+        {
+          "code": "world-rich",
+          "name": {
+            "en": "Rich Home World",
+            "ru": "Богатый мир"
+          },
+          "description": {
+            "en": "The home world is rich in minerals: a worker gives markedly more production.",
+            "ru": "Родной мир богат минералами: рабочий даёт заметно больше производства."
+          },
+          "picks": 2,
+          "excludes": [
+            "world-poor"
+          ],
+          "effects": [
+            {
+              "type": "HOME_MINERALS_STEPS",
+              "amount": 1
+            }
+          ]
+        },
+        {
+          "code": "world-artifacts",
+          "name": {
+            "en": "Artifacts Home World",
+            "ru": "Мир артефактов"
+          },
+          "description": {
+            "en": "The home world is strewn with the legacy of a vanished civilisation: a scientist there gives two extra points.",
+            "ru": "Родной мир усыпан наследием ушедшей цивилизации: учёный на нём даёт два лишних очка."
+          },
+          "picks": 4,
+          "effects": [
+            {
+              "type": "HOME_RESEARCH_PER_SCIENTIST",
+              "amount": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "food-consumption",
+      "name": {
+        "en": "What the race eats",
+        "ru": "Чем питается раса"
+      },
+      "description": {
+        "en": "How much food a colonist needs. The two sides are never taken at once: a cyborg eats half, a lithovore does not eat at all.",
+        "ru": "Сколько еды нужно жителю. Обе стороны разом не берутся: киборг ест наполовину, литовор не ест вовсе."
+      },
+      "options": [
+        {
+          "code": "cybernetic",
+          "name": {
+            "en": "Cybernetic",
+            "ru": "Киборги"
+          },
+          "description": {
+            "en": "A colonist eats half the food, but half a portion of production on top of that. Ships repair themselves.",
+            "ru": "Житель съедает половину еды, но полпорции производства сверх того. Корабли чинятся сами."
+          },
+          "picks": -3,
+          "effects": [
+            {
+              "type": "FOOD_CONSUMPTION_PERCENT",
+              "amount": -50
+            },
+            {
+              "type": "PRODUCTION_CONSUMPTION_PERCENT",
+              "amount": 50
+            },
+            {
+              "type": "CYBERNETIC",
+              "amount": 1
+            }
+          ]
+        },
+        {
+          "code": "lithovore",
+          "name": {
+            "en": "Lithovore",
+            "ru": "Литоворы"
+          },
+          "description": {
+            "en": "The race eats stone: it needs no food at all, and there is no need to keep farmers. Farming sides of the race are not taken with this one.",
+            "ru": "Раса ест камень: еда ей не нужна вовсе, и фермеров можно не держать. Сельских сторон расы с этим не берут."
+          },
+          "picks": 14,
+          "excludes": [
+            "food-poor",
+            "food-good",
+            "food-great"
+          ],
+          "effects": [
+            {
+              "type": "FOOD_CONSUMPTION_PERCENT",
+              "amount": -100
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "diplomacy",
+      "name": {
+        "en": "How the neighbours see the race",
+        "ru": "Отношение соседей"
+      },
+      "description": {
+        "en": "How the race looks in the eyes of the other empires — s. 14.",
+        "ru": "Как раса выглядит в глазах чужих империй — п. 14."
+      },
+      "options": [
+        {
+          "code": "repulsive",
+          "name": {
+            "en": "Repulsive",
+            "ru": "Отталкивающие"
+          },
+          "description": {
+            "en": "Nobody bargains with the race: the other empires are hostile, there are no treaties, and only war and surrender are left.",
+            "ru": "С расой не договариваются: чужие империи враждебны, договоров нет, остаются война и капитуляция."
+          },
+          "picks": -6,
+          "effects": [
+            {
+              "type": "REPULSIVE",
+              "amount": 1
+            },
+            {
+              "type": "ASSIMILATION_PERCENT",
+              "amount": -50
+            }
+          ]
+        },
+        {
+          "code": "charismatic",
+          "name": {
+            "en": "Charismatic",
+            "ru": "Обаятельные"
+          },
+          "description": {
+            "en": "The race is liked: the neighbours agree to treaties more readily, and leaders come more often and hire for half the price.",
+            "ru": "Расу любят: соседи охотнее идут на договор, а лидеры приходят чаще и нанимаются вдвое дешевле."
+          },
+          "picks": 4,
+          "effects": [
+            {
+              "type": "DIPLOMACY_PERCENT",
+              "amount": 100
+            },
+            {
+              "type": "CHARISMATIC",
+              "amount": 1
+            },
+            {
+              "type": "ASSIMILATION_PERCENT",
+              "amount": 100
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "creativity",
+      "name": {
+        "en": "Creativity",
+        "ru": "Изобретательность"
+      },
+      "description": {
+        "en": "How the race chooses what to research at a level of the tree — s. 9.",
+        "ru": "Как раса выбирает, что изучить на уровне дерева — п. 9."
+      },
+      "options": [
+        {
+          "code": "uncreative",
+          "name": {
+            "en": "Uncreative",
+            "ru": "Неизобретательные"
+          },
+          "description": {
+            "en": "The race does not choose: at every level of the tree it gets a random technology.",
+            "ru": "Раса не выбирает: на каждом уровне дерева ей достаётся случайная технология."
+          },
+          "picks": -4,
+          "effects": [
+            {
+              "type": "UNCREATIVE",
+              "amount": 1
+            }
+          ]
+        },
+        {
+          "code": "creative",
+          "name": {
+            "en": "Creative",
+            "ru": "Изобретательные"
+          },
+          "description": {
+            "en": "The race gets every technology of the level at once instead of one by choice.",
+            "ru": "Раса получает все технологии уровня разом, а не одну на выбор."
+          },
+          "picks": 3,
+          "effects": [
+            {
+              "type": "CREATIVE",
+              "amount": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "economics",
+      "name": {
+        "en": "Economy",
+        "ru": "Хозяйство"
+      },
+      "description": {
+        "en": "How the race deals with pollution and with trade.",
+        "ru": "Как раса обходится с загрязнением и с торговлей."
+      },
+      "multiple": true,
+      "options": [
+        {
+          "code": "tolerant",
+          "name": {
+            "en": "Tolerant",
+            "ru": "Неприхотливые"
+          },
+          "description": {
+            "en": "Poisoned air costs the race nothing: the usable share of any planet is a quarter higher, and pollution does not get in the way.",
+            "ru": "Расе нипочём отравленный воздух: пригодная доля любой планеты выше на четверть, загрязнение не мешает."
+          },
+          "picks": 14,
+          "effects": [
+            {
+              "type": "TOLERANT",
+              "amount": 1
+            },
+            {
+              "type": "POLLUTION_NONE",
+              "amount": 1
+            }
+          ]
+        },
+        {
+          "code": "traders",
+          "name": {
+            "en": "Born Traders",
+            "ru": "Прирождённые торговцы"
+          },
+          "description": {
+            "en": "Trade goods and surplus food go for twice as much, and trade treaties bring half again as much.",
+            "ru": "Товары и лишняя еда идут вдвое дороже, договоры о торговле приносят в полтора раза больше."
+          },
+          "picks": 5,
+          "effects": [
+            {
+              "type": "TRADE_INCOME_PERCENT",
+              "amount": 100
+            },
+            {
+              "type": "TRADE_TREATY_PERCENT",
+              "amount": 25
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "special",
+      "name": {
+        "en": "Special abilities",
+        "ru": "Особые способности"
+      },
+      "description": {
+        "en": "Sides of the race, each on its own. They are taken together and in any set, as long as the points suffice.",
+        "ru": "Стороны расы, каждая сама по себе. Берутся вместе и в любом наборе, лишь бы хватило очков."
+      },
+      "multiple": true,
+      "options": [
+        {
+          "code": "lucky",
+          "name": {
+            "en": "Lucky",
+            "ru": "Везучие"
+          },
+          "description": {
+            "en": "Good chances come more often than bad ones, and the raiders from Beyond attack three times as rarely.",
+            "ru": "Хорошие случайности приходят чаще плохих, а налётчики из-за Предела нападают втрое реже."
+          },
+          "picks": 2,
+          "effects": [
+            {
+              "type": "LUCKY",
+              "amount": 1
+            }
+          ]
+        },
+        {
+          "code": "omniscient",
+          "name": {
+            "en": "Omniscient",
+            "ru": "Всевидящие"
+          },
+          "description": {
+            "en": "The race sees the whole galaxy from the first turn: every system, planet and colony.",
+            "ru": "Раса видит всю галактику с первого хода: любую систему, планету и колонию."
+          },
+          "picks": 4,
+          "effects": [
+            {
+              "type": "OMNISCIENT",
+              "amount": 1
+            }
+          ]
+        },
+        {
+          "code": "stealthy-ships",
+          "name": {
+            "en": "Stealthy Ships",
+            "ru": "Скрытные корабли"
+          },
+          "description": {
+            "en": "The race's warships are invisible on the map until they come to an enemy system.",
+            "ru": "Боевые корабли расы не видны на карте, пока не придут в чужую систему."
+          },
+          "picks": 1,
+          "effects": [
+            {
+              "type": "STEALTHY_SHIPS",
+              "amount": 1
+            }
+          ]
+        },
+        {
+          "code": "warlord",
+          "name": {
+            "en": "Warlord",
+            "ru": "Военачальники"
+          },
+          "description": {
+            "en": "Every colony keeps two extra ships, and the crews are one rank more experienced than usual.",
+            "ru": "Каждая колония держит два лишних корабля, а команды опытнее обычных на ступень."
+          },
+          "picks": 4,
+          "effects": [
+            {
+              "type": "WARLORD",
+              "amount": 1
+            },
+            {
+              "type": "SHIP_ATTACK_PERCENT",
+              "amount": 10
+            },
+            {
+              "type": "SHIP_DEFENSE_PERCENT",
+              "amount": 10
+            }
+          ]
+        },
+        {
+          "code": "trans-dimensional",
+          "name": {
+            "en": "Trans Dimensional",
+            "ru": "Надпространственные"
+          },
+          "description": {
+            "en": "The race's ships cover two more parsecs a turn and are nimbler in battle.",
+            "ru": "Корабли расы проходят на два парсека за ход больше и проворнее в бою."
+          },
+          "picks": 4,
+          "effects": [
+            {
+              "type": "SHIP_SPEED_PARSECS",
+              "amount": 2
+            },
+            {
+              "type": "SHIP_COMBAT_SPEED",
+              "amount": 4
+            }
+          ]
+        },
+        {
+          "code": "telepathic",
+          "name": {
+            "en": "Telepathic",
+            "ru": "Телепаты"
+          },
+          "description": {
+            "en": "A large ship takes an enemy colony without troops, the neighbours are more agreeable, and the agents work better.",
+            "ru": "Крупный корабль подчиняет чужую колонию без десанта, соседи сговорчивее, агенты работают лучше."
+          },
+          "picks": 16,
+          "effects": [
+            {
+              "type": "TELEPATHIC",
+              "amount": 1
+            },
+            {
+              "type": "ESPIONAGE_POINTS",
+              "amount": 1
+            },
+            {
+              "type": "DIPLOMACY_PERCENT",
+              "amount": 25
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "government_upgrades": [
+    {
+      "code": "gov-confederation",
+      "name": {
+        "en": "Confederation",
+        "ru": "Конфедерация"
+      },
+      "description": {
+        "en": "Feudalism grown into a union of equals: ships are built two thirds cheaper, and lost colonies no longer fall to the enemy together with their colonists.",
+        "ru": "Феодализм, доросший до союза равных: корабли строятся на две трети дешевле, а потерянные колонии больше не достаются противнику вместе с жителями."
+      },
+      "replaces": "gov-feudal",
+      "required_tech": "confederation",
+      "effects": [
+        {
+          "type": "RESEARCH_PERCENT",
+          "amount": -50
+        },
+        {
+          "type": "SHIP_COST_PERCENT",
+          "amount": -66
+        }
+      ]
+    },
+    {
+      "code": "gov-imperium",
+      "name": {
+        "en": "Imperium",
+        "ru": "Империум"
+      },
+      "description": {
+        "en": "A dictatorship grown into an empire: the counter-espionage is twice as strong, and the empire keeps a fleet half again as large.",
+        "ru": "Диктатура, доросшая до империи: контрразведка крепче вдвое, а флот империя содержит в полтора раза больший."
+      },
+      "replaces": "gov-dictatorship",
+      "required_tech": "imperium",
+      "effects": [
+        {
+          "type": "ESPIONAGE_DEFENSE_POINTS",
+          "amount": 2
+        },
+        {
+          "type": "COMMAND_PERCENT",
+          "amount": 50
+        }
+      ]
+    },
+    {
+      "code": "gov-federation",
+      "name": {
+        "en": "Federation",
+        "ru": "Федерация"
+      },
+      "description": {
+        "en": "A democracy grown into a federation: the scientists and the treasury get three quarters on top instead of a half.",
+        "ru": "Демократия, доросшая до федерации: учёные и казна получают три четверти сверху вместо половины."
+      },
+      "replaces": "gov-democracy",
+      "required_tech": "federation",
+      "effects": [
+        {
+          "type": "RESEARCH_PERCENT",
+          "amount": 75
+        },
+        {
+          "type": "INCOME_PERCENT",
+          "amount": 75
+        },
+        {
+          "type": "ESPIONAGE_DEFENSE_POINTS",
+          "amount": -1
+        },
+        {
+          "type": "ASSIMILATION_PERCENT",
+          "amount": 100
+        }
+      ]
+    },
+    {
+      "code": "gov-galactic-unification",
+      "name": {
+        "en": "Galactic Unification",
+        "ru": "Галактическое единство"
+      },
+      "description": {
+        "en": "The race's unity grown galactic: a farmer and a worker give twice the usual.",
+        "ru": "Единство расы, доросшее до галактического: фермер и рабочий дают вдвое больше обычного."
+      },
+      "replaces": "gov-unification",
+      "required_tech": "galactic-unification",
+      "effects": [
+        {
+          "type": "PRODUCTION_PERCENT",
+          "amount": 100
+        },
+        {
+          "type": "FOOD_PERCENT",
+          "amount": 100
+        },
+        {
+          "type": "ESPIONAGE_DEFENSE_POINTS",
+          "amount": 1
+        },
+        {
+          "type": "ASSIMILATION_PERCENT",
+          "amount": -50
+        }
+      ]
+    }
+  ],
+  "races": [
+    {
+      "code": "HUMANS",
+      "name": {
+        "en": "Earthlings",
+        "ru": "Земляне"
+      },
+      "description": {
+        "en": "Democracy and charm. They grow rich and research faster than the rest, and the neighbours readily come to terms with them.",
+        "ru": "Демократия и обаяние. Богатеют и исследуют быстрее прочих, а соседи охотно идут с ними на договор."
+      },
+      "home_climate": "TERRAN",
+      "color": "#4fa3ff",
+      "traits": [
+        "gov-democracy",
+        "charismatic",
+        "traders"
+      ]
+    },
+    {
+      "code": "PSILONS",
+      "name": {
+        "en": "Cerebri",
+        "ru": "Церебри"
+      },
+      "description": {
+        "en": "Great scientists and inventors. A level of the tree gives them every technology at once, and their home world is large, if of low gravity.",
+        "ru": "Великие учёные и изобретатели. Уровень дерева даёт им все технологии разом, а родной мир велик, хоть и малой тяжести."
+      },
+      "home_climate": "TERRAN",
+      "color": "#ff5f5f",
+      "traits": [
+        "gov-dictatorship",
+        "science-great",
+        "creative",
+        "world-large",
+        "grav-low",
+        "ground-poor",
+        "spy-poor",
+        "ship-defense-poor",
+        "world-rich"
+      ]
+    },
+    {
+      "code": "KLACKONS",
+      "name": {
+        "en": "Chitarri",
+        "ru": "Читарри"
+      },
+      "description": {
+        "en": "A hive: unification, good farmers and industrialists, a large home world. But chance will choose for them what to research.",
+        "ru": "Улей: объединение, хорошие фермеры и промышленники, большой родной мир. Но выбирать, что изучать, за них будет случай."
+      },
+      "home_climate": "TERRAN",
+      "color": "#57d977",
+      "traits": [
+        "gov-unification",
+        "industry-good",
+        "uncreative",
+        "science-poor",
+        "ground-poor",
+        "world-rich"
+      ]
+    },
+    {
+      "code": "SILICOIDS",
+      "name": {
+        "en": "Lithari",
+        "ru": "Литари"
+      },
+      "description": {
+        "en": "Living stones: they do not eat at all, live on any planet and please nobody. They grow twice as slowly as the rest.",
+        "ru": "Живые камни: не едят вовсе, живут на любой планете и никому не нравятся. Растут вдвое медленнее прочих."
+      },
+      "home_climate": "TERRAN",
+      "color": "#ffd447",
+      "traits": [
+        "gov-dictatorship",
+        "lithovore",
+        "tolerant",
+        "growth-slow",
+        "repulsive",
+        "world-rich"
+      ]
+    },
+    {
+      "code": "MRRSHAN",
+      "name": {
+        "en": "Felyr",
+        "ru": "Фелиры"
+      },
+      "description": {
+        "en": "Gunner cats: the best volley in the galaxy, a rich home world and warlords at the head of the fleet.",
+        "ru": "Кошки-канониры: лучший залп в галактике, богатый родной мир и военачальники во главе флота."
+      },
+      "home_climate": "TERRAN",
+      "color": "#b56cff",
+      "traits": [
+        "gov-dictatorship",
+        "ship-attack-great",
+        "world-rich",
+        "warlord",
+        "food-good"
+      ]
+    },
+    {
+      "code": "BULRATHI",
+      "name": {
+        "en": "Ursani",
+        "ru": "Урсани"
+      },
+      "description": {
+        "en": "Bears of high gravity: sturdy troops and accurate gunners. Heavy worlds cost them nothing.",
+        "ru": "Медведи большой тяжести: крепкий десант и меткие канониры. Тяжёлые миры им нипочём."
+      },
+      "home_climate": "TERRAN",
+      "color": "#ff9a3c",
+      "traits": [
+        "gov-dictatorship",
+        "grav-high",
+        "ground-good",
+        "ship-attack-good",
+        "world-large",
+        "world-rich",
+        "spy-poor",
+        "ship-defense-poor",
+        "food-good"
+      ]
+    },
+    {
+      "code": "SAKKRA",
+      "name": {
+        "en": "Saurath",
+        "ru": "Саураты"
+      },
+      "description": {
+        "en": "Lizards: twice as prolific, good farmers, they live below the surface and their home world is large. Feudal and poor spies.",
+        "ru": "Ящеры: плодовиты вдвое, хорошие фермеры, живут под поверхностью и родной мир их велик. Феодалы и плохие шпионы."
+      },
+      "home_climate": "TERRAN",
+      "color": "#47e3d5",
+      "traits": [
+        "gov-feudal",
+        "growth-fast",
+        "food-good",
+        "subterranean",
+        "world-large",
+        "spy-poor",
+        "ship-attack-poor",
+        "ship-defense-poor",
+        "world-rich"
+      ]
+    },
+    {
+      "code": "DARLOKS",
+      "name": {
+        "en": "Veylin",
+        "ru": "Вейлины"
+      },
+      "description": {
+        "en": "Masters of the secret war: great spies whose ships are invisible on the map.",
+        "ru": "Мастера тайной войны: великие шпионы, чьи корабли не видны на карте."
+      },
+      "home_climate": "TERRAN",
+      "color": "#ff7bd5",
+      "traits": [
+        "gov-dictatorship",
+        "spy-great",
+        "stealthy-ships",
+        "science-good"
+      ]
+    },
+    {
+      "code": "ALKARI",
+      "name": {
+        "en": "Aviari",
+        "ru": "Авиары"
+      },
+      "description": {
+        "en": "Bird pilots: the best ship defence in the galaxy and a home world strewn with the legacy of a vanished civilisation.",
+        "ru": "Птицы-пилоты: лучшая в галактике защита кораблей и родной мир, усыпанный наследием ушедшей цивилизации."
+      },
+      "home_climate": "TERRAN",
+      "color": "#8ad0ff",
+      "traits": [
+        "gov-dictatorship",
+        "ship-defense-great",
+        "world-artifacts",
+        "world-rich"
+      ]
+    },
+    {
+      "code": "ELERIAN",
+      "name": {
+        "en": "Iluni",
+        "ru": "Илуни"
+      },
+      "description": {
+        "en": "Telepathic seers: they see the whole galaxy, take colonies without troops and shoot accurately. A feudal government halves their science.",
+        "ru": "Телепаты-провидцы: видят всю галактику, подчиняют колонии без десанта и метко стреляют. Феодальный строй роняет их науку вдвое."
+      },
+      "home_climate": "TERRAN",
+      "color": "#c48bff",
+      "traits": [
+        "gov-feudal",
+        "telepathic",
+        "omniscient",
+        "ship-attack-good",
+        "ship-defense-good",
+        "science-good"
+      ]
+    },
+    {
+      "code": "GNOLAM",
+      "name": {
+        "en": "Gildrin",
+        "ru": "Гилдрины"
+      },
+      "description": {
+        "en": "Traders and lucky ones: twice the tax, double the takings from goods, and fortune on their side. They grew up in low gravity.",
+        "ru": "Торговцы и счастливчики: вдвое больший налог, двойная выручка с товаров и удача на их стороне. Выросли в малой тяжести."
+      },
+      "home_climate": "TERRAN",
+      "color": "#ffc061",
+      "traits": [
+        "gov-dictatorship",
+        "money-rich",
+        "lucky",
+        "traders",
+        "grav-low",
+        "science-good"
+      ]
+    },
+    {
+      "code": "MEKLAR",
+      "name": {
+        "en": "Synthar",
+        "ru": "Синтары"
+      },
+      "description": {
+        "en": "Cyborgs: they eat half as much but consume ore, and they are great industrialists on top of that.",
+        "ru": "Киборги: едят вполовину меньше, но проедают руду, и великие промышленники сверх того."
+      },
+      "home_climate": "TERRAN",
+      "color": "#9fb0c9",
+      "traits": [
+        "gov-dictatorship",
+        "cybernetic",
+        "industry-great",
+        "world-rich",
+        "ship-defense-good",
+        "ground-good",
+        "science-good",
+        "subterranean"
+      ]
+    },
+    {
+      "code": "TRILARIAN",
+      "name": {
+        "en": "Tidari",
+        "ru": "Тидари"
+      },
+      "description": {
+        "en": "A water folk: wet worlds hold three times as many of them, and their ships fold space and cover two extra parsecs a turn.",
+        "ru": "Водный народ: мокрые миры вмещают их втрое, а корабли складывают пространство и проходят два лишних парсека за ход."
+      },
+      "home_climate": "TERRAN",
+      "color": "#4fe0c4",
+      "traits": [
+        "gov-dictatorship",
+        "aquatic",
+        "trans-dimensional",
+        "world-rich"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+        Названия звёзд переехали из БД в текстовый справочник star-names.txt рядом с сервером
+        (п. 11.3): его правит человек в любом редакторе, и правки подхватываются без
+        миграции и перезапуска. Таблица ref_star_name больше не нужна.
+
+        Changelog'и 001 (создание таблицы) и 011 (наполнение) не трогаем: они уже применены,
+        правка сломала бы контрольные суммы Liquibase.
+    -->
+    <changeSet id="015-01-drop-ref-star-name" author="moo3">
+        <dropTable tableName="ref_star_name"/>
+
+        <rollback>
+            <createTable tableName="ref_star_name">
+                <column name="name" type="VARCHAR(64)">
+                    <constraints primaryKey="true" primaryKeyName="pk_ref_star_name" nullable="false"/>
+                </column>
+                <column name="sort_order" type="INT">
+                    <constraints nullable="false"/>
+                </column>
+            </createTable>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

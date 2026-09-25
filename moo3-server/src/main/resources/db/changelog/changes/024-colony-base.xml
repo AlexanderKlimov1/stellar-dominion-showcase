@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+        Колониальная база — п. 4.1.
+
+        Сам проект стройки кодом лежит в planet.project_code вместе с домами и товарами,
+        отдельной колонки ему не нужно. А вот достроенная база живёт до тех пор, пока
+        игрок не выберет планету для заселения: между концом хода и этим выбором может
+        пройти сколько угодно времени, поэтому её готовность хранится флагом на колонии.
+    -->
+    <changeSet id="024-01-add-planet-colony-base-ready" author="moo3">
+        <addColumn tableName="planet">
+            <column name="colony_base_ready" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

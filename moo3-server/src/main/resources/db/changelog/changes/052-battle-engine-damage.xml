@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+      Выбитый двигатель — п. 8, наведение по излучению (EMG) из MOO II.
+
+      Такая ракета, пробившись сквозь щит, бьёт не по корпусу, а по двигателю: корабль
+      остаётся на ходу, но ползёт. Признак живёт у корабля боя, а не у проекта: поломка
+      эта на один бой, и в следующий корабль выходит целым.
+    -->
+    <changeSet id="052-battle-engine-damage" author="moo3">
+        <addColumn tableName="battle_ship">
+            <column name="engine_damaged" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

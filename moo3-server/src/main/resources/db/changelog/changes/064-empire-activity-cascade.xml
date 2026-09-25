@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+      Счётчик пользования механиками ПЕРЕЖИВАЛ СВОЮ ПАРТИЮ, и это была настоящая утечка.
+
+      У соседней таблицы летописи (`empire_history`) внешний ключ на партию стоит с
+      каскадом: удалили партию — ушла и летопись. У `empire_activity` его при заведении
+      (054) забыли, а `GameService` чистит только то, что связано отношениями JPA, — и
+      счётчики оставались навсегда.
+
+      Измерено 18.09.2026: 1 162 785 строк, из них 1 162 615 — от партий, которых давно
+      нет; 232 МБ. Балансовый прогон играет по пятьсот партий и каждую удаляет за собой,
+      так что таблица росла тысячами строк в час. Читать это не мешало (индекс по
+      `game_id` есть), а вот каждая вставка поддерживала уникальный индекс
+      `(player_id, code)` по миллиону с лишним строк — и вставок на партию десятки.
+
+      Сирот сносим разово, а дальше их не будет: ключ с каскадом отвечает за это надёжнее
+      любой уборки в коде — забыть его нельзя.
+    -->
+    <changeSet id="064-empire-activity-drop-orphans" author="moo3">
+        <comment>Снести счётчики партий, которых больше нет</comment>
+        <sql>
+            DELETE FROM empire_activity a
+            WHERE NOT EXISTS (SELECT 1 FROM game g WHERE g.id = a.game_id)
+        </sql>
+    </changeSet>
+
+    <changeSet id="064-empire-activity-cascade" author="moo3">
+        <comment>Счётчик уходит вместе со своей партией — как летопись</comment>
+        <addForeignKeyConstraint
+                constraintName="fk_empire_activity_game"
+                baseTableName="empire_activity"
+                baseColumnNames="game_id"
+                referencedTableName="game"
+                referencedColumnNames="id"
+                onDelete="CASCADE"/>
+    </changeSet>
+
+</databaseChangeLog>

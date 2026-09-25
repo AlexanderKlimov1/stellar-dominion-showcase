@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+        п. 11.1 — дерево технологий: 8 разделов по 3 тестовые технологии.
+        Технологии внутри раздела связаны цепочкой parent_code, чтобы дерево
+        отрабатывало реальную иерархию, а не плоский список.
+
+        Технологии терраформирования (п. 4.1.2.1) сюда не входят: пока п. 9 не
+        детализирован, они заданы перечислением TerraformingTech и на них ссылается
+        ref_planet_climate.required_tech_code. При наполнении реального дерева
+        достаточно добавить их отдельным changeSet с теми же кодами.
+    -->
+    <changeSet id="013-01-seed-technology" author="moo3">
+        <insert tableName="technology">
+            <column name="code" value="TECH_1_1"/>
+            <column name="section_code" value="SECTION_1"/>
+            <column name="section_name" value="Раздел1"/>
+            <column name="section_order" valueNumeric="1"/>
+            <column name="name" value="Тех11"/>
+            <column name="description" value="Тестовая технология Тех11 раздела Раздел1."/>
+            <column name="research_cost" valueNumeric="80"/>
+            <column name="sort_order" valueNumeric="1"/>
+        </insert>
+        <insert tableName="technology">
+            <column name="code" value="TECH_1_2"/>
+            <column name="section_code" value="SECTION_1"/>
+            <column name="section_name" value="Раздел1"/>
+            <column name="section_order" valueNumeric="1"/>
+            <column name="name" value="Тех12"/>
+            <column name="description" value="Тестовая технология Тех12 раздела Раздел1."/>
+            <column name="research_cost" valueNumeric="110"/>
+            <column name="parent_code" value="TECH_1_1"/>
+            <column name="sort_order" valueNumeric="2"/>
+        </insert>
+        <insert tableName="technology">
+            <column name="code" value="TECH_1_3"/>
+            <column name="section_code" value="SECTION_1"/>
+            <column name="section_name" value="Раздел1"/>
+            <column name="section_order" valueNumeric="1"/>
+            <column name="name" value="Тех13"/>
+            <column name="description" value="Тестовая технология Тех13 раздела Раздел1."/>
+            <column name="research_cost" valueNumeric="140"/>
+            <column name="parent_code" value="TECH_1_2"/>
+            <column name="sort_order" valueNumeric="3"/>
+        </insert>
+        <insert tableName="technology">
+            <column name="code" value="TECH_2_1"/>
+            <column name="section_code" value="SECTION_2"/>
+            <column name="section_name" value="Раздел2"/>
+            <column name="section_order" valueNumeric="2"/>
+            <column name="name" value="Тех21"/>
+            <column name="description" value="Тестовая технология Тех21 раздела Раздел2."/>
+            <column name="research_cost" valueNumeric="130"/>
+            <column name="sort_order" valueNumeric="1"/>
+        </insert>
+        <insert tableName="technology">
+            <column name="code" value="TECH_2_2"/>
+            <column name="section_code" value="SECTION_2"/>
+            <column name="section_name" value="Раздел2"/>
+            <column name="section_order" valueNumeric="2"/>
+            <column name="name" value="Тех22"/>
+            <column name="description" value="Тестовая технология Тех22 раздела Раздел2."/>
+            <column name="research_cost" valueNumeric="160"/>
+            <column name="parent_code" value="TECH_2_1"/>
+            <column name="sort_order" valueNumeric="2"/>
+        </insert>
+        <insert tableName="technology">
+            <column name="code" value="TECH_2_3"/>
+            <column name="section_code" value="SECTION_2"/>
+            <column name="section_name" value="Раздел2"/>
+            <column name="section_order" valueNumeric="2"/>
+            <column name="name" value="Тех23"/>
+            <column name="description" value="Тестовая технология Тех23 раздела Раздел2."/>
+            <column name="research_cost" valueNumeric="190"/>
+            <column name="parent_code" value="TECH_2_2"/>
+            <column name="sort_order" valueNumeric="3"/>
+        </insert>
+        <insert tableName="technology">
+            <column name="code" value="TECH_3_1"/>
+            <column name="section_code" value="SECTION_3"/>
+            <column name="section_name" value="Раздел3"/>
+            <column name="section_order" valueNumeric="3"/>
+            <column name="name" value="Тех31"/>
+            <column name="description" value="Тестовая технология Тех31 раздела Раздел3."/>
+            <column name="research_cost" valueNumeric="180"/>
+            <column name="sort_order" valueNumeric="1"/>
+        </insert>
+        <insert tableName="technology">
+            <column name="code" value="TECH_3_2"/>
+            <column name="section_code" value="SECTION_3"/>
+            <column name="section_name" value="Раздел3"/>
+            <column name="section_order" valueNumeric="3"/>
+            <column name="name" value="Тех32"/>
+            <column name="description" value="Тестовая технология Тех32 раздела Раздел3."/>
+            <column name="research_cost" valueNumeric="210"/>
+            <column name="parent_code" value="TECH_3_1"/>
+            <column name="sort_order" valueNumeric="2"/>
+        </insert>
+        <insert tableName="technology">
+            <column name="code" value="TECH_3_3"/>
+            <column name="section_code" value="SECTION_3"/>
+            <column name="section_name" value="Раздел3"/>
+            <column name="section_order" valueNumeric="3"/>
+            <column name="name" value="Тех33"/>
+            <column name="description" value="Тестовая технология Тех33 раздела Раздел3."/>
+            <column name="research_cost" valueNumeric="240"/>
+            <column name="parent_code" value="TECH_3_2"/>
+            <column name="sort_order" valueNumeric="3"/>
+        </insert>
+        <insert tableName="technology">
+            <column name="code" value="TECH_4_1"/>
+            <column name="section_code" value="SECTION_4"/>
+            <column name="section_name" value="Раздел4"/>
+            <column name="section_order" valueNumeric="4"/>
+            <column name="name" value="Тех41"/>
+            <column name="description" value="Тестовая технология Тех41 раздела Раздел4."/>
+            <column name="research_cost" valueNumeric="230"/>
+            <column name="sort_order" valueNumeric="1"/>
+        </insert>
+        <insert tableName="technology">
+            <column name="code" value="TECH_4_2"/>
+            <column name="section_code" value="SECTION_4"/>
+            <column name="section_name" value="Раздел4"/>
+            <column name="section_order" valueNumeric="4"/>
+            <column name="name" value="Тех42"/>
+            <column name="description" value="Тестовая технология Тех42 раздела Раздел4."/>
+            <column name="research_cost" valueNumeric="260"/>
+            <column name="parent_code" value="TECH_4_1"/>
+            <column name="sort_order" valueNumeric="2"/>
+        </insert>
+        <insert tableName="technology">
+            <column name="code" value="TECH_4_3"/>
+            <column name="section_code" value="SECTION_4"/>
+            <column name="section_name" value="Раздел4"/>
+            <column name="section_order" valueNumeric="4"/>
+            <column name="name" value="Тех43"/>
+            <column name="description" value="Тестовая технология Тех43 раздела Раздел4."/>
+            <column name="research_cost" valueNumeric="290"/>
+            <column name="parent_code" value="TECH_4_2"/>
+            <column name="sort_order" valueNumeric="3"/>
+        </insert>
+        <insert tableName="technology">
+            <column name="code" value="TECH_5_1"/>
+            <column name="section_code" value="SECTION_5"/>
+            <column name="section_name" value="Раздел5"/>
+            <column name="section_order" valueNumeric="5"/>
+            <column name="name" value="Тех51"/>
+            <column name="description" value="Тестовая технология Тех51 раздела Раздел5."/>
+            <column name="research_cost" valueNumeric="280"/>
+            <column name="sort_order" valueNumeric="1"/>
+        </insert>
+        <insert tableName="technology">
+            <column name="code" value="TECH_5_2"/>
+            <column name="section_code" value="SECTION_5"/>
+            <column name="section_name" value="Раздел5"/>
+            <column name="section_order" valueNumeric="5"/>
+            <column name="name" value="Тех52"/>
+            <column name="description" value="Тестовая технология Тех52 раздела Раздел5."/>
+            <column name="research_cost" valueNumeric="310"/>
+            <column name="parent_code" value="TECH_5_1"/>
+            <column name="sort_order" valueNumeric="2"/>
+        </insert>
+        <insert tableName="technology">
+            <column name="code" value="TECH_5_3"/>
+            <column name="section_code" value="SECTION_5"/>
+            <column name="section_name" value="Раздел5"/>
+            <column name="section_order" valueNumeric="5"/>
+            <column name="name" value="Тех53"/>
+            <column name="description" value="Тестовая технология Тех53 раздела Раздел5."/>
+            <column name="research_cost" valueNumeric="340"/>
+            <column name="parent_code" value="TECH_5_2"/>
+            <column name="sort_order" valueNumeric="3"/>
+        </insert>
+        <insert tableName="technology">
+            <column name="code" value="TECH_6_1"/>
+            <column name="section_code" value="SECTION_6"/>
+            <column name="section_name" value="Раздел6"/>
+            <column name="section_order" valueNumeric="6"/>
+            <column name="name" value="Тех61"/>
+            <column name="description" value="Тестовая технология Тех61 раздела Раздел6."/>
+            <column name="research_cost" valueNumeric="330"/>
+            <column name="sort_order" valueNumeric="1"/>
+        </insert>
+        <insert tableName="technology">
+            <column name="code" value="TECH_6_2"/>
+            <column name="section_code" value="SECTION_6"/>
+            <column name="section_name" value="Раздел6"/>
+            <column name="section_order" valueNumeric="6"/>
+            <column name="name" value="Тех62"/>
+            <column name="description" value="Тестовая технология Тех62 раздела Раздел6."/>
+            <column name="research_cost" valueNumeric="360"/>
+            <column name="parent_code" value="TECH_6_1"/>
+            <column name="sort_order" valueNumeric="2"/>
+        </insert>
+        <insert tableName="technology">
+            <column name="code" value="TECH_6_3"/>
+            <column name="section_code" value="SECTION_6"/>
+            <column name="section_name" value="Раздел6"/>
+            <column name="section_order" valueNumeric="6"/>
+            <column name="name" value="Тех63"/>
+            <column name="description" value="Тестовая технология Тех63 раздела Раздел6."/>
+            <column name="research_cost" valueNumeric="390"/>
+            <column name="parent_code" value="TECH_6_2"/>
+            <column name="sort_order" valueNumeric="3"/>
+        </insert>
+        <insert tableName="technology">
+            <column name="code" value="TECH_7_1"/>
+            <column name="section_code" value="SECTION_7"/>
+            <column name="section_name" value="Раздел7"/>
+            <column name="section_order" valueNumeric="7"/>
+            <column name="name" value="Тех71"/>
+            <column name="description" value="Тестовая технология Тех71 раздела Раздел7."/>
+            <column name="research_cost" valueNumeric="380"/>
+            <column name="sort_order" valueNumeric="1"/>
+        </insert>
+        <insert tableName="technology">
+            <column name="code" value="TECH_7_2"/>
+            <column name="section_code" value="SECTION_7"/>
+            <column name="section_name" value="Раздел7"/>
+            <column name="section_order" valueNumeric="7"/>
+            <column name="name" value="Тех72"/>
+            <column name="description" value="Тестовая технология Тех72 раздела Раздел7."/>
+            <column name="research_cost" valueNumeric="410"/>
+            <column name="parent_code" value="TECH_7_1"/>
+            <column name="sort_order" valueNumeric="2"/>
+        </insert>
+        <insert tableName="technology">
+            <column name="code" value="TECH_7_3"/>
+            <column name="section_code" value="SECTION_7"/>
+            <column name="section_name" value="Раздел7"/>
+            <column name="section_order" valueNumeric="7"/>
+            <column name="name" value="Тех73"/>
+            <column name="description" value="Тестовая технология Тех73 раздела Раздел7."/>
+            <column name="research_cost" valueNumeric="440"/>
+            <column name="parent_code" value="TECH_7_2"/>
+            <column name="sort_order" valueNumeric="3"/>
+        </insert>
+        <insert tableName="technology">
+            <column name="code" value="TECH_8_1"/>
+            <column name="section_code" value="SECTION_8"/>
+            <column name="section_name" value="Раздел8"/>
+            <column name="section_order" valueNumeric="8"/>
+            <column name="name" value="Тех81"/>
+            <column name="description" value="Тестовая технология Тех81 раздела Раздел8."/>
+            <column name="research_cost" valueNumeric="430"/>
+            <column name="sort_order" valueNumeric="1"/>
+        </insert>
+        <insert tableName="technology">
+            <column name="code" value="TECH_8_2"/>
+            <column name="section_code" value="SECTION_8"/>
+            <column name="section_name" value="Раздел8"/>
+            <column name="section_order" valueNumeric="8"/>
+            <column name="name" value="Тех82"/>
+            <column name="description" value="Тестовая технология Тех82 раздела Раздел8."/>
+            <column name="research_cost" valueNumeric="460"/>
+            <column name="parent_code" value="TECH_8_1"/>
+            <column name="sort_order" valueNumeric="2"/>
+        </insert>
+        <insert tableName="technology">
+            <column name="code" value="TECH_8_3"/>
+            <column name="section_code" value="SECTION_8"/>
+            <column name="section_name" value="Раздел8"/>
+            <column name="section_order" valueNumeric="8"/>
+            <column name="name" value="Тех83"/>
+            <column name="description" value="Тестовая технология Тех83 раздела Раздел8."/>
+            <column name="research_cost" valueNumeric="490"/>
+            <column name="parent_code" value="TECH_8_2"/>
+            <column name="sort_order" valueNumeric="3"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

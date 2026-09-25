@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+        Галактика в парсеках — п. 4.2, п. 8.
+
+        Своя единица длины (ГРЕ) была нужна, пока размеры галактик брались наугад: карта
+        мерялась ГРЕ, дальность кораблей — парсеками MOO II, и между ними стоял
+        переводной множитель, свой у каждого размера. Множитель и был лишним звеном: от
+        него зависело, дотянется ли империя до соседа, а подбирался он на глаз.
+
+        Теперь карта меряется тем же, чем и топливо, — парсеками, а размеры взяты из
+        оригинала: Small 20, Medium 27, Large 33, Huge 38 парсеков в ширину при пропорции
+        1,4:1. Дальность Standard Fuel Cells (4 парсека) и прибавка дополнительных баков
+        (+50 %) теперь значат ровно то же, что в MOO II, и переводить ничего не нужно.
+
+        Координаты звёзд становятся дробными: в галактике 20×14 парсеков целых точек 280
+        на три десятка звёзд, и они легли бы заметной решёткой. Десятые доли парсека
+        решётку убирают, а расстояния остаются теми же числами, что и дальность топлива.
+    -->
+    <changeSet id="043-01-galaxy-parsecs" author="moo3">
+        <renameColumn tableName="game" oldColumnName="width_gre" newColumnName="width_parsecs"
+                      columnDataType="INT"/>
+        <renameColumn tableName="game" oldColumnName="height_gre" newColumnName="height_parsecs"
+                      columnDataType="INT"/>
+        <renameColumn tableName="ref_galaxy_size" oldColumnName="width_gre"
+                      newColumnName="width_parsecs" columnDataType="INT"/>
+        <renameColumn tableName="ref_galaxy_size" oldColumnName="height_gre"
+                      newColumnName="height_parsecs" columnDataType="INT"/>
+    </changeSet>
+
+    <!--
+        Координаты звёзд: целые ГРЕ уступают место дробным парсекам. Старые партии
+        переводятся тем самым множителем, который стоял между единицами до сих пор
+        (Small 8, Medium 15, Large 20, Huge 24 ГРЕ в парсеке), — сохранённые галактики
+        остаются такими же, только записаны в парсеках.
+    -->
+    <changeSet id="043-02-star-coordinates-parsecs" author="moo3">
+        <addColumn tableName="star_system">
+            <column name="x_parsec" type="DOUBLE PRECISION"/>
+            <column name="y_parsec" type="DOUBLE PRECISION"/>
+        </addColumn>
+
+        <sql>
+            UPDATE star_system s
+            SET x_parsec = ROUND((s.x_gre / g.scale)::numeric, 1),
+                y_parsec = ROUND((s.y_gre / g.scale)::numeric, 1)
+            FROM (SELECT id,
+                         CASE galaxy_size
+                             WHEN 'SMALL' THEN 8.0
+                             WHEN 'MEDIUM' THEN 15.0
+                             WHEN 'LARGE' THEN 20.0
+                             ELSE 24.0
+                         END AS scale
+                  FROM game) g
+            WHERE s.game_id = g.id;
+        </sql>
+
+        <!-- Партии, у которых координат почему-то не оказалось, ставим в начало координат. -->
+        <sql>
+            UPDATE star_system SET x_parsec = 0, y_parsec = 0
+            WHERE x_parsec IS NULL OR y_parsec IS NULL;
+        </sql>
+
+        <addNotNullConstraint tableName="star_system" columnName="x_parsec"
+                              columnDataType="DOUBLE PRECISION"/>
+        <addNotNullConstraint tableName="star_system" columnName="y_parsec"
+                              columnDataType="DOUBLE PRECISION"/>
+        <dropColumn tableName="star_system" columnName="x_gre"/>
+        <dropColumn tableName="star_system" columnName="y_gre"/>
+    </changeSet>
+
+    <!--
+        Размеры партий и справочника — на числа оригинала. Старые партии переезжают
+        вместе со звёздами: их поле теперь тоже в парсеках.
+    -->
+    <changeSet id="043-03-galaxy-sizes-of-the-original" author="moo3">
+        <sql>
+            UPDATE game SET width_parsecs = CASE galaxy_size
+                                                WHEN 'SMALL' THEN 20
+                                                WHEN 'MEDIUM' THEN 27
+                                                WHEN 'LARGE' THEN 33
+                                                ELSE 38
+                                            END,
+                            height_parsecs = CASE galaxy_size
+                                                WHEN 'SMALL' THEN 14
+                                                WHEN 'MEDIUM' THEN 19
+                                                WHEN 'LARGE' THEN 24
+                                                ELSE 27
+                                             END;
+        </sql>
+
+        <update tableName="ref_galaxy_size">
+            <column name="width_parsecs" valueNumeric="20"/>
+            <column name="height_parsecs" valueNumeric="14"/>
+            <where>code = 'SMALL'</where>
+        </update>
+        <update tableName="ref_galaxy_size">
+            <column name="width_parsecs" valueNumeric="27"/>
+            <column name="height_parsecs" valueNumeric="19"/>
+            <where>code = 'MEDIUM'</where>
+        </update>
+        <update tableName="ref_galaxy_size">
+            <column name="width_parsecs" valueNumeric="33"/>
+            <column name="height_parsecs" valueNumeric="24"/>
+            <where>code = 'LARGE'</where>
+        </update>
+        <update tableName="ref_galaxy_size">
+            <column name="width_parsecs" valueNumeric="38"/>
+            <column name="height_parsecs" valueNumeric="27"/>
+            <where>code = 'HUGE'</where>
+        </update>
+    </changeSet>
+
+</databaseChangeLog>

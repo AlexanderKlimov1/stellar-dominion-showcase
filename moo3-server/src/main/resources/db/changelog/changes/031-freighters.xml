@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+        Грузовой флот — п. 8 и п. 4.1.1: корабли, которые возят еду между колониями.
+        Держатся числом у игрока, а не строками: грузовик не воюет, не летает по карте
+        и ничем не отличается от соседнего — империи важно только, сколько их всего.
+        Так же устроены шпионы (`player.spies`).
+    -->
+    <changeSet id="031-01-player-freighters" author="moo3">
+        <comment>Грузовые корабли империи: возят еду голодающим колониям — п. 4.1.1.</comment>
+        <addColumn tableName="player">
+            <column name="freighters" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+        Сохранённые партии: состояние игры на конец завершённого хода.
+
+        Состояние лежит одним документом JSONB, а не разложено по копиям таблиц game,
+        player, star_system и planet: сохранение должно быть самодостаточным и переживать
+        удаление исходной игры, поэтому внешнего ключа на game здесь нет, а game_id
+        остаётся просто пометкой, с какой партии снят слепок.
+
+        Остальные колонки — витрина для диалога загрузки: список сохранений строится
+        по ним, без разбора документа.
+    -->
+    <changeSet id="016-01-create-game-save" author="moo3">
+        <createTable tableName="game_save">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_game_save" nullable="false"/>
+            </column>
+            <column name="game_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="galaxy_size" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="width_gre" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="height_gre" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="star_count" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="turn" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="total_players" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="human_players" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="saved_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="state" type="JSONB">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createIndex tableName="game_save" indexName="ix_game_save_saved_at">
+            <column name="saved_at"/>
+        </createIndex>
+
+        <createIndex tableName="game_save" indexName="ix_game_save_game_id">
+            <column name="game_id"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

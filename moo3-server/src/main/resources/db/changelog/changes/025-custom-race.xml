@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+        Конструктор расы — п. 7.
+
+        Игрок собирает расу перед партией: даёт ей название и покупает особенности за
+        очки расы. В базе от расы остаются только название и коды выбранных особенностей —
+        их цена и действие живут в файле конструктора (moo3.game.race-traits-file) и
+        правятся без миграций.
+
+        Коды лежат одной колонкой через запятую, а не отдельной таблицей: набор выбирается
+        один раз и дальше только читается вместе с самим игроком, искать по нему нечего.
+    -->
+    <changeSet id="025-01-add-player-custom-race" author="moo3">
+        <addColumn tableName="player">
+            <column name="race_name" type="VARCHAR(128)"/>
+            <column name="race_traits" type="VARCHAR(512)"/>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

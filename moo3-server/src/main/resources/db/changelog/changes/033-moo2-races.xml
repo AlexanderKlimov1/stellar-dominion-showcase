@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+        Тринадцать рас MOO II в справочнике — п. 5.
+
+        Экран выбора расы открывает партию, и на нём стоят те же расы, что в оригинале:
+        игра начинается с выбора готовой расы, а «своя раса» — только один из вариантов.
+        В справочнике их было восемь и с именами первой части (Humans, Psilons), поэтому
+        имена приведены к написанию MOO II, а недостающие пять добавлены.
+
+        Расы пока заглушки: у них есть имя, цвет на карте и климат родного мира, но нет
+        своего набора особенностей — в MOO II каждая готовая раса это набор тех же picks,
+        что покупает игрок. Точка расширения: когда наборы появятся, они лягут в
+        `resources/Races/race-traits.json` рядом с ценами, а клетки экрана станут
+        выбираемыми.
+    -->
+    <changeSet id="033-01-rename-races" author="moo3">
+        <update tableName="race">
+            <column name="name" value="Human"/>
+            <where>code = 'HUMANS'</where>
+        </update>
+        <update tableName="race">
+            <column name="name" value="Psilon"/>
+            <where>code = 'PSILONS'</where>
+        </update>
+        <update tableName="race">
+            <column name="name" value="Klackon"/>
+            <where>code = 'KLACKONS'</where>
+        </update>
+        <update tableName="race">
+            <column name="name" value="Silicoid"/>
+            <where>code = 'SILICOIDS'</where>
+        </update>
+        <update tableName="race">
+            <column name="name" value="Darlok"/>
+            <where>code = 'DARLOKS'</where>
+        </update>
+    </changeSet>
+
+    <changeSet id="033-02-seed-moo2-races" author="moo3">
+        <insert tableName="race">
+            <column name="code" value="ALKARI"/>
+            <column name="name" value="Alkari"/>
+            <column name="description" value="Заглушка расы: набор особенностей появится вместе с готовыми расами — п. 7."/>
+            <column name="home_climate_code" value="TERRAN"/>
+            <column name="color" value="#8ad0ff"/>
+            <column name="sort_order" valueNumeric="9"/>
+        </insert>
+        <insert tableName="race">
+            <column name="code" value="ELERIAN"/>
+            <column name="name" value="Elerian"/>
+            <column name="description" value="Заглушка расы: набор особенностей появится вместе с готовыми расами — п. 7."/>
+            <column name="home_climate_code" value="TERRAN"/>
+            <column name="color" value="#c48bff"/>
+            <column name="sort_order" valueNumeric="10"/>
+        </insert>
+        <insert tableName="race">
+            <column name="code" value="GNOLAM"/>
+            <column name="name" value="Gnolam"/>
+            <column name="description" value="Заглушка расы: набор особенностей появится вместе с готовыми расами — п. 7."/>
+            <column name="home_climate_code" value="TERRAN"/>
+            <column name="color" value="#ffc061"/>
+            <column name="sort_order" valueNumeric="11"/>
+        </insert>
+        <insert tableName="race">
+            <column name="code" value="MEKLAR"/>
+            <column name="name" value="Meklar"/>
+            <column name="description" value="Заглушка расы: набор особенностей появится вместе с готовыми расами — п. 7."/>
+            <column name="home_climate_code" value="TERRAN"/>
+            <column name="color" value="#9fb0c9"/>
+            <column name="sort_order" valueNumeric="12"/>
+        </insert>
+        <insert tableName="race">
+            <column name="code" value="TRILARIAN"/>
+            <column name="name" value="Trilarian"/>
+            <column name="description" value="Заглушка расы: набор особенностей появится вместе с готовыми расами — п. 7."/>
+            <column name="home_climate_code" value="OCEAN"/>
+            <column name="color" value="#4fe0c4"/>
+            <column name="sort_order" valueNumeric="13"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

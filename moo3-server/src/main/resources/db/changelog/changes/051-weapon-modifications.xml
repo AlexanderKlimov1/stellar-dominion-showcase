@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+      Модификации ствола — п. 8, «Modifications» окна дизайна MOO II.
+
+      Ствол в проекте стоит не сам по себе: его утяжеляют, облегчают до ближней обороны,
+      учат бить чаще, пробивать броню или охватывать корабль целиком. Коды модификаций
+      хранятся строкой через запятую в самой строке состава — их у ствола одна-две, своей
+      таблицей они дали бы выборку на каждый ствол проекта ради двух слов.
+
+      Пустая строка значит «ствол как есть»: так стоят все проекты, собранные до этой
+      правки, и разбирать их заново не нужно.
+    -->
+    <changeSet id="051-weapon-modifications" author="moo3">
+        <addColumn tableName="ship_design_component">
+            <column name="modifications" type="varchar(200)"/>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

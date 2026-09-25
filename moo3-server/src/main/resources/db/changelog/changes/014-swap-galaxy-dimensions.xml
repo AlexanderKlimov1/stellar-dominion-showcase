@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+        Ширина и высота галактик меняются местами: галактика становится вытянутой
+        по горизонтали, а не по вертикали. Small остаётся квадратной (100×100).
+
+        Отдельным changeSet, а не правкой 010-seed-reference.xml: тот changeSet уже
+        применён, и изменение его содержимого сломало бы контрольную сумму Liquibase.
+
+        Строки таблицы game не трогаем: там лежат размеры уже сгенерированных галактик,
+        и звёзды в них расставлены по прежним границам.
+    -->
+    <changeSet id="014-01-swap-galaxy-dimensions" author="moo3">
+        <update tableName="ref_galaxy_size">
+            <column name="width_gre" valueNumeric="300"/>
+            <column name="height_gre" valueNumeric="200"/>
+            <where>code = 'MEDIUM'</where>
+        </update>
+        <update tableName="ref_galaxy_size">
+            <column name="width_gre" valueNumeric="450"/>
+            <column name="height_gre" valueNumeric="300"/>
+            <where>code = 'LARGE'</where>
+        </update>
+        <update tableName="ref_galaxy_size">
+            <column name="width_gre" valueNumeric="600"/>
+            <column name="height_gre" valueNumeric="400"/>
+            <where>code = 'HUGE'</where>
+        </update>
+
+        <rollback>
+            <update tableName="ref_galaxy_size">
+                <column name="width_gre" valueNumeric="200"/>
+                <column name="height_gre" valueNumeric="300"/>
+                <where>code = 'MEDIUM'</where>
+            </update>
+            <update tableName="ref_galaxy_size">
+                <column name="width_gre" valueNumeric="300"/>
+                <column name="height_gre" valueNumeric="450"/>
+                <where>code = 'LARGE'</where>
+            </update>
+            <update tableName="ref_galaxy_size">
+                <column name="width_gre" valueNumeric="400"/>
+                <column name="height_gre" valueNumeric="600"/>
+                <where>code = 'HUGE'</where>
+            </update>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

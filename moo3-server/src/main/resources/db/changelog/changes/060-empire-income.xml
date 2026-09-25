@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+      Доход империи за ход в летописи — мерило денег для балансировки (этап 3).
+
+      В летописи была КАЗНА (credits) — запас, а не поток: империя, потратившая всё на
+      стройку, стоит с нулём в кармане и живёт при этом лучше скопидома. Мерить деньги
+      запасом значит мерить бережливость, а не богатство. Доход — поток, такой же, как
+      выработка и наука, и сравнивать его с ними можно напрямую.
+
+      Считается он и так каждый ход (ProductionPhase, ColonyService.income); в летопись
+      кладётся тем же замером, что и всё прочее, — лишнего прохода по колониям нет.
+    -->
+    <changeSet id="060-empire-income" author="moo3">
+        <addColumn tableName="empire_history">
+            <column name="income" type="integer" defaultValueNumeric="0"/>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

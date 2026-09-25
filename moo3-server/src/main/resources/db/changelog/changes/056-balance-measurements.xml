@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+      Сырые замеры прогона — этап 2 (balance-metrics-works.txt).
+
+      Правила чтения замера меняются чаще самих замеров: за один вечер порядок оценки
+      правился трижды — сборки стали переигрываться на каждую партию, гребень вырос,
+      курс очка перестал считаться по отобранным сторонам. Каждый раз переигрывать
+      двести партий по сорок минут значило бы чинить прибор вслепую.
+
+      С сырыми замерами прогон пересуживается мгновенно и нынешними правилами, а цены
+      берутся из его собственного снимка: прогон мерил те цены, и судить его по другим
+      было бы подлогом.
+    -->
+    <changeSet id="056-balance-measurements" author="moo3">
+        <addColumn tableName="balance_run">
+            <column name="measurements" type="jsonb"/>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

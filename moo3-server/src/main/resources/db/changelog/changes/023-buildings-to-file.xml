@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+        Справочник зданий переехал в файл описания — п. 10.
+
+        Стоимость, содержание и действие зданий теперь лежат в JSON
+        (moo3.game.buildings-file) и читаются на лету, как дерево технологий: правки
+        подхватываются без перезапуска сервера и без миграций. Держать те же данные ещё
+        и в таблице незачем — расходиться им нельзя, а источник должен быть один.
+
+        Построенное на планетах остаётся в базе: planet_building хранит коды зданий,
+        то есть ссылки в этот файл, и внешнего ключа на справочник у него не было.
+    -->
+    <changeSet id="023-01-drop-building" author="moo3">
+        <dropTable tableName="building"/>
+    </changeSet>
+
+</databaseChangeLog>

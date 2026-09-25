@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+        Очередь стройки колонии — п. 10.
+
+        Хранится строкой в самой планете, а не отдельной таблицей, и вот почему: очередь
+        нужна фазе производства на каждой колонии каждый ход, а планеты ход и так
+        вычитывает целиком (TurnContext). Своя таблица означала бы выборку «на планету»
+        изнутри посчитанного хода — ту самую, от которой в этом проекте уже уходили
+        (см. «Грабли» в CLAUDE.md).
+
+        В строке лежат коды из того же списка стройки, что колония отдаёт клиенту
+        (`colony.available`), через запятую и по порядку. Запятой в кодах нет: у зданий
+        это латиница с дефисами, у кораблей — «SHIP:<проект>».
+    -->
+    <changeSet id="048-01-planet-build-queue" author="moo3">
+        <addColumn tableName="planet">
+            <column name="build_queue" type="VARCHAR(1000)"/>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

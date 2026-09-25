@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+      СПРАВОЧНИКИ УШЛИ ИЗ БАЗЫ — решение хозяина проекта 18.09.2026.
+
+      Пять таблиц хранили то, что и так записано в коде и в файлах игры:
+
+        ref_galaxy_size, ref_planet_size, ref_planet_climate, ref_mineral_richness
+            — дословные близнецы перечислений GalaxySize, PlanetSize, PlanetClimate и
+              MineralRichness. Те же названия, те же числа, второй раз;
+        race
+            — тринадцать готовых рас, чей СОСТАВ уже лежал в race-traits.json, а имя, цвет
+              и климат родного мира — здесь. Климат при этом был ТРЕТЬЕЙ копией: его же
+              возвращал PlayerRoster.homeClimatesByRace;
+        ability
+            — три строки «Способность 1, 2, 3», заглушки первых дней. Ни один экран к ним
+              не обращался: их место давно заняли стороны расы.
+
+      ЧЕМ ЭТО ПЛАТИЛОСЬ. Во-первых, справочник в двух местах разъезжается молча — правило
+      проекта про мёртвые данные («поле справочника, которого не спрашивает ни один сервис,
+      это не данные, а намерение») здесь работало наоборот: данные спрашивались, но не те.
+      Во-вторых, и это решило дело: на ПУСТОЙ схеме игра не поднимается вовсе. Балансовому
+      прогону в памяти (профиль `balance`, H2) справочникам взяться неоткуда, и первая же
+      партия отвечала «Справочник рас пуст».
+
+      Куда что переехало:
+        размеры, климаты, недра  -> перечисления domain/enums (там они и были)
+        цепочка терраформирования -> PlanetClimate.requiredTechCode и next()
+        расы целиком              -> resources/Races/race-traits.json, раздел races
+        способности               -> никуда, их не было в игре
+    -->
+
+    <changeSet id="065-drop-reference-tables" author="moo3">
+        <comment>Справочники читаются из файлов и перечислений — таблицы больше не нужны</comment>
+        <!--
+          race_ability — связка «раса — способность», пустая с самого начала: ни одной
+          строки за всю историю базы и ни одного упоминания в коде. Она держала внешние
+          ключи на обе таблицы, поэтому уходит первой.
+        -->
+        <dropTable tableName="race_ability"/>
+        <dropTable tableName="ability"/>
+        <dropTable tableName="race"/>
+        <dropTable tableName="ref_galaxy_size"/>
+        <dropTable tableName="ref_planet_size"/>
+        <dropTable tableName="ref_planet_climate"/>
+        <dropTable tableName="ref_mineral_richness"/>
+    </changeSet>
+
+    <!--
+      И последняя таблица-справочник — `technology`. В ней лежали двадцать четыре строки
+      вида «Раздел1 / Тех11 / Тестовая технология Тех11 раздела Раздел1»: заглушки первых
+      дней, ровно как у способностей. Настоящее дерево науки давно читается из
+      `resources/Technologies/tech.json` (ResearchCatalog), а раскладку изученного по
+      четырём разделам окна Info собирает TechnologySections — и выводит её не из этой
+      таблицы, а из того, ЧТО технология открывает: здание, пушку, модуль корабля.
+      Эндпоинт `/api/reference/technologies`, служба TechnologyTreeService, сущность и
+      репозиторий ушли вместе с таблицей: ни один экран к ним не обращался.
+    -->
+    <changeSet id="065-drop-technology-table" author="moo3">
+        <comment>Заглушки дерева науки: настоящее дерево лежит в tech.json</comment>
+        <dropTable tableName="technology"/>
+    </changeSet>
+
+</databaseChangeLog>

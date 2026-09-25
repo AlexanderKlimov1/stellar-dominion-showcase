@@ -1,0 +1,1047 @@
+<title>Stellar Dominion</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+  :root {
+    color-scheme: dark;
+    --ground: #05070f;
+    --panel: #0d1424;
+    --panel-2: #121829;
+    --edge: #1e2a44;
+    --edge-soft: #16203a;
+    --ink-bright: #eef4ff;
+    --ink: #ccd8ea;
+    --ink-soft: #a3b4cc;
+    --ink-dim: #8a9bb4;
+    --ink-faint: #73839c;
+    --accent: #7fd4ff;
+    --accent-dim: #3f7fa8;
+    --good: #4ade80;
+    --warn: #fbbf24;
+    --danger: #fb8a8a;
+    --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .shell {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding-inline: 16px;
+  }
+
+  /* --- оглавление ------------------------------------------------------- */
+
+  .toc { padding-block: 24px 8px; }
+
+  .toc-title {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin: 0 0 10px;
+  }
+
+  .toc ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .toc a {
+    display: block;
+    padding: 8px 12px;
+    border: 1px solid var(--edge);
+    border-radius: 2px;
+    background: var(--panel);
+    color: var(--ink-soft);
+    text-decoration: none;
+    font-size: 14px;
+  }
+
+  .toc a:hover, .toc a:focus-visible { color: var(--ink-bright); border-color: var(--accent-dim); }
+
+  .toc .num {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--accent);
+    margin-right: 8px;
+  }
+
+  /* --- шапка ------------------------------------------------------------ */
+
+  header.hero {
+    padding-block: 40px 28px;
+    border-bottom: 1px solid var(--edge-soft);
+  }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin: 0 0 14px;
+  }
+
+  h1 {
+    font-size: clamp(34px, 6vw, 58px);
+    line-height: 1.04;
+    letter-spacing: -0.02em;
+    margin: 0 0 14px;
+    color: var(--ink-bright);
+    text-wrap: balance;
+    font-weight: 600;
+  }
+
+  .lede {
+    font-size: clamp(16px, 2.1vw, 19px);
+    color: var(--ink-soft);
+    max-width: 62ch;
+    margin: 0;
+  }
+
+  .facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 28px;
+    margin-top: 26px;
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--ink-dim);
+  }
+
+  .facts b {
+    color: var(--ink-bright);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* --- разделы ---------------------------------------------------------- */
+
+  section { padding-block: 44px; border-bottom: 1px solid var(--edge-soft); }
+  section:last-of-type { border-bottom: 0; }
+
+  h2 {
+    font-size: clamp(24px, 3.4vw, 32px);
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+    color: var(--ink-bright);
+    margin: 0 0 6px;
+    font-weight: 600;
+    text-wrap: balance;
+  }
+
+  h3 {
+    font-size: 18px;
+    color: var(--ink-bright);
+    margin: 34px 0 10px;
+    font-weight: 600;
+  }
+
+  h4 {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin: 26px 0 8px;
+    font-weight: 500;
+  }
+
+  p { max-width: 68ch; margin: 0 0 14px; }
+  p.wide { max-width: none; }
+
+  a { color: var(--accent); }
+
+  code, .mono { font-family: var(--mono); font-size: 0.9em; }
+  code { color: var(--ink-bright); }
+
+  .note { color: var(--ink-dim); font-size: 14px; }
+
+  ul.plain { margin: 0 0 14px; padding-left: 18px; max-width: 68ch; }
+  ul.plain li { margin-bottom: 6px; }
+
+  /* --- схемы ------------------------------------------------------------ */
+
+  .figure { margin: 22px 0 8px; }
+
+  .figure-scroll { overflow-x: auto; }
+
+  .figure svg { display: block; width: 100%; max-width: 100%; height: auto; min-width: 560px; }
+
+  figcaption {
+    font-size: 13px;
+    color: var(--ink-dim);
+    margin-top: 10px;
+    max-width: 72ch;
+  }
+
+  .svg-label { font-family: "IBM Plex Mono", monospace; font-size: 11px; letter-spacing: 0.12em; }
+  .svg-name { font-family: "IBM Plex Sans", sans-serif; font-size: 14px; font-weight: 600; }
+  .svg-small { font-family: "IBM Plex Sans", sans-serif; font-size: 11.5px; }
+
+  /* --- карточки --------------------------------------------------------- */
+
+  .grid {
+    display: grid;
+    gap: 14px;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    margin: 18px 0;
+  }
+
+  .card {
+    border: 1px solid var(--edge);
+    background: var(--panel);
+    border-radius: 3px;
+    padding: 16px 16px 14px;
+  }
+
+  .card h5 {
+    margin: 0 0 6px;
+    font-size: 15px;
+    color: var(--ink-bright);
+    font-weight: 600;
+  }
+
+  .card p { font-size: 14px; color: var(--ink-soft); margin: 0; max-width: none; }
+
+  .card .tag {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  /* --- таблицы ---------------------------------------------------------- */
+
+  .table-scroll { overflow-x: auto; margin: 18px 0; }
+
+  table { border-collapse: collapse; width: 100%; min-width: 520px; font-size: 14px; }
+
+  th, td {
+    text-align: left;
+    padding: 9px 14px 9px 0;
+    border-bottom: 1px solid var(--edge-soft);
+    vertical-align: top;
+  }
+
+  th {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    font-weight: 500;
+  }
+
+  td.num { font-family: var(--mono); font-variant-numeric: tabular-nums; color: var(--ink-bright); }
+  td.code { font-family: var(--mono); font-size: 13px; color: var(--ink); }
+  td small { color: var(--ink-dim); }
+
+  /* --- лента фаз хода --------------------------------------------------- */
+
+  .phases { display: flex; flex-wrap: wrap; gap: 6px; margin: 16px 0; }
+
+  .phase {
+    border: 1px solid var(--edge);
+    border-left: 2px solid var(--accent-dim);
+    background: var(--panel);
+    padding: 6px 10px;
+    font-size: 13px;
+    border-radius: 2px;
+  }
+
+  .phase b { font-family: var(--mono); color: var(--ink-faint); font-weight: 500; margin-right: 6px; font-size: 11px; }
+
+  /* --- снимки ----------------------------------------------------------- */
+
+  .shots { display: grid; gap: 22px; margin-top: 22px; }
+
+  @media (min-width: 760px) { .shots { grid-template-columns: 1fr 1fr; } }
+
+  .shot { border: 1px solid var(--edge); background: var(--panel); border-radius: 3px; overflow: hidden; }
+
+  .shot img { display: block; width: 100%; height: auto; background: var(--ground); }
+
+  .shot .cap { padding: 12px 14px 14px; }
+
+  .shot .cap b { display: block; color: var(--ink-bright); font-size: 15px; margin-bottom: 4px; }
+
+  .shot .cap span { font-size: 13.5px; color: var(--ink-soft); }
+
+  /* --- палитра ролей ---------------------------------------------------- */
+
+  .roles { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 6px; }
+
+  .role {
+    border: 1px solid var(--edge);
+    background: var(--panel);
+    border-radius: 2px;
+    padding: 8px 12px;
+    font-family: var(--mono);
+    font-size: 12px;
+  }
+
+  .role i { font-style: normal; display: block; font-size: 11px; color: var(--ink-faint); }
+
+  footer {
+    padding-block: 30px 44px;
+    color: var(--ink-faint);
+    font-size: 13px;
+  }
+
+  @media (min-width: 1000px) {
+    .shell { grid-template-columns: 220px 1fr; column-gap: 48px; }
+    .toc {
+      grid-column: 1;
+      position: sticky;
+      top: env(safe-area-inset-top, 0px);
+      align-self: start;
+      padding-block: 40px;
+      max-height: 100vh;
+      overflow-y: auto;
+    }
+    .toc ol { flex-direction: column; gap: 4px; }
+    .toc a { border: 0; background: none; padding: 6px 0 6px 2px; border-left: 2px solid transparent; padding-left: 10px; }
+    .toc a:hover, .toc a:focus-visible { border-left-color: var(--accent); }
+    .main { grid-column: 2; }
+    header.hero { grid-column: 2; }
+  }
+
+  @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+</style>
+
+<div class="shell">
+  <header class="hero">
+    <p class="eyebrow">Пошаговая стратегия · перенос Master of Orion II</p>
+    <h1>Stellar Dominion</h1>
+    <p class="lede">
+      Игра на Spring&nbsp;Boot и React&nbsp;+&nbsp;Phaser, у которой рядом с самой игрой живёт
+      целая мастерская приборов: они меряют баланс, взламывают его, подсматривают управление
+      у настоящей MOO&nbsp;II в DOSBox и учат нейросеть играть. Эта страница — разбор того,
+      из чего всё собрано.
+    </p>
+    <div class="facts">
+      <span><b>369</b> классов сервера</span>
+      <span><b>116</b> модулей клиента</span>
+      <span><b>24</b> сущности</span>
+      <span><b>15</b> фаз хода</span>
+      <span><b>1145</b> ключей перевода</span>
+      <span><b>18</b> инструментов</span>
+      <span><b>36</b> сцен оригинала</span>
+    </div>
+  </header>
+
+  <nav class="toc" aria-label="Содержание">
+    <p class="toc-title">Содержание</p>
+    <ol>
+      <li><a href="#components"><span class="num">01</span>Компоненты и связи</a></li>
+      <li><a href="#balance"><span class="num">02</span>Приборы балансировки</a></li>
+      <li><a href="#brain"><span class="num">03</span>Нейросеть</a></li>
+      <li><a href="#orion"><span class="num">04</span>Снятие сцен с оригинала</a></li>
+      <li><a href="#screens"><span class="num">05</span>Экраны игры</a></li>
+      <li><a href="#tech"><span class="num">06</span>Технические детали</a></li>
+    </ol>
+  </nav>
+
+  <main class="main">
+
+    <!-- ================================================================== -->
+    <section id="components">
+      <p class="eyebrow">Раздел 1</p>
+      <h2>Компоненты системы и их связи</h2>
+      <p>
+        Ядро простое: клиент говорит с сервером по REST и слушает события партии, сервер
+        держит партии в PostgreSQL, а правила игры читает из JSON-справочников на диске.
+        Всё остальное на схеме — мастерская: инструменты, которые ту же игру меряют,
+        расшатывают и учат.
+      </p>
+
+      <figure class="figure">
+        <div class="figure-scroll">
+          <svg viewBox="0 0 980 560" role="img" aria-label="Схема компонентов: клиент, сервер, хранилища и инструменты">
+            <defs>
+              <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0,0 L10,5 L0,10 z" fill="#7fd4ff"></path>
+              </marker>
+              <marker id="arrow-dim" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0,0 L10,5 L0,10 z" fill="#8a9bb4"></path>
+              </marker>
+            </defs>
+
+            <!-- клиент -->
+            <rect x="24" y="60" width="240" height="150" rx="3" fill="#0d1424" stroke="#1e2a44"></rect>
+            <text x="44" y="88" class="svg-label" fill="#73839c">КЛИЕНТ</text>
+            <text x="44" y="112" class="svg-name" fill="#eef4ff">React + Phaser</text>
+            <text x="44" y="136" class="svg-small" fill="#a3b4cc">ui/ — экраны, game/ — карта</text>
+            <text x="44" y="155" class="svg-small" fill="#a3b4cc">state/ — Zustand + XState</text>
+            <text x="44" y="174" class="svg-small" fill="#a3b4cc">i18n/ — два языка</text>
+            <text x="44" y="193" class="svg-small" fill="#73839c">116 модулей</text>
+
+            <!-- сервер -->
+            <rect x="370" y="40" width="250" height="190" rx="3" fill="#0d1424" stroke="#3f7fa8"></rect>
+            <text x="390" y="68" class="svg-label" fill="#73839c">СЕРВЕР</text>
+            <text x="390" y="92" class="svg-name" fill="#eef4ff">Spring Boot · Java 23</text>
+            <text x="390" y="116" class="svg-small" fill="#a3b4cc">web/ — 29 контроллеров</text>
+            <text x="390" y="135" class="svg-small" fill="#a3b4cc">service/ — 105 служб</text>
+            <text x="390" y="154" class="svg-small" fill="#a3b4cc">galaxy/ — генерация карты</text>
+            <text x="390" y="173" class="svg-small" fill="#a3b4cc">15 фаз конца хода</text>
+            <text x="390" y="197" class="svg-small" fill="#73839c">369 классов, 49 тестов</text>
+
+            <!-- база -->
+            <rect x="726" y="40" width="230" height="96" rx="3" fill="#0d1424" stroke="#1e2a44"></rect>
+            <text x="746" y="68" class="svg-label" fill="#73839c">ХРАНИЛИЩЕ ПАРТИЙ</text>
+            <text x="746" y="92" class="svg-name" fill="#eef4ff">PostgreSQL 15 · 5433</text>
+            <text x="746" y="113" class="svg-small" fill="#a3b4cc">схема — Liquibase</text>
+            <text x="746" y="130" class="svg-small" fill="#a3b4cc">H2 в памяти — для прогонов</text>
+
+            <!-- справочники -->
+            <rect x="726" y="152" width="230" height="78" rx="3" fill="#0d1424" stroke="#1e2a44"></rect>
+            <text x="746" y="180" class="svg-label" fill="#73839c">СПРАВОЧНИКИ</text>
+            <text x="746" y="203" class="svg-small" fill="#a3b4cc">tech · buildings · ships</text>
+            <text x="746" y="221" class="svg-small" fill="#a3b4cc">leaders · race-traits · pairs</text>
+
+            <!-- связи ядра -->
+            <line x1="264" y1="118" x2="362" y2="118" stroke="#7fd4ff" stroke-width="1.5" marker-end="url(#arrow)"></line>
+            <text x="270" y="110" class="svg-small" fill="#7fd4ff">REST</text>
+            <line x1="362" y1="152" x2="264" y2="152" stroke="#7fd4ff" stroke-width="1.5" marker-end="url(#arrow)"></line>
+            <text x="270" y="170" class="svg-small" fill="#7fd4ff">SSE — события</text>
+
+            <line x1="620" y1="88" x2="718" y2="88" stroke="#8a9bb4" stroke-width="1.5" marker-end="url(#arrow-dim)"></line>
+            <text x="626" y="80" class="svg-small" fill="#8a9bb4">JPA</text>
+            <line x1="620" y1="188" x2="718" y2="188" stroke="#8a9bb4" stroke-width="1.5" marker-end="url(#arrow-dim)"></line>
+            <text x="626" y="180" class="svg-small" fill="#8a9bb4">чтение на лету</text>
+
+            <!-- мастерская -->
+            <text x="24" y="282" class="svg-label" fill="#73839c">МАСТЕРСКАЯ — ИНСТРУМЕНТЫ РАЗРАБОТКИ</text>
+            <line x1="24" y1="294" x2="956" y2="294" stroke="#16203a"></line>
+
+            <rect x="24" y="312" width="222" height="104" rx="3" fill="#121829" stroke="#1e2a44"></rect>
+            <text x="42" y="338" class="svg-name" fill="#eef4ff">Пульт балансировки</text>
+            <text x="42" y="360" class="svg-small" fill="#a3b4cc">внутри сервера; играет партии</text>
+            <text x="42" y="378" class="svg-small" fill="#a3b4cc">пачкой и выносит приговор</text>
+            <text x="42" y="396" class="svg-small" fill="#a3b4cc">каждой цене стороны расы</text>
+
+            <rect x="262" y="312" width="222" height="104" rx="3" fill="#121829" stroke="#1e2a44"></rect>
+            <text x="280" y="338" class="svg-name" fill="#eef4ff">Оракул сборок</text>
+            <text x="280" y="360" class="svg-small" fill="#a3b4cc">там же; ищет сильнейшую</text>
+            <text x="280" y="378" class="svg-small" fill="#a3b4cc">расу поколениями с отсевом —</text>
+            <text x="280" y="396" class="svg-small" fill="#a3b4cc">«взломщик» против оценщика</text>
+
+            <rect x="500" y="312" width="222" height="104" rx="3" fill="#121829" stroke="#1e2a44"></rect>
+            <text x="518" y="338" class="svg-name" fill="#eef4ff">Орионометр</text>
+            <text x="518" y="360" class="svg-small" fill="#a3b4cc">пульт в меню игры плюс</text>
+            <text x="518" y="378" class="svg-small" fill="#a3b4cc">питоновский записыватель:</text>
+            <text x="518" y="396" class="svg-small" fill="#a3b4cc">смотрит на MOO II в DOSBox</text>
+
+            <rect x="738" y="312" width="218" height="104" rx="3" fill="#121829" stroke="#1e2a44"></rect>
+            <text x="756" y="338" class="svg-name" fill="#eef4ff">Нейросеть</text>
+            <text x="756" y="360" class="svg-small" fill="#a3b4cc">четыре головы, отбор</text>
+            <text x="756" y="378" class="svg-small" fill="#a3b4cc">поколениями; ведёт свою</text>
+            <text x="756" y="396" class="svg-small" fill="#a3b4cc">империю по тому же REST</text>
+
+            <rect x="24" y="436" width="300" height="86" rx="3" fill="#0d1424" stroke="#16203a"></rect>
+            <text x="42" y="462" class="svg-name" fill="#ccd8ea">Сквозная проверка</text>
+            <text x="42" y="484" class="svg-small" fill="#a3b4cc">596 проверок по всем подсистемам</text>
+            <text x="42" y="502" class="svg-small" fill="#73839c">regress.py</text>
+
+            <rect x="340" y="436" width="300" height="86" rx="3" fill="#0d1424" stroke="#16203a"></rect>
+            <text x="358" y="462" class="svg-name" fill="#ccd8ea">Партия целиком без человека</text>
+            <text x="358" y="484" class="svg-small" fill="#a3b4cc">восемь империй ИИ до победы</text>
+            <text x="358" y="502" class="svg-small" fill="#73839c">ai_game.py · ai_audit.py</text>
+
+            <rect x="656" y="436" width="300" height="86" rx="3" fill="#0d1424" stroke="#16203a"></rect>
+            <text x="674" y="462" class="svg-name" fill="#ccd8ea">Поиск мёртвых механик</text>
+            <text x="674" y="484" class="svg-small" fill="#a3b4cc">что тратит ресурсы и не даёт</text>
+            <text x="674" y="502" class="svg-small" fill="#73839c">waste_check.py</text>
+
+            <!-- стрелки инструментов к серверу -->
+            <line x1="135" y1="312" x2="420" y2="238" stroke="#8a9bb4" stroke-width="1" stroke-dasharray="4 3" marker-end="url(#arrow-dim)"></line>
+            <line x1="373" y1="312" x2="470" y2="238" stroke="#8a9bb4" stroke-width="1" stroke-dasharray="4 3" marker-end="url(#arrow-dim)"></line>
+            <line x1="611" y1="312" x2="545" y2="238" stroke="#8a9bb4" stroke-width="1" stroke-dasharray="4 3" marker-end="url(#arrow-dim)"></line>
+            <line x1="847" y1="312" x2="600" y2="238" stroke="#8a9bb4" stroke-width="1" stroke-dasharray="4 3" marker-end="url(#arrow-dim)"></line>
+          </svg>
+        </div>
+        <figcaption>
+          Сплошные стрелки — то, чем игра работает; пунктир — то, чем её меряют. Пульт
+          балансировки и оракул живут <em>внутри</em> сервера: они играют партии его же кодом,
+          а не своей копией правил.
+        </figcaption>
+      </figure>
+
+      <div class="grid">
+        <div class="card">
+          <span class="tag">Правило</span>
+          <h5>Данные, а не код</h5>
+          <p>Новое здание, технология, пушка, корпус или лидер — запись в JSON, а не ветка в
+          сервисе. В базе от них остаются только коды.</p>
+        </div>
+        <div class="card">
+          <span class="tag">Правило</span>
+          <h5>Один расчёт — одно место</h5>
+          <p>Все числовые правила MoO2 живут в <code>PopulationCalculator</code>, боя — в
+          <code>BattleRules</code>, полёта — в <code>FlightRules</code>. Величина, посчитанная
+          дважды, однажды разойдётся.</p>
+        </div>
+        <div class="card">
+          <span class="tag">Правило</span>
+          <h5>Ход считается один раз</h5>
+          <p>Галактика вычитывается раз на ход и передаётся фазам контекстом. Выборка «на
+          игрока» внутри хода бьёт по всему ходу.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================== -->
+    <section id="balance">
+      <p class="eyebrow">Раздел 1 · продолжение</p>
+      <h2>Как приборы балансировки работают вместе</h2>
+      <p>
+        Задача у них одна: назначить честную цену каждой стороне расы — их полсотни, и игрок
+        собирает из них свою расу на заданный бюджет. Цена не назначается на глаз: её
+        <em>меряют</em>, и меряют в четыре этапа, где каждый следующий проверяет предыдущий.
+      </p>
+
+      <figure class="figure">
+        <div class="figure-scroll">
+          <svg viewBox="0 0 980 420" role="img" aria-label="Схема этапов балансировки">
+            <defs>
+              <marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0,0 L10,5 L0,10 z" fill="#7fd4ff"></path>
+              </marker>
+              <marker id="a3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0,0 L10,5 L0,10 z" fill="#fbbf24"></path>
+              </marker>
+            </defs>
+
+            <rect x="20" y="40" width="200" height="112" rx="3" fill="#0d1424" stroke="#1e2a44"></rect>
+            <text x="38" y="66" class="svg-label" fill="#73839c">ЭТАП 0</text>
+            <text x="38" y="90" class="svg-name" fill="#eef4ff">Телеметрия</text>
+            <text x="38" y="112" class="svg-small" fill="#a3b4cc">партии пачкой, летопись</text>
+            <text x="38" y="130" class="svg-small" fill="#a3b4cc">по ходам, счётчики того,</text>
+            <text x="38" y="148" class="svg-small" fill="#a3b4cc">чем империя пользовалась</text>
+
+            <rect x="256" y="40" width="200" height="112" rx="3" fill="#0d1424" stroke="#1e2a44"></rect>
+            <text x="274" y="66" class="svg-label" fill="#73839c">ЭТАП 1</text>
+            <text x="274" y="90" class="svg-name" fill="#eef4ff">Курс очка</text>
+            <text x="274" y="112" class="svg-small" fill="#a3b4cc">сколько силы приносит</text>
+            <text x="274" y="130" class="svg-small" fill="#a3b4cc">одно очко бюджета —</text>
+            <text x="274" y="148" class="svg-small" fill="#a3b4cc">шкала для приговоров</text>
+
+            <rect x="492" y="40" width="200" height="112" rx="3" fill="#0d1424" stroke="#3f7fa8"></rect>
+            <text x="510" y="66" class="svg-label" fill="#73839c">ЭТАП 2 · ОЦЕНЩИК</text>
+            <text x="510" y="90" class="svg-name" fill="#eef4ff">Пульт</text>
+            <text x="510" y="112" class="svg-small" fill="#a3b4cc">случайные законные сборки,</text>
+            <text x="510" y="130" class="svg-small" fill="#a3b4cc">регрессия по семи мерилам,</text>
+            <text x="510" y="148" class="svg-small" fill="#a3b4cc">приговор каждой цене</text>
+
+            <rect x="728" y="40" width="200" height="112" rx="3" fill="#0d1424" stroke="#fbbf24"></rect>
+            <text x="746" y="66" class="svg-label" fill="#73839c">ЭТАП 3 · ВЗЛОМЩИК</text>
+            <text x="746" y="90" class="svg-name" fill="#eef4ff">Оракул сборок</text>
+            <text x="746" y="112" class="svg-small" fill="#a3b4cc">поколения с отсевом ищут</text>
+            <text x="746" y="130" class="svg-small" fill="#a3b4cc">расу, которая бьёт всё</text>
+            <text x="746" y="148" class="svg-small" fill="#a3b4cc">остальное</text>
+
+            <line x1="220" y1="96" x2="248" y2="96" stroke="#7fd4ff" stroke-width="1.5" marker-end="url(#a2)"></line>
+            <line x1="456" y1="96" x2="484" y2="96" stroke="#7fd4ff" stroke-width="1.5" marker-end="url(#a2)"></line>
+            <line x1="692" y1="96" x2="720" y2="96" stroke="#7fd4ff" stroke-width="1.5" marker-end="url(#a2)"></line>
+
+            <!-- справочник цен -->
+            <rect x="256" y="240" width="436" height="96" rx="3" fill="#121829" stroke="#3f7fa8"></rect>
+            <text x="276" y="266" class="svg-label" fill="#73839c">ЕДИНСТВЕННОЕ, ЧТО ДВИГАЕТСЯ</text>
+            <text x="276" y="292" class="svg-name" fill="#eef4ff">race-traits.json — цены сторон расы</text>
+            <text x="276" y="316" class="svg-small" fill="#a3b4cc">балансировка меняет ЦЕНУ, а не действие стороны</text>
+
+            <path d="M592 152 L592 232" stroke="#7fd4ff" stroke-width="1.5" fill="none" marker-end="url(#a2)"></path>
+            <text x="602" y="196" class="svg-small" fill="#7fd4ff">приговоры</text>
+
+            <path d="M828 152 L828 288 L700 288" stroke="#fbbf24" stroke-width="1.5" fill="none" marker-end="url(#a3)"></path>
+            <text x="716" y="220" class="svg-small" fill="#fbbf24">находки взломщика</text>
+
+            <path d="M256 288 L120 288 L120 160" stroke="#8a9bb4" stroke-width="1.5" fill="none" stroke-dasharray="4 3" marker-end="url(#arrow-dim)"></path>
+            <text x="34" y="220" class="svg-small" fill="#8a9bb4">следующий круг мерит заново</text>
+
+            <rect x="20" y="356" width="908" height="48" rx="3" fill="#0d1424" stroke="#16203a"></rect>
+            <text x="40" y="386" class="svg-small" fill="#a3b4cc">Журнал цен: каждая правка записана вместе с тем, на чём она измерена — без него через месяц не откатить и не понять, откуда цена взялась.</text>
+          </svg>
+        </div>
+        <figcaption>
+          Круг замкнут: приговоры и находки двигают цены в справочнике, а поднятые цены
+          меняют и курс очка — поэтому следующий круг меряет всё заново. Мера успеха круга —
+          <b>невязка</b>: медиана расхождения между ценой и измеренной отдачей.
+        </figcaption>
+      </figure>
+
+      <h3>Почему оценщику нужен взломщик</h3>
+      <p>
+        Пульт назначает цены по <em>случайным</em> сборкам, а живой игрок случайной не играет:
+        он ищет сильнейшую. Комбинацию, которая бьёт всё остальное, случайными сборками не
+        поймать — она встречается раз на тысячу. Оракул ищет её нарочно и отвечает на два
+        вопроса плана: нет ли доминирующей сборки и какие стороны не вошли в верхушку.
+      </p>
+
+      <h4>Семь мерил силы</h4>
+      <p class="wide">
+        Выработка и наука с весом 1; деньги, военная сила, наземный бой, широта науки и
+        разведка — с весом ½. Одного мерила мало: жителя в MOO&nbsp;II ставят либо к станку,
+        либо в лабораторию, и без мерила науки «плохие учёные» за −3 очка выходили
+        <em>выгодной покупкой</em> (+1,19), а с ним встали на место (−3,43).
+      </p>
+
+      <div class="grid">
+        <div class="card">
+          <span class="tag">Тонкость</span>
+          <h5>Вес берётся регрессией</h5>
+          <p>Стороны покупают не поодиночке, и сильная тянула бы за собой всё, что обычно
+          стоит рядом. Доля приводится к нулю внутри партии, стартовый угол идёт столбцами.</p>
+        </div>
+        <div class="card">
+          <span class="tag">Тонкость</span>
+          <h5>У связки своя цена</h5>
+          <p>Цены сторон складываются, а сила иных пар умножается. Поэтому у пары есть
+          надбавка — и она тоже измеряется, а не назначается.</p>
+        </div>
+        <div class="card">
+          <span class="tag">Тонкость</span>
+          <h5>Пусто ≠ ноль</h5>
+          <p>Мерило, не сработавшее в партии ни разу, отдаёт пусто. Ноль у всех — это «мерить
+          нечем», а не «все одинаково слабы».</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================== -->
+    <section id="brain">
+      <p class="eyebrow">Раздел 1 · продолжение</p>
+      <h2>Нейросеть: устройство и обучение</h2>
+      <p>
+        Сеть учится играть в нашу игру, а не в оригинал, и причина простая: партия у нас
+        считается по REST за секунды, а в DOSBox — это полчаса настоящей мыши. Тысячи партий
+        там не сыграть ни за какое время.
+      </p>
+
+      <figure class="figure">
+        <div class="figure-scroll">
+          <svg viewBox="0 0 980 400" role="img" aria-label="Устройство сети: четыре головы и отбор поколениями">
+            <defs>
+              <marker id="a4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0,0 L10,5 L0,10 z" fill="#4ade80"></path>
+              </marker>
+            </defs>
+
+            <text x="20" y="34" class="svg-label" fill="#73839c">ОДНА ГОЛОВА = ОДНО РЕШЕНИЕ</text>
+
+            <g>
+              <rect x="20" y="52" width="216" height="128" rx="3" fill="#0d1424" stroke="#1e2a44"></rect>
+              <text x="38" y="78" class="svg-name" fill="#eef4ff">Стройка</text>
+              <text x="38" y="100" class="svg-small" fill="#a3b4cc">вход: 10 признаков колонии</text>
+              <text x="38" y="118" class="svg-small" fill="#a3b4cc">+ 15 признаков проекта</text>
+              <text x="38" y="142" class="svg-small" fill="#73839c">оценивает каждый проект</text>
+              <text x="38" y="160" class="svg-small" fill="#73839c">по очереди, строит лучший</text>
+            </g>
+            <g>
+              <rect x="252" y="52" width="216" height="128" rx="3" fill="#0d1424" stroke="#1e2a44"></rect>
+              <text x="270" y="78" class="svg-name" fill="#eef4ff">Наука</text>
+              <text x="270" y="100" class="svg-small" fill="#a3b4cc">вход: 4 признака империи</text>
+              <text x="270" y="118" class="svg-small" fill="#a3b4cc">+ 10 признаков уровня</text>
+              <text x="270" y="142" class="svg-small" fill="#73839c">восемь разделов дерева</text>
+            </g>
+            <g>
+              <rect x="484" y="52" width="216" height="128" rx="3" fill="#0d1424" stroke="#1e2a44"></rect>
+              <text x="502" y="78" class="svg-name" fill="#eef4ff">Флот</text>
+              <text x="502" y="100" class="svg-small" fill="#a3b4cc">вход: 6 признаков флота</text>
+              <text x="502" y="118" class="svg-small" fill="#a3b4cc">+ 9 признаков цели</text>
+              <text x="502" y="142" class="svg-small" fill="#73839c">без неё сеть не выходила</text>
+              <text x="502" y="160" class="svg-small" fill="#73839c">из родной системы ни разу</text>
+            </g>
+            <g>
+              <rect x="716" y="52" width="216" height="128" rx="3" fill="#0d1424" stroke="#1e2a44"></rect>
+              <text x="734" y="78" class="svg-name" fill="#eef4ff">Жители</text>
+              <text x="734" y="100" class="svg-small" fill="#a3b4cc">вход: 10 + 3 занятия</text>
+              <text x="734" y="124" class="svg-small" fill="#73839c">добавлена последней: доля</text>
+              <text x="734" y="142" class="svg-small" fill="#73839c">мощи стояла на 0,101 при</text>
+              <text x="734" y="160" class="svg-small" fill="#73839c">справедливой 0,25</text>
+            </g>
+
+            <!-- слои -->
+            <rect x="252" y="208" width="448" height="60" rx="3" fill="#121829" stroke="#3f7fa8"></rect>
+            <text x="272" y="234" class="svg-name" fill="#eef4ff">Скрытый слой: 48 узлов, tanh</text>
+            <text x="272" y="256" class="svg-small" fill="#a3b4cc">у каждой головы свои веса; выход — одно число «насколько это хорошо»</text>
+
+            <line x1="128" y1="180" x2="330" y2="200" stroke="#8a9bb4" stroke-width="1" marker-end="url(#arrow-dim)"></line>
+            <line x1="360" y1="180" x2="420" y2="200" stroke="#8a9bb4" stroke-width="1" marker-end="url(#arrow-dim)"></line>
+            <line x1="592" y1="180" x2="540" y2="200" stroke="#8a9bb4" stroke-width="1" marker-end="url(#arrow-dim)"></line>
+            <line x1="824" y1="180" x2="630" y2="200" stroke="#8a9bb4" stroke-width="1" marker-end="url(#arrow-dim)"></line>
+
+            <!-- обучение -->
+            <text x="20" y="310" class="svg-label" fill="#73839c">ОБУЧЕНИЕ — ОТБОРОМ, А НЕ ГРАДИЕНТОМ</text>
+            <rect x="20" y="326" width="912" height="58" rx="3" fill="#0d1424" stroke="#16203a"></rect>
+            <text x="40" y="350" class="svg-small" fill="#ccd8ea">поколение весов → партии по REST → доля своей мощи в мощи всех империй → лучшие остаются → потомки с шумом sigma</text>
+            <text x="40" y="370" class="svg-small" fill="#a3b4cc">sigma подстраивается сама: растёт при улучшении, падает при застое, при долгом застое — разогрев</text>
+          </svg>
+        </div>
+        <figcaption>
+          Награда — исход целой партии, а не отдельного хода, и сказать, какое именно нажатие
+          сколько принесло, нечем. Отбор требует лишь сравнения: сыграли одними весами, сыграли
+          другими — чьи лучше, те и остались.
+        </figcaption>
+      </figure>
+
+      <p>
+        Каждая голова заведена не для полноты, а после замера, показавшего, что без неё
+        учиться нечему. Сеть, умевшая только строить, за шестьдесят ходов не вышла из родной
+        системы ни разу — колония одна, флотов ноль; сеть, не трогавшая жителей, играла тем
+        распределением, какое колония получила при основании.
+      </p>
+    </section>
+
+    <!-- ================================================================== -->
+    <section id="orion">
+      <p class="eyebrow">Раздел 2</p>
+      <h2>Способ разработки: снятие сцен с оригинала</h2>
+      <p>
+        Половина окон MOO&nbsp;II нигде не выложена, а по памяти разметку не восстановить.
+        Поэтому разметка наших экранов сверяется <em>со снимками настоящей игры</em>, снятыми
+        в DOSBox. Инструменты для этого выросли в отдельную подсистему.
+      </p>
+
+      <figure class="figure">
+        <div class="figure-scroll">
+          <svg viewBox="0 0 980 420" role="img" aria-label="Цепочка снятия сцен с оригинала">
+            <defs>
+              <marker id="a5" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0,0 L10,5 L0,10 z" fill="#7fd4ff"></path>
+              </marker>
+            </defs>
+
+            <rect x="20" y="44" width="180" height="104" rx="3" fill="#0d1424" stroke="#1e2a44"></rect>
+            <text x="38" y="70" class="svg-label" fill="#73839c">ИСТОЧНИК</text>
+            <text x="38" y="94" class="svg-name" fill="#eef4ff">MOO II в DOSBox</text>
+            <text x="38" y="116" class="svg-small" fill="#a3b4cc">сборка 1.50.26,</text>
+            <text x="38" y="134" class="svg-small" fill="#a3b4cc">окно 640×480 ×2</text>
+
+            <rect x="232" y="44" width="180" height="104" rx="3" fill="#0d1424" stroke="#1e2a44"></rect>
+            <text x="250" y="70" class="svg-label" fill="#73839c">ГЛАЗА</text>
+            <text x="250" y="94" class="svg-name" fill="#eef4ff">Снимок окна</text>
+            <text x="250" y="116" class="svg-small" fill="#a3b4cc">PrintWindow — берёт кадр,</text>
+            <text x="250" y="134" class="svg-small" fill="#a3b4cc">даже если окно закрыто</text>
+
+            <rect x="444" y="44" width="212" height="104" rx="3" fill="#0d1424" stroke="#3f7fa8"></rect>
+            <text x="462" y="70" class="svg-label" fill="#73839c">УЗНАВАНИЕ</text>
+            <text x="462" y="94" class="svg-name" fill="#eef4ff">Примета 32×24</text>
+            <text x="462" y="116" class="svg-small" fill="#a3b4cc">средние яркости НЕ всего кадра,</text>
+            <text x="462" y="134" class="svg-small" fill="#a3b4cc">а области, что стоит на месте</text>
+
+            <rect x="688" y="44" width="244" height="104" rx="3" fill="#0d1424" stroke="#1e2a44"></rect>
+            <text x="706" y="70" class="svg-label" fill="#73839c">СПРАВОЧНИК</text>
+            <text x="706" y="94" class="svg-name" fill="#eef4ff">scenes.json — 36 сцен</text>
+            <text x="706" y="116" class="svg-small" fill="#a3b4cc">имя, область, что нажимать;</text>
+            <text x="706" y="134" class="svg-small" fill="#a3b4cc">11 помечены «окно поверх»</text>
+
+            <line x1="200" y1="96" x2="224" y2="96" stroke="#7fd4ff" stroke-width="1.5" marker-end="url(#a5)"></line>
+            <line x1="412" y1="96" x2="436" y2="96" stroke="#7fd4ff" stroke-width="1.5" marker-end="url(#a5)"></line>
+            <line x1="656" y1="96" x2="680" y2="96" stroke="#7fd4ff" stroke-width="1.5" marker-end="url(#a5)"></line>
+
+            <!-- две ветки -->
+            <rect x="120" y="212" width="340" height="120" rx="3" fill="#121829" stroke="#1e2a44"></rect>
+            <text x="140" y="238" class="svg-label" fill="#73839c">ВЕТКА А — ИНСТРУМЕНТ ИГРАЕТ САМ</text>
+            <text x="140" y="264" class="svg-name" fill="#eef4ff">moo2_play.py</text>
+            <text x="140" y="286" class="svg-small" fill="#a3b4cc">читает растровый шрифт по словарю,</text>
+            <text x="140" y="304" class="svg-small" fill="#a3b4cc">меряет карту по пикселям, а решает</text>
+            <text x="140" y="322" class="svg-small" fill="#a3b4cc">выписками из нашего AiEmpireService</text>
+
+            <rect x="500" y="212" width="360" height="120" rx="3" fill="#121829" stroke="#fbbf24"></rect>
+            <text x="520" y="238" class="svg-label" fill="#73839c">ВЕТКА Б — ОРИОНОМЕТР СМОТРИТ</text>
+            <text x="520" y="264" class="svg-name" fill="#eef4ff">moo2_record.py</text>
+            <text x="520" y="286" class="svg-small" fill="#a3b4cc">пишет каждое нажатие человека: время,</text>
+            <text x="520" y="304" class="svg-small" fill="#a3b4cc">точка в игровых координатах, сцена,</text>
+            <text x="520" y="322" class="svg-small" fill="#a3b4cc">расхождение узнавания и снимок ДО клика</text>
+
+            <path d="M810 148 L810 180 L680 180 L680 204" stroke="#fbbf24" stroke-width="1.5" fill="none" marker-end="url(#a3)"></path>
+            <path d="M550 148 L550 180 L290 180 L290 204" stroke="#7fd4ff" stroke-width="1.5" fill="none" marker-end="url(#a5)"></path>
+
+            <rect x="120" y="356" width="740" height="48" rx="3" fill="#0d1424" stroke="#16203a"></rect>
+            <text x="140" y="386" class="svg-small" fill="#a3b4cc">Неизвестный экран записыватель кладёт снимком и останавливается — так справочник и растёт: 21 сцена утром, 36 вечером.</text>
+          </svg>
+        </div>
+        <figcaption>
+          Две ветки решают разные задачи. Инструмент, играющий сам, проверяет <em>ход игры</em>:
+          что оригинал даёт строить, в каком порядке и почём. Орионометр отвечает на вопрос
+          «каким нажатием это делается» — и отвечает дешевле любого перебора догадок.
+        </figcaption>
+      </figure>
+
+      <h3>Почему записывать человека оказалось дешевле, чем догадываться</h3>
+      <p>
+        Инструмент не умел переставлять жителей с работы на работу — и не умел никогда. Это
+        чинилось четырьмя заходами подряд, и каждый стоил партии: перетаскивание фигурки,
+        нажатие по фигурке, нажатие по свободному месту, перебор всего ряда. Наблюдения
+        противоречили друг другу. Хозяин проекта назвал правило одной фразой: нажатие берёт
+        всех, кто <em>правее</em> точки, а следующее кладёт их туда, где курсор. Всё сошлось с
+        первой попытки. Орионометр и родился из этого счёта: <b>вопрос стоит одной фразы, а
+        перебор догадок — часов и испорченных партий.</b>
+      </p>
+
+      <h4>Три грабли, на которых узнавание сцен ломалось</h4>
+      <div class="grid">
+        <div class="card">
+          <span class="tag">Примета</span>
+          <h5>Снимают с неподвижного</h5>
+          <p>У колонии примета бралась с угла, где стоит портрет губернатора, — только что
+          основанная колония не узнавалась вовсе. У окна выкупа — с вопроса, где стоят цена и
+          объём, а они меняются каждый раз.</p>
+        </div>
+        <div class="card">
+          <span class="tag">Примета</span>
+          <h5>Бедная — глотает чужое</h5>
+          <p>Тёмная полоса во всю высоту экрана совпадает почти с чем угодно: ею оказались
+          помечены 50 нажатий по 32 разным точкам — в окне, где кнопка одна.</p>
+        </div>
+        <div class="card">
+          <span class="tag">Примета</span>
+          <h5>Окно над картой — «поверх»</h5>
+          <p>Примета карты снята с нижней полосы, а она видна из-под любого окна. Так
+          спрятались ровно те две вещи, ради которых всё и делалось: отправка флота и начало
+          боя — 37 кадров под чужим именем.</p>
+        </div>
+      </div>
+
+      <p class="note">
+        Вывод, записанный в грабли проекта: отсутствие чего-то в протоколе — это утверждение
+        о <em>приборе</em>, а не о мире.
+      </p>
+    </section>
+
+    <!-- ================================================================== -->
+    <section id="screens">
+      <p class="eyebrow">Раздел 3</p>
+      <h2>Экраны игры</h2>
+      <p>
+        Снято с работающей сборки: сервер на 8080, клиент на 5173, партия на средней галактике
+        с четырьмя империями. Разметка каждого экрана сверена со снимком соответствующего окна
+        оригинала.
+      </p>
+
+      <div class="shots">
+        <figure class="shot">
+          <img src="docs/shots/first-screen.png" alt="Экран входа в игру: заголовок Stellar Dominion, форма входа, переключатели языка и размера текста" loading="lazy" width="1584" height="849">
+          <figcaption class="cap">
+            <b>Первая сцена — вход</b>
+            <span>Экран стоит перед главным меню: сервер спрашивает пропуск на входе в любую
+            партию. Справа вверху — переключатель языка и четыре ступени размера текста;
+            размер и язык живут в учётной записи, а не в браузере.</span>
+          </figcaption>
+        </figure>
+
+        <figure class="shot">
+          <img src="docs/shots/milky-way.png" alt="Схема Млечного Пути: спиральная галактика из ста тысяч звёзд, панель управления поворотом и наклоном" loading="lazy" width="1584" height="849">
+          <figcaption class="cap">
+            <b>Схема Млечного Пути</b>
+            <span>Сто тысяч сто точек: сотня именованных элементов плюс сто тысяч звёзд фона.
+            Кадр — 4,5 мс: координаты в типизированном массиве, синусы поворота считаются раз
+            на кадр, звёзды рисуются пикселями в буфер одним вызовом.</span>
+          </figcaption>
+        </figure>
+
+        <figure class="shot">
+          <img src="docs/shots/galaxy-map.png" alt="Карта галактики: звёзды разных цветов, родная звезда Denebola, правая панель с казной, флотом, едой и наукой" loading="lazy" width="1584" height="849">
+          <figcaption class="cap">
+            <b>Карта галактики</b>
+            <span>Сцена Phaser с одной нижней полосой разделов — верхней полосы нет, весь верх
+            отдан галактике. Справа сегменты империи: казна, флот, еда, транспорт, наука.
+            Масштаб меняется колесом мыши.</span>
+          </figcaption>
+        </figure>
+
+        <figure class="shot">
+          <img src="docs/shots/research.png" alt="Экран выбора исследования: восемь разделов дерева технологий двумя столбцами" loading="lazy" width="1584" height="849">
+          <figcaption class="cap">
+            <b>Выбор исследования</b>
+            <span>Разметка окна CHANGE CURRENT RESEARCH: два столбца на четыре строки, слева
+            описание технологии под курсором. Заголовков у окна два — «выбор нового» и «смена
+            текущего», и это тоже оригинал.</span>
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <!-- ================================================================== -->
+    <section id="tech">
+      <p class="eyebrow">Раздел 4</p>
+      <h2>Технические детали</h2>
+
+      <h3>Из чего собран сервер</h3>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr><th>Пакет</th><th>Классов</th><th>Что там</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="code">service/</td><td class="num">105</td><td>вся игровая логика; <code>service/stub/</code> — точки расширения без реализации</td></tr>
+            <tr><td class="code">dto/</td><td class="num">101</td><td>контракты REST; пустые поля не сериализуются вовсе</td></tr>
+            <tr><td class="code">domain/enums/</td><td class="num">37</td><td>игровые правила таблицами</td></tr>
+            <tr><td class="code">web/</td><td class="num">29</td><td>контроллеры по подсистемам и обработка ошибок</td></tr>
+            <tr><td class="code">repository/</td><td class="num">29</td><td>Spring Data; выборки внутри хода с явным порядком</td></tr>
+            <tr><td class="code">domain/entity/</td><td class="num">24</td><td>JPA-сущности партии</td></tr>
+            <tr><td class="code">galaxy/</td><td class="num">4</td><td>генерация галактики, планет, родных миров</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Ключевые службы</h3>
+      <div class="grid">
+        <div class="card">
+          <span class="tag">Числа игры</span>
+          <h5>PopulationCalculator</h5>
+          <p>Все числовые правила MoO2 в одном месте: выработка, рост, деньги, загрязнение,
+          цена выкупа стройки. Формулы правятся только здесь.</p>
+        </div>
+        <div class="card">
+          <span class="tag">Колонии</span>
+          <h5>ColonyService</h5>
+          <p>Занятия жителей, выработка со зданиями, очередь стройки, продажа построек, выкуп,
+          загрязнение. Очередь хранится строкой в самой планете.</p>
+        </div>
+        <div class="card">
+          <span class="tag">Ход</span>
+          <h5>TurnService + TurnContext</h5>
+          <p>Галактика вычитывается один раз на ход и передаётся фазам контекстом. Фаза, что
+          изменила состояние, правит и контекст.</p>
+        </div>
+        <div class="card">
+          <span class="tag">Корабли</span>
+          <h5>ShipDesignService + ShipDesignRules</h5>
+          <p>Шесть ячеек проектов не пустуют; обновление идёт новой строкой, а старая
+          помечается вытесненной — построенный корабль остаётся с тем, с чем построен.</p>
+        </div>
+        <div class="card">
+          <span class="tag">Бой</span>
+          <h5>TacticalBattleService + BattleRules</h5>
+          <p>Поле 32×20, корабли поимённо, очередь по инициативе корабля. Попадание считается
+          кривой оригинала; пробитая броня выбивает случайное гнездо.</p>
+        </div>
+        <div class="card">
+          <span class="tag">Флот</span>
+          <h5>FleetService + FlightRules</h5>
+          <p>Дальность от ближайшей своей опоры, время в пути по самому медленному кораблю.
+          Летящий флот не стоит нигде.</p>
+        </div>
+        <div class="card">
+          <span class="tag">Соседи</span>
+          <h5>AiEmpireService</h5>
+          <p>Стройка по окупаемости, расселение, оборона по угрозе, выкуп за кредиты,
+          разведка и подчинение телепатами. Механика, к которой у ИИ нет пути, для
+          балансировки мертва.</p>
+        </div>
+        <div class="card">
+          <span class="tag">Баланс</span>
+          <h5>BalanceRunService + BalanceOracleService</h5>
+          <p>Оценщик и взломщик. Цены снимаются до первой партии и лежат в самой записи
+          прогона: цены правятся с соседнего экрана, и без снимка не сказать, что он мерил.</p>
+        </div>
+      </div>
+
+      <h3>Пятнадцать фаз конца хода</h3>
+      <p>Новая фаза — новый бин; <code>TurnService</code> подхватит сам. Порядок как в MoO2:</p>
+      <div class="phases">
+        <span class="phase"><b>5</b>Население</span>
+        <span class="phase"><b>6</b>Перевозки</span>
+        <span class="phase"><b>7</b>Производство</span>
+        <span class="phase"><b>8</b>Империи ИИ</span>
+        <span class="phase"><b>9</b>Лидеры</span>
+        <span class="phase"><b>10</b>Исследования</span>
+        <span class="phase"><b>11</b>Ассимиляция</span>
+        <span class="phase"><b>12</b>Разведка</span>
+        <span class="phase"><b>13</b>Прибытие флотов</span>
+        <span class="phase"><b>14</b>Встречи флотов</span>
+        <span class="phase"><b>15</b>Знакомства</span>
+        <span class="phase"><b>16</b>События галактики</span>
+        <span class="phase"><b>17</b>Дипломатия ИИ</span>
+        <span class="phase"><b>18</b>Летопись империй</span>
+        <span class="phase"><b>19</b>Победа</span>
+      </div>
+
+      <h3>Сущности партии</h3>
+      <p class="wide mono note">
+        GameEntity · PlayerEntity · StarSystemEntity · PlanetEntity · PlanetBuildingEntity ·
+        FleetEntity · FleetShipEntity · FleetEncounterEntity · ShipDesignEntity ·
+        ShipDesignComponentEntity · SpaceBattleEntity · BattleShipEntity ·
+        PlayerTechnologyEntity · PlayerLeaderEntity · PlayerExploredSystemEntity ·
+        PlayerEventEntity · DiplomacyRelationEntity · CouncilVoteEntity · SpyEntity ·
+        PopulationTransferEntity · EmpireHistoryEntity · EmpireActivityEntity ·
+        TurnReportEntity · GameSaveEntity
+      </p>
+
+      <h3>Справочники — данными, а не кодом</h3>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr><th>Файл</th><th>Размер</th><th>Что описывает</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="code">Technologies/tech.json</td><td class="num">75 КБ</td><td>дерево из восьми разделов; у технологии есть код, и он же лежит в базе</td></tr>
+            <tr><td class="code">Ships/ship-components.json</td><td class="num">59 КБ</td><td>корпуса, компоненты, 14 модификаций оружия, платформы обороны, тела чудищ</td></tr>
+            <tr><td class="code">Races/race-traits.json</td><td class="num">58 КБ</td><td>53 стороны расы в 18 группах, тринадцать готовых рас, развитые строи</td></tr>
+            <tr><td class="code">Leaders/leaders.json</td><td class="num">44 КБ</td><td>лидеры со званиями, способностями и приносимыми технологиями</td></tr>
+            <tr><td class="code">Buildings/buildings.json</td><td class="num">20 КБ</td><td>здания парами «тип эффекта — количество»</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note">
+        Все пять двуязычны: поле — либо строка, либо пара <code>{ "en": …, "ru": … }</code>.
+        Язык выбирается при обращении, а не при чтении файла: справочник разбирается один раз
+        и лежит в памяти общим для всех запросов.
+      </p>
+
+      <h3>Договорённости, на которых всё держится</h3>
+      <ul class="plain">
+        <li><b>Отказ API несёт ключ, а не текст.</b> Переводит его один обработчик; подстановки
+        переводятся тоже. Слово, сохранённое в базе на одном языке, потом не перевести ничем.</li>
+        <li><b>Отчёт хода хранится ключом, а переводится при чтении.</b> Ход заканчивает один
+        игрок, а отчёт открывают все — у каждого свой язык.</li>
+        <li><b>Цвет текста — роль, размер — ступень шкалы.</b> Шесть ролей с измеренным
+        контрастом на основном фоне; оттенков по месту в интерфейсе нет.</li>
+        <li><b>Случайность выводится из зерна партии везде</b> — лидеры, бои, исследования,
+        события. Иначе парные прогоны сравнивали бы не расы, а удачу.</li>
+      </ul>
+
+      <h4>Шесть ролей цвета и их контраст</h4>
+      <div class="roles">
+        <span class="role" style="color:#eef4ff">ink-bright <i>18,2 : 1</i></span>
+        <span class="role" style="color:#ccd8ea">ink <i>14,0 : 1</i></span>
+        <span class="role" style="color:#a3b4cc">ink-soft <i>9,5 : 1</i></span>
+        <span class="role" style="color:#8a9bb4">ink-dim <i>7,1 : 1</i></span>
+        <span class="role" style="color:#73839c">ink-faint <i>5,2 : 1</i></span>
+        <span class="role" style="color:#55637a">ink-off <i>3,3 : 1</i></span>
+      </div>
+      <p class="note">
+        Эта страница набрана теми же ролями — это палитра самой игры, а не подобранная заново.
+      </p>
+    </section>
+
+    <footer>
+      Stellar Dominion · перенос Master of Orion II на Spring Boot и React + Phaser.
+      Снимки сделаны с работающей сборки 25.09.2026.
+    </footer>
+  </main>
+</div>

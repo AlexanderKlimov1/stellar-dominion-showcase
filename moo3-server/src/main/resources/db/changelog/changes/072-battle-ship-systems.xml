@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+      Выбитые системы корабля — п. 8.
+
+      Всё, что прошло сквозь щит и броню, рвёт корабль изнутри: гаснет пушка, разбивается
+      двигатель, сгорает прицел. Хранится это списком в одной колонке (через U+001F, как
+      подстановки событий): систем у корабля единицы, живут они один бой, и своя таблица
+      дала бы выборку «на корабль» внутри каждого залпа.
+
+      Прежняя колонка engine_damaged отсюда уходит: двигатель стал одной из систем этого
+      списка, а две правды об одном и том же однажды разойдутся. Боёв она переживает
+      ровно один — незаконченные бои прошлой версии продолжатся с целыми двигателями,
+      и это лучше, чем два признака.
+    -->
+    <changeSet id="072-battle-ship-systems" author="moo3">
+        <addColumn tableName="battle_ship">
+            <column name="damaged_systems" type="varchar(512)"/>
+        </addColumn>
+        <dropColumn tableName="battle_ship" columnName="engine_damaged"/>
+    </changeSet>
+
+</databaseChangeLog>

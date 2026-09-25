@@ -1,0 +1,518 @@
+{
+  "source": "StrategyWiki, Master of Orion II: Battle at Antares — страницы Hiring Leaders, Colony Leaders, Ship Leaders. Имена, стартовый опыт, набор способностей, их сила и прирост за уровень взяты оттуда дословно; цена найма и жалованье — реконструкция, см. LeaderRules.",
+  "ranks": {
+    "colony": [
+      { "experience": 0, "title": { "en": "Administrator", "ru": "Администратор" } },
+      { "experience": 60, "title": { "en": "Director", "ru": "Директор" } },
+      { "experience": 150, "title": { "en": "Magistrate", "ru": "Магистрат" } },
+      { "experience": 300, "title": { "en": "Commissioner", "ru": "Комиссар" } },
+      { "experience": 500, "title": { "en": "Governor", "ru": "Губернатор" } }
+    ],
+    "ship": [
+      { "experience": 0, "title": { "en": "Commander", "ru": "Коммандер" } },
+      { "experience": 60, "title": { "en": "Captain", "ru": "Капитан" } },
+      { "experience": 150, "title": { "en": "Commodore", "ru": "Коммодор" } },
+      { "experience": 300, "title": { "en": "Rear Admiral", "ru": "Контр-адмирал" } },
+      { "experience": 500, "title": { "en": "Admiral", "ru": "Адмирал" } },
+      { "experience": 1000, "title": { "en": "Lord Admiral", "ru": "Лорд-адмирал" } }
+    ]
+  },
+  "abilities": [
+    {
+      "code": "ASSASSIN",
+      "kind": "GENERAL",
+      "name": { "en": "Assassin", "ru": "Убийца" },
+      "unit": "PERCENT",
+      "description": {
+        "en": "Every turn there is a chance to kill an enemy spy working against the empire.",
+        "ru": "Каждый ход есть шанс убить чужого шпиона, работающего против империи."
+      },
+      "works": "ALWAYS",
+      "effect": "ESPIONAGE_DEFENCE"
+    },
+    {
+      "code": "COMMANDO",
+      "kind": "GENERAL",
+      "name": { "en": "Commando", "ru": "Командос" },
+      "unit": "POINTS",
+      "description": {
+        "en": "For a colony leader — a bonus to the defending troops, for a ship leader — to your own; attackers get it two and a half times over.",
+        "ru": "У колониального лидера — прибавка обороняющемуся десанту, у корабельного — своим бойцам; нападающие получают её в два с половиной раза."
+      },
+      "works": "ASSIGNED",
+      "effect": "GROUND_COMBAT"
+    },
+    {
+      "code": "DIPLOMAT",
+      "kind": "GENERAL",
+      "name": { "en": "Diplomat", "ru": "Дипломат" },
+      "unit": "POINTS",
+      "description": {
+        "en": "A bonus to every negotiation: the neighbours agree more readily. Useless to a repulsive race.",
+        "ru": "Прибавка ко всем переговорам: соседи охотнее соглашаются. Отталкивающей расе бесполезен."
+      },
+      "works": "ALWAYS",
+      "effect": "DIPLOMACY"
+    },
+    {
+      "code": "FAMOUS",
+      "kind": "GENERAL",
+      "name": { "en": "Famous", "ru": "Знаменитость" },
+      "unit": "CREDITS",
+      "description": {
+        "en": "Lowers the hiring cost and the salary of the other leaders and makes them appear more often. Of several famous leaders only the strongest counts.",
+        "ru": "Снижает цену найма и жалованье остальных лидеров и учащает их появление. Из нескольких знаменитостей считается только сильнейшая."
+      },
+      "works": "ALWAYS",
+      "effect": "LEADER_COST"
+    },
+    {
+      "code": "MEGAWEALTH",
+      "kind": "GENERAL",
+      "name": { "en": "Megawealth", "ru": "Богач" },
+      "unit": "CREDITS",
+      "description": {
+        "en": "Takes no salary at all and brings the treasury 10 credits a turn. The sum does not grow with experience.",
+        "ru": "Жалованья не берёт вовсе, а приносит казне 10 кредитов за ход. С опытом сумма не растёт."
+      },
+      "works": "ALWAYS",
+      "effect": "TREASURY"
+    },
+    {
+      "code": "RESEARCHER",
+      "kind": "GENERAL",
+      "name": { "en": "Researcher", "ru": "Исследователь" },
+      "unit": "POINTS",
+      "description": {
+        "en": "A flat bonus to the empire's research points per turn.",
+        "ru": "Твёрдая прибавка к очкам исследований империи за ход."
+      },
+      "works": "ALWAYS",
+      "effect": "RESEARCH"
+    },
+    {
+      "code": "SPY_MASTER",
+      "kind": "GENERAL",
+      "name": { "en": "Spy Master", "ru": "Мастер шпионажа" },
+      "unit": "PERCENT",
+      "description": {
+        "en": "Your agents at the neighbours work better — theft and sabotage, but not defence.",
+        "ru": "Свои агенты у соседей работают лучше — кража и саботаж, но не защита."
+      },
+      "works": "ALWAYS",
+      "effect": "ESPIONAGE_ATTACK"
+    },
+    {
+      "code": "TELEPATH",
+      "kind": "GENERAL",
+      "name": { "en": "Telepath", "ru": "Телепат" },
+      "unit": "PERCENT",
+      "description": {
+        "en": "Your agents on defence catch enemy spies better, and the colony where the leader serves cannot be taken by telepathy.",
+        "ru": "Свои агенты на защите ловят чужих шпионов лучше, а колонию, где он служит, нельзя подчинить телепатией."
+      },
+      "works": "ALWAYS",
+      "effect": "ESPIONAGE_DEFENCE"
+    },
+    {
+      "code": "TRADER",
+      "kind": "GENERAL",
+      "name": { "en": "Trader", "ru": "Торговец" },
+      "unit": "PERCENT",
+      "description": {
+        "en": "The income from trade treaties is higher. Useless to a repulsive race.",
+        "ru": "Доход с торговых договоров выше. Отталкивающей расе бесполезен."
+      },
+      "works": "ALWAYS",
+      "effect": "TRADE_TREATY"
+    },
+    {
+      "code": "ENVIRONMENTALIST",
+      "kind": "COLONY",
+      "name": { "en": "Environmentalist", "ru": "Эколог" },
+      "unit": "PERCENT",
+      "description": {
+        "en": "Lowers the industrial pollution of the system's colonies.",
+        "ru": "Снижает промышленное загрязнение колоний системы."
+      },
+      "works": "ASSIGNED",
+      "effect": "NONE",
+      "note": {
+        "en": "Pollution is in the game, but this ability is not wired to it yet: the card shows it and it changes nothing.",
+        "ru": "Загрязнение в игре есть, но эта способность к нему пока не подключена: в карточке она показана и ни на что не влияет."
+      }
+    },
+    {
+      "code": "FARMING",
+      "kind": "COLONY",
+      "name": { "en": "Farming Leader", "ru": "Земледелец" },
+      "unit": "PERCENT",
+      "description": {
+        "en": "The farmers of every colony in the system give more food. Flat bonuses from buildings are untouched.",
+        "ru": "Фермеры всех колоний системы дают больше еды. Твёрдых прибавок от зданий не касается."
+      },
+      "works": "ASSIGNED",
+      "effect": "FOOD_PER_FARMER"
+    },
+    {
+      "code": "FINANCIAL",
+      "kind": "COLONY",
+      "name": { "en": "Financial Leader", "ru": "Финансист" },
+      "unit": "PERCENT",
+      "description": {
+        "en": "The tax income of the system's colonies is higher.",
+        "ru": "Налоговый доход колоний системы выше."
+      },
+      "works": "ASSIGNED",
+      "effect": "COLONY_INCOME"
+    },
+    {
+      "code": "INSTRUCTOR",
+      "kind": "COLONY",
+      "name": { "en": "Instructor", "ru": "Наставник" },
+      "unit": "POINTS",
+      "description": {
+        "en": "The crews of all the empire's ships gain experience faster. Only the best instructor counts.",
+        "ru": "Экипажи всех кораблей империи набирают опыт быстрее. Считается только лучший наставник."
+      },
+      "works": "ALWAYS",
+      "effect": "NONE",
+      "note": {
+        "en": "Crew experience is not in the game yet — the ability is shown and changes nothing.",
+        "ru": "Опыта у экипажей в игре пока нет — способность показывается, но ни на что не влияет."
+      }
+    },
+    {
+      "code": "LABOR",
+      "kind": "COLONY",
+      "name": { "en": "Labor Leader", "ru": "Управляющий" },
+      "unit": "PERCENT",
+      "description": {
+        "en": "The workers of every colony in the system give more production. Flat bonuses from buildings are untouched.",
+        "ru": "Рабочие всех колоний системы дают больше производства. Твёрдых прибавок от зданий не касается."
+      },
+      "works": "ASSIGNED",
+      "effect": "PRODUCTION_PER_WORKER"
+    },
+    {
+      "code": "MEDICINE",
+      "kind": "COLONY",
+      "name": { "en": "Medicine", "ru": "Врач" },
+      "unit": "PERCENT",
+      "description": {
+        "en": "The population of the system's colonies grows faster.",
+        "ru": "Население колоний системы растёт быстрее."
+      },
+      "works": "ASSIGNED",
+      "effect": "POPULATION_GROWTH"
+    },
+    {
+      "code": "SCIENCE",
+      "kind": "COLONY",
+      "name": { "en": "Science Leader", "ru": "Учёный" },
+      "unit": "PERCENT",
+      "description": {
+        "en": "The scientists of every colony in the system give more research points.",
+        "ru": "Учёные всех колоний системы дают больше очков исследований."
+      },
+      "works": "ASSIGNED",
+      "effect": "RESEARCH_PER_SCIENTIST"
+    },
+    {
+      "code": "SPIRITUAL",
+      "kind": "COLONY",
+      "name": { "en": "Spiritual Leader", "ru": "Духовный лидер" },
+      "unit": "PERCENT",
+      "description": {
+        "en": "Raises the morale in the system. Useless to Unification.",
+        "ru": "Поднимает настроение в системе. Объединению бесполезен."
+      },
+      "works": "ASSIGNED",
+      "effect": "NONE",
+      "note": {
+        "en": "Colony morale is not in the game yet — the ability is shown and changes nothing.",
+        "ru": "Настроения колоний в игре пока нет — способность показывается, но ни на что не влияет."
+      }
+    },
+    {
+      "code": "TACTICS",
+      "kind": "COLONY",
+      "name": { "en": "Tactician", "ru": "Тактик" },
+      "unit": "POINTS",
+      "description": {
+        "en": "It does not work in the original either — a known MOO II bug since 1996.",
+        "ru": "В оригинале не работает — известная ошибка MOO II с 1996 года."
+      },
+      "works": "ASSIGNED",
+      "effect": "NONE",
+      "note": {
+        "en": "The ability does not work in the original either; it is kept for the sake of a complete list.",
+        "ru": "Способность не работает и в оригинале; оставлена ради полноты списка."
+      }
+    },
+    {
+      "code": "ENGINEER",
+      "kind": "SHIP",
+      "name": { "en": "Engineer", "ru": "Инженер" },
+      "unit": "PERCENT",
+      "description": {
+        "en": "Repairs the fleet's ships in battle and after a victory.",
+        "ru": "Чинит корабли флота в бою и после победы."
+      },
+      "works": "ASSIGNED",
+      "effect": "NONE",
+      "note": {
+        "en": "Ship repair is not in the game yet — the ability is shown and changes nothing.",
+        "ru": "Починки кораблей в игре пока нет — способность показывается, но ни на что не влияет."
+      }
+    },
+    {
+      "code": "FIGHTER_PILOT",
+      "kind": "SHIP",
+      "name": { "en": "Fighter Pilot", "ru": "Лётчик" },
+      "unit": "POINTS",
+      "description": {
+        "en": "The fleet's fighters shoot more accurately and dodge better.",
+        "ru": "Истребители флота метче стреляют и лучше уклоняются."
+      },
+      "works": "ASSIGNED",
+      "effect": "NONE",
+      "note": {
+        "en": "Fighters are not in the game yet — the ability is shown and changes nothing.",
+        "ru": "Истребителей в игре пока нет — способность показывается, но ни на что не влияет."
+      }
+    },
+    {
+      "code": "GALACTIC_LORE",
+      "kind": "SHIP",
+      "name": { "en": "Galactic Lore", "ru": "Знаток галактики" },
+      "unit": "POINTS",
+      "description": {
+        "en": "Reveals knowledge of stars and planets and adds attack against monsters.",
+        "ru": "Открывает сведения о звёздах и планетах и прибавляет атаку против чудовищ."
+      },
+      "works": "ASSIGNED",
+      "effect": "NONE",
+      "note": {
+        "en": "Space monsters are in the game, but this ability is not wired to them yet, and scouting a system with a fleet reveals its contents anyway.",
+        "ru": "Космические чудища в игре есть, но эта способность к ним пока не подключена, а состав системы и так открывает приход флота."
+      }
+    },
+    {
+      "code": "HELMSMAN",
+      "kind": "SHIP",
+      "name": { "en": "Helmsman", "ru": "Рулевой" },
+      "unit": "POINTS",
+      "description": {
+        "en": "The defence of all the fleet's ships against beam weapons is higher.",
+        "ru": "Защита всех кораблей флота от лучевого оружия выше."
+      },
+      "works": "ASSIGNED",
+      "effect": "SHIP_DEFENCE"
+    },
+    {
+      "code": "NAVIGATOR",
+      "kind": "SHIP",
+      "name": { "en": "Navigator", "ru": "Навигатор" },
+      "unit": "POINTS",
+      "description": { "en": "The fleet travels faster.", "ru": "Флот идёт быстрее." },
+      "works": "ASSIGNED",
+      "effect": "FLEET_SPEED"
+    },
+    {
+      "code": "OPERATIONS",
+      "kind": "SHIP",
+      "name": { "en": "Operations", "ru": "Штабист" },
+      "unit": "POINTS",
+      "description": {
+        "en": "The empire gets extra command points.",
+        "ru": "Империя получает дополнительные очки командования."
+      },
+      "works": "ALWAYS",
+      "effect": "NONE",
+      "note": {
+        "en": "Command points are in the game, but this ability is not wired to them yet: the card shows it and it changes nothing.",
+        "ru": "Командные очки в игре есть, но эта способность к ним пока не подключена: в карточке она показана и ни на что не влияет."
+      }
+    },
+    {
+      "code": "ORDNANCE",
+      "kind": "SHIP",
+      "name": { "en": "Ordnance", "ru": "Оружейник" },
+      "unit": "PERCENT",
+      "description": {
+        "en": "The damage of all the fleet's ships is higher by this percent of the base.",
+        "ru": "Урон всех кораблей флота выше на этот процент от базового."
+      },
+      "works": "ASSIGNED",
+      "effect": "SHIP_DAMAGE"
+    },
+    {
+      "code": "SECURITY",
+      "kind": "SHIP",
+      "name": { "en": "Security", "ru": "Начальник охраны" },
+      "unit": "POINTS",
+      "description": {
+        "en": "The ship's troops fight off enemy boarding better.",
+        "ru": "Бойцы корабля лучше отбиваются от чужого абордажа."
+      },
+      "works": "ASSIGNED",
+      "effect": "GROUND_COMBAT"
+    },
+    {
+      "code": "WEAPONRY",
+      "kind": "SHIP",
+      "name": { "en": "Weaponry", "ru": "Канонир" },
+      "unit": "POINTS",
+      "description": {
+        "en": "The accuracy of beam weapons on all the fleet's ships is higher.",
+        "ru": "Точность лучевого оружия всех кораблей флота выше."
+      },
+      "works": "ASSIGNED",
+      "effect": "SHIP_ATTACK"
+    }
+  ],
+  "leaders": [
+    { "id": 30, "code": "ailis", "name": { "en": "Ilsera", "ru": "Ильсера" }, "title": { "en": "Gifted", "ru": "Одарённая" }, "kind": "COLONY", "race": null, "startExperience": 60,
+      "skills": [{ "ability": "ENVIRONMENTALIST", "value": -20, "perLevel": -10 }, { "ability": "MEDICINE", "value": 30, "perLevel": 15 }, { "ability": "SPIRITUAL", "value": 10, "perLevel": 5 }] },
+    { "id": 34, "code": "androgena", "name": { "en": "Ostrava", "ru": "Острава" }, "title": { "en": "Administrator", "ru": "Управительница" }, "kind": "COLONY", "race": null, "startExperience": 60,
+      "skills": [{ "ability": "FARMING", "value": 20, "perLevel": 10 }, { "ability": "FINANCIAL", "value": 20, "perLevel": 10 }, { "ability": "LABOR", "value": 20, "perLevel": 10 }, { "ability": "MEDICINE", "value": 20, "perLevel": 10 }] },
+    { "id": 45, "code": "black-razor", "name": { "en": "Vantrell Sable", "ru": "Вантрелл Сейбл" }, "title": { "en": "Punisher", "ru": "Каратель" }, "kind": "COLONY", "race": null, "startExperience": 60,
+      "skills": [{ "ability": "ASSASSIN", "value": 6, "perLevel": 3 }, { "ability": "SPY_MASTER", "value": 6, "perLevel": 3 }, { "ability": "FARMING", "value": 20, "perLevel": 10 }, { "ability": "FINANCIAL", "value": 20, "perLevel": 10 }, { "ability": "LABOR", "value": 20, "perLevel": 10 }] },
+    { "id": 41, "code": "brainac", "name": { "en": "Quorrin", "ru": "Куоррин" }, "title": { "en": "Unpredictable", "ru": "Непредсказуемый" }, "kind": "COLONY", "race": null, "startExperience": 60, "randomSkills": 3,
+      "skills": [] },
+    { "id": 39, "code": "cassandra", "name": { "en": "Nyssira", "ru": "Ниссира" }, "title": { "en": "Iluni Seer", "ru": "Провидица илуни" }, "kind": "COLONY", "race": "ELERIAN", "startExperience": 60,
+      "skills": [{ "ability": "DIPLOMAT", "value": 20, "perLevel": 10 }, { "ability": "TELEPATH", "value": 6, "perLevel": 3 }, { "ability": "ENVIRONMENTALIST", "value": -20, "perLevel": -10 }, { "ability": "SPIRITUAL", "value": 10, "perLevel": 5 }],
+      "techs": ["telepathic-training"] },
+    { "id": 32, "code": "chug", "name": { "en": "Borrik", "ru": "Боррик" }, "title": { "en": "Planetologist", "ru": "Планетолог" }, "kind": "COLONY", "race": null, "startExperience": 60,
+      "skills": [{ "ability": "RESEARCHER", "value": 10, "perLevel": 5 }, { "ability": "ENVIRONMENTALIST", "value": -20, "perLevel": -10 }, { "ability": "FARMING", "value": 20, "perLevel": 10 }],
+      "techs": ["terraforming"] },
+    { "id": 51, "code": "claw", "name": { "en": "Kzarr", "ru": "Кзарр" }, "title": { "en": "Chitarri Overseer", "ru": "Надсмотрщик читарри" }, "kind": "COLONY", "race": "KLACKONS", "startExperience": 150,
+      "skills": [{ "ability": "OPERATIONS", "value": 9, "perLevel": 3 }, { "ability": "FARMING", "value": 45, "perLevel": 15 }, { "ability": "LABOR", "value": 45, "perLevel": 15 }] },
+    { "id": 6, "code": "crassis", "name": { "en": "Meridon", "ru": "Меридон" }, "title": { "en": "Manager", "ru": "Управляющий" }, "kind": "COLONY", "race": null, "startExperience": 0,
+      "skills": [{ "ability": "LABOR", "value": 10, "perLevel": 10 }] },
+    { "id": 20, "code": "draxx", "name": { "en": "Sethrane", "ru": "Сетрейн" }, "title": { "en": "Spymaster", "ru": "Мастер шпионажа" }, "kind": "COLONY", "race": null, "startExperience": 0,
+      "skills": [{ "ability": "ASSASSIN", "value": 3, "perLevel": 3 }, { "ability": "SPY_MASTER", "value": 3, "perLevel": 3 }] },
+    { "id": 60, "code": "electra", "name": { "en": "Veloria", "ru": "Велория" }, "title": { "en": "High Priestess", "ru": "Верховная жрица" }, "kind": "COLONY", "race": null, "startExperience": 300,
+      "skills": [{ "ability": "TELEPATH", "value": 8, "perLevel": 2 }, { "ability": "ENVIRONMENTALIST", "value": -60, "perLevel": -15 }, { "ability": "FARMING", "value": 60, "perLevel": 15 }, { "ability": "SPIRITUAL", "value": 30, "perLevel": 7.5 }] },
+    { "id": 4, "code": "emo", "name": { "en": "Tessil", "ru": "Тессил" }, "title": { "en": "Scientist", "ru": "Учёный" }, "kind": "COLONY", "race": null, "startExperience": 0,
+      "skills": [{ "ability": "SCIENCE", "value": 10, "perLevel": 10 }] },
+    { "id": 37, "code": "felina", "name": { "en": "Maribeth Sol", "ru": "Марибет Сол" }, "title": { "en": "Naturalist", "ru": "Натуралистка" }, "kind": "COLONY", "race": null, "startExperience": 60,
+      "skills": [{ "ability": "ENVIRONMENTALIST", "value": -30, "perLevel": -15 }, { "ability": "FARMING", "value": 30, "perLevel": 15 }] },
+    { "id": 8, "code": "galis", "name": { "en": "Aurelio Vance", "ru": "Аурелио Вэнс" }, "title": { "en": "Financier", "ru": "Финансист" }, "kind": "COLONY", "race": null, "startExperience": 0,
+      "skills": [{ "ability": "FINANCIAL", "value": 10, "perLevel": 10 }] },
+    { "id": 18, "code": "garron", "name": { "en": "Hallam Dree", "ru": "Халлам Дри" }, "title": { "en": "Ambassador", "ru": "Посол" }, "kind": "COLONY", "race": null, "startExperience": 0,
+      "skills": [{ "ability": "DIPLOMAT", "value": 15, "perLevel": 15 }, { "ability": "FAMOUS", "value": 60, "perLevel": 60 }, { "ability": "MEGAWEALTH", "value": 10, "perLevel": 0 }] },
+    { "id": 35, "code": "grogg", "name": { "en": "Pipkin Vale", "ru": "Пипкин Вейл" }, "title": { "en": "Gildrin Dealer", "ru": "Делец гилдринов" }, "kind": "COLONY", "race": "GNOLAM", "startExperience": 60,
+      "skills": [{ "ability": "MEGAWEALTH", "value": 10, "perLevel": 0 }, { "ability": "FINANCIAL", "value": 30, "perLevel": 15 }, { "ability": "LABOR", "value": 20, "perLevel": 10 }] },
+    { "id": 10, "code": "houri", "name": { "en": "Senna Wyld", "ru": "Сенна Уайлд" }, "title": { "en": "Ecologist", "ru": "Эколог" }, "kind": "COLONY", "race": null, "startExperience": 0,
+      "skills": [{ "ability": "ENVIRONMENTALIST", "value": -15, "perLevel": -15 }] },
+    { "id": 24, "code": "khunagg", "name": { "en": "Dromagh", "ru": "Дромаг" }, "title": { "en": "Ruthless", "ru": "Безжалостный" }, "kind": "COLONY", "race": null, "startExperience": 60,
+      "skills": [{ "ability": "COMMANDO", "value": 4, "perLevel": 2 }, { "ability": "FARMING", "value": 20, "perLevel": 10 }, { "ability": "LABOR", "value": 20, "perLevel": 10 }, { "ability": "TACTICS", "value": 12, "perLevel": 6 }] },
+    { "id": 1, "code": "kimbuzzi", "name": { "en": "Tobbe Marrow", "ru": "Тоббе Марроу" }, "title": { "en": "Farmer", "ru": "Земледелец" }, "kind": "COLONY", "race": null, "startExperience": 0,
+      "skills": [{ "ability": "FARMING", "value": 10, "perLevel": 10 }] },
+    { "id": 26, "code": "kirsus", "name": { "en": "Ilvan Thess", "ru": "Ильван Тесс" }, "title": { "en": "Cerebri Scholar", "ru": "Учёный церебри" }, "kind": "COLONY", "race": "PSILONS", "startExperience": 60,
+      "skills": [{ "ability": "RESEARCHER", "value": 15, "perLevel": 7.5 }, { "ability": "SCIENCE", "value": 30, "perLevel": 15 }] },
+    { "id": 12, "code": "lydon", "name": { "en": "Cassius Orme", "ru": "Кассиус Орм" }, "title": { "en": "Aristocrat", "ru": "Аристократ" }, "kind": "COLONY", "race": null, "startExperience": 0,
+      "skills": [{ "ability": "DIPLOMAT", "value": 10, "perLevel": 10 }, { "ability": "FAMOUS", "value": 60, "perLevel": 60 }, { "ability": "MEGAWEALTH", "value": 10, "perLevel": 0 }] },
+    { "id": 62, "code": "malovane", "name": { "en": "Harrowgate", "ru": "Харроугейт" }, "title": { "en": "Warlord", "ru": "Полководец" }, "kind": "COLONY", "race": null, "startExperience": 300,
+      "skills": [{ "ability": "COMMANDO", "value": 15, "perLevel": 3 }, { "ability": "INSTRUCTOR", "value": 6, "perLevel": 1.5 }, { "ability": "LABOR", "value": 60, "perLevel": 15 }, { "ability": "SPIRITUAL", "value": 30, "perLevel": 7.5 }] },
+    { "id": 49, "code": "matrix", "name": { "en": "Cipherine", "ru": "Сайферин" }, "title": { "en": "Cybermancer", "ru": "Киберманс" }, "kind": "COLONY", "race": null, "startExperience": 150,
+      "skills": [{ "ability": "ASSASSIN", "value": 6, "perLevel": 2 }, { "ability": "TELEPATH", "value": 9, "perLevel": 3 }, { "ability": "SCIENCE", "value": 45, "perLevel": 15 }, { "ability": "SPIRITUAL", "value": 22, "perLevel": 7.5 }] },
+    { "id": 57, "code": "megatron", "name": { "en": "Kalibrax", "ru": "Калибракс" }, "title": { "en": "Ancient Android", "ru": "Древний андроид" }, "kind": "COLONY", "race": null, "startExperience": 150,
+      "skills": [{ "ability": "FARMING", "value": 45, "perLevel": 15 }, { "ability": "LABOR", "value": 45, "perLevel": 15 }, { "ability": "SCIENCE", "value": 45, "perLevel": 15 }],
+      "techs": ["android-farmers", "android-scientists", "android-workers"], "techsRandomOne": true },
+    { "id": 43, "code": "mentox", "name": { "en": "Osgrim Vell", "ru": "Осгрим Велл" }, "title": { "en": "Legendary Scientist", "ru": "Легендарный учёный" }, "kind": "COLONY", "race": null, "startExperience": 150,
+      "skills": [{ "ability": "FAMOUS", "value": 270, "perLevel": 90 }, { "ability": "RESEARCHER", "value": 22, "perLevel": 7.5 }, { "ability": "SCIENCE", "value": 45, "perLevel": 15 }],
+      "techs": ["research-laboratory", "autolab"] },
+    { "id": 63, "code": "necron", "name": { "en": "Morvain", "ru": "Морвейн" }, "title": { "en": "Dark Overlord", "ru": "Тёмный властелин" }, "kind": "COLONY", "race": null, "startExperience": 300,
+      "skills": [{ "ability": "TELEPATH", "value": 12, "perLevel": 3 }, { "ability": "FINANCIAL", "value": 60, "perLevel": 15 }, { "ability": "LABOR", "value": 60, "perLevel": 15 }, { "ability": "SCIENCE", "value": 60, "perLevel": 15 }, { "ability": "SPIRITUAL", "value": 30, "perLevel": 7.5 }] },
+    { "id": 36, "code": "nimraaz", "name": { "en": "Tarquel", "ru": "Таркель" }, "title": { "en": "Master Tactician", "ru": "Мастер тактики" }, "kind": "COLONY", "race": null, "startExperience": 60,
+      "skills": [{ "ability": "COMMANDO", "value": 6, "perLevel": 3 }, { "ability": "OPERATIONS", "value": 6, "perLevel": 3 }, { "ability": "INSTRUCTOR", "value": 2, "perLevel": 1 }, { "ability": "TACTICS", "value": 9, "perLevel": 9 }] },
+    { "id": 50, "code": "orphus", "name": { "en": "Elowen Pax", "ru": "Эловен Пакс" }, "title": { "en": "Peacemaker", "ru": "Миротворец" }, "kind": "COLONY", "race": null, "startExperience": 150,
+      "skills": [{ "ability": "DIPLOMAT", "value": 45, "perLevel": 15 }, { "ability": "FAMOUS", "value": 180, "perLevel": 60 }, { "ability": "INSTRUCTOR", "value": 3, "perLevel": 1 }, { "ability": "MEDICINE", "value": 45, "perLevel": 15 }, { "ability": "SPIRITUAL", "value": 22, "perLevel": 7.5 }] },
+    { "id": 22, "code": "ralleia", "name": { "en": "Lyssandre", "ru": "Лиссандра" }, "title": { "en": "Siren", "ru": "Сирена" }, "kind": "COLONY", "race": null, "startExperience": 60,
+      "skills": [{ "ability": "DIPLOMAT", "value": 30, "perLevel": 15 }, { "ability": "FAMOUS", "value": 120, "perLevel": 60 }, { "ability": "SPIRITUAL", "value": 10, "perLevel": 5 }] },
+    { "id": 25, "code": "rash-iki", "name": { "en": "Kor-Vashti", "ru": "Кор-Вашти" }, "title": { "en": "Warleader", "ru": "Военачальник" }, "kind": "COLONY", "race": null, "startExperience": 60,
+      "skills": [{ "ability": "COMMANDO", "value": 4, "perLevel": 2 }, { "ability": "INSTRUCTOR", "value": 3, "perLevel": 1.5 }, { "ability": "LABOR", "value": 30, "perLevel": 15 }, { "ability": "TACTICS", "value": 12, "perLevel": 6 }] },
+    { "id": 47, "code": "tanus", "name": { "en": "Rennick Ash", "ru": "Ренник Эш" }, "title": { "en": "Revolutionary", "ru": "Революционер" }, "kind": "COLONY", "race": null, "startExperience": 150,
+      "skills": [{ "ability": "FARMING", "value": 30, "perLevel": 10 }, { "ability": "LABOR", "value": 30, "perLevel": 10 }, { "ability": "SCIENCE", "value": 30, "perLevel": 10 }, { "ability": "SPIRITUAL", "value": 15, "perLevel": 5 }],
+      "techs": ["advanced-government"] },
+    { "id": 53, "code": "torg", "name": { "en": "Ulgrath", "ru": "Ульграт" }, "title": { "en": "Sovereign", "ru": "Повелитель" }, "kind": "COLONY", "race": null, "startExperience": 150,
+      "skills": [{ "ability": "COMMANDO", "value": 6, "perLevel": 2 }, { "ability": "FARMING", "value": 45, "perLevel": 15 }, { "ability": "FINANCIAL", "value": 45, "perLevel": 15 }, { "ability": "LABOR", "value": 45, "perLevel": 15 }] },
+    { "id": 16, "code": "urro", "name": { "en": "Fennoril", "ru": "Феннорил" }, "title": { "en": "Physician of the Outer Reach", "ru": "Врач с Окраины" }, "kind": "COLONY", "race": null, "startExperience": 0,
+      "skills": [{ "ability": "RESEARCHER", "value": 5, "perLevel": 5 }, { "ability": "MEDICINE", "value": 15, "perLevel": 15 }] },
+    { "id": 28, "code": "valin", "name": { "en": "Dashiel Rook", "ru": "Дэшил Рук" }, "title": { "en": "Free Trader", "ru": "Вольный торговец" }, "kind": "COLONY", "race": null, "startExperience": 60,
+      "skills": [{ "ability": "MEGAWEALTH", "value": 10, "perLevel": 0 }, { "ability": "TRADER", "value": 30, "perLevel": 15 }, { "ability": "FINANCIAL", "value": 20, "perLevel": 10 }] },
+    { "id": 55, "code": "vott", "name": { "en": "Grellith", "ru": "Греллит" }, "title": { "en": "Technomancer", "ru": "Техномант" }, "kind": "COLONY", "race": null, "startExperience": 150,
+      "skills": [{ "ability": "MEGAWEALTH", "value": 10, "perLevel": 0 }, { "ability": "RESEARCHER", "value": 22, "perLevel": 7.5 }, { "ability": "FINANCIAL", "value": 45, "perLevel": 15 }, { "ability": "SCIENCE", "value": 45, "perLevel": 15 }],
+      "techs": ["virtual-reality-network"] },
+    { "id": 64, "code": "xantus", "name": { "en": "Oberon Vaal", "ru": "Оберон Ваал" }, "title": { "en": "High Sovereign", "ru": "Верховный правитель" }, "kind": "COLONY", "race": null, "startExperience": 300,
+      "skills": [{ "ability": "ENVIRONMENTALIST", "value": -60, "perLevel": -15 }, { "ability": "FINANCIAL", "value": 60, "perLevel": 15 }, { "ability": "LABOR", "value": 60, "perLevel": 15 }, { "ability": "SCIENCE", "value": 60, "perLevel": 15 }, { "ability": "SPIRITUAL", "value": 30, "perLevel": 7.5 }] },
+    { "id": 14, "code": "yota", "name": { "en": "Old Wenmoor", "ru": "Старый Уэнмур" }, "title": { "en": "Old Mentor", "ru": "Старый наставник" }, "kind": "COLONY", "race": null, "startExperience": 0,
+      "skills": [{ "ability": "FAMOUS", "value": 90, "perLevel": 90 }, { "ability": "INSTRUCTOR", "value": 1, "perLevel": 1.5 }] },
+
+    { "id": 15, "code": "altos", "name": { "en": "Skerrin", "ru": "Скеррин" }, "title": { "en": "Aviari Pilot", "ru": "Пилот-авиар" }, "kind": "SHIP", "race": "ALKARI", "startExperience": 0,
+      "skills": [{ "ability": "FIGHTER_PILOT", "value": 5, "perLevel": 5 }, { "ability": "HELMSMAN", "value": 7, "perLevel": 7.5 }, { "ability": "NAVIGATOR", "value": 1, "perLevel": 0.5 }] },
+    { "id": 9, "code": "aquasarrious", "name": { "en": "Thalassa Nir", "ru": "Таласса Нир" }, "title": { "en": "Tidari Navigator", "ru": "Навигатор тидари" }, "kind": "SHIP", "race": "TRILARIAN", "startExperience": 0,
+      "skills": [{ "ability": "HELMSMAN", "value": 5, "perLevel": 5 }, { "ability": "NAVIGATOR", "value": 1, "perLevel": 1 }, { "ability": "WEAPONRY", "value": 5, "perLevel": 5 }] },
+    { "id": 33, "code": "caern", "name": { "en": "Ferrand Kell", "ru": "Ферранд Келл" }, "title": { "en": "Outland Mercenary", "ru": "Наёмник с окраин" }, "kind": "SHIP", "race": null, "startExperience": 60,
+      "skills": [{ "ability": "HELMSMAN", "value": 5, "perLevel": 5 }, { "ability": "NAVIGATOR", "value": 1, "perLevel": 0.5 }, { "ability": "ORDNANCE", "value": 5, "perLevel": 5 }, { "ability": "SECURITY", "value": 2, "perLevel": 2 }, { "ability": "WEAPONRY", "value": 5, "perLevel": 5 }] },
+    { "id": 2, "code": "cyr", "name": { "en": "Jax Ivory", "ru": "Джакс Айвори" }, "title": { "en": "Fighter Ace", "ru": "Ас-истребитель" }, "kind": "SHIP", "race": null, "startExperience": 0,
+      "skills": [{ "ability": "FIGHTER_PILOT", "value": 5, "perLevel": 5 }] },
+    { "id": 61, "code": "dalan", "name": { "en": "Corvin Halloway", "ru": "Корвин Хэллоуэй" }, "title": { "en": "Legendary Captain", "ru": "Легендарный капитан" }, "kind": "SHIP", "race": null, "startExperience": 300,
+      "skills": [{ "ability": "FIGHTER_PILOT", "value": 7, "perLevel": 7.5 }, { "ability": "HELMSMAN", "value": 7, "perLevel": 7.5 }, { "ability": "ORDNANCE", "value": 7, "perLevel": 7.5 }, { "ability": "WEAPONRY", "value": 7, "perLevel": 7.5 }, { "ability": "FAMOUS", "value": 90, "perLevel": 90 }] },
+    { "id": 58, "code": "dantos", "name": { "en": "Rusk Maddox", "ru": "Раск Мэддокс" }, "title": { "en": "Raider Chief", "ru": "Предводитель разбойников" }, "kind": "SHIP", "race": null, "startExperience": 300,
+      "skills": [{ "ability": "FIGHTER_PILOT", "value": 7, "perLevel": 7.5 }, { "ability": "HELMSMAN", "value": 5, "perLevel": 5 }, { "ability": "WEAPONRY", "value": 7, "perLevel": 7.5 }, { "ability": "FAMOUS", "value": 90, "perLevel": 90 }, { "ability": "MEGAWEALTH", "value": 10, "perLevel": 0 }] },
+    { "id": 42, "code": "diablo", "name": { "en": "Scourgewire", "ru": "Скорджвайр" }, "title": { "en": "Cyber-marauder", "ru": "Кибермародёр" }, "kind": "SHIP", "race": null, "startExperience": 60,
+      "skills": [{ "ability": "ORDNANCE", "value": 5, "perLevel": 5 }, { "ability": "WEAPONRY", "value": 5, "perLevel": 5 }, { "ability": "ASSASSIN", "value": 2, "perLevel": 2 }, { "ability": "COMMANDO", "value": 2, "perLevel": 2 }, { "ability": "SPY_MASTER", "value": 2, "perLevel": 2 }] },
+    { "id": 7, "code": "gizmo", "name": { "en": "Tinker Vosk", "ru": "Тинкер Воск" }, "title": { "en": "Inventor", "ru": "Изобретатель" }, "kind": "SHIP", "race": null, "startExperience": 0,
+      "skills": [{ "ability": "ENGINEER", "value": 2, "perLevel": 2 }, { "ability": "RESEARCHER", "value": 5, "perLevel": 5 }] },
+    { "id": 31, "code": "grak", "name": { "en": "Brommak", "ru": "Броммак" }, "title": { "en": "Ursani Commando", "ru": "Коммандос урсани" }, "kind": "SHIP", "race": "BULRATHI", "startExperience": 60,
+      "skills": [{ "ability": "SECURITY", "value": 2, "perLevel": 2 }, { "ability": "COMMANDO", "value": 3, "perLevel": 3 }, { "ability": "FAMOUS", "value": 60, "perLevel": 60 }, { "ability": "OPERATIONS", "value": 2, "perLevel": 2 }] },
+    { "id": 3, "code": "grum", "name": { "en": "Halden Ironmark", "ru": "Халден Айронмарк" }, "title": { "en": "Armorer", "ru": "Оружейник" }, "kind": "SHIP", "race": null, "startExperience": 0,
+      "skills": [{ "ability": "SECURITY", "value": 2, "perLevel": 2 }, { "ability": "COMMANDO", "value": 2, "perLevel": 2 }] },
+    { "id": 5, "code": "hawk", "name": { "en": "Selvan Reach", "ru": "Селван Рич" }, "title": { "en": "Astrogator", "ru": "Астрогатор" }, "kind": "SHIP", "race": null, "startExperience": 0,
+      "skills": [{ "ability": "HELMSMAN", "value": 5, "perLevel": 5 }, { "ability": "NAVIGATOR", "value": 1, "perLevel": 0.5 }] },
+    { "id": 19, "code": "jarred", "name": { "en": "Emory Stride", "ru": "Эмори Страйд" }, "title": { "en": "Pathfinder", "ru": "Первопроходец" }, "kind": "SHIP", "race": null, "startExperience": 60,
+      "skills": [{ "ability": "HELMSMAN", "value": 5, "perLevel": 5 }, { "ability": "NAVIGATOR", "value": 1, "perLevel": 1 }, { "ability": "WEAPONRY", "value": 5, "perLevel": 5 }, { "ability": "DIPLOMAT", "value": 10, "perLevel": 10 }] },
+    { "id": 56, "code": "karg", "name": { "en": "Redmane Krull", "ru": "Редмейн Крулл" }, "title": { "en": "Pirate Captain", "ru": "Пиратский капитан" }, "kind": "SHIP", "race": null, "startExperience": 150,
+      "skills": [{ "ability": "GALACTIC_LORE", "value": 7, "perLevel": 7.5 }, { "ability": "HELMSMAN", "value": 7, "perLevel": 7.5 }, { "ability": "NAVIGATOR", "value": 1, "perLevel": 1 }, { "ability": "ORDNANCE", "value": 7, "perLevel": 7.5 }, { "ability": "WEAPONRY", "value": 7, "perLevel": 7.5 }] },
+    { "id": 23, "code": "kher", "name": { "en": "Slick Marlowe", "ru": "Слик Марлоу" }, "title": { "en": "Smuggler", "ru": "Контрабандист" }, "kind": "SHIP", "race": null, "startExperience": 60,
+      "skills": [{ "ability": "HELMSMAN", "value": 5, "perLevel": 5 }, { "ability": "NAVIGATOR", "value": 1, "perLevel": 0.5 }, { "ability": "WEAPONRY", "value": 5, "perLevel": 5 }, { "ability": "TRADER", "value": 10, "perLevel": 10 }] },
+    { "id": 29, "code": "kronos", "name": { "en": "Aeonel", "ru": "Эонель" }, "title": { "en": "Ancient Wanderer", "ru": "Древний странник" }, "kind": "SHIP", "race": null, "startExperience": 150,
+      "skills": [{ "ability": "GALACTIC_LORE", "value": 7, "perLevel": 7.5 }, { "ability": "HELMSMAN", "value": 5, "perLevel": 5 }, { "ability": "NAVIGATOR", "value": 1, "perLevel": 1 }],
+      "techs": ["dimensional-portal"] },
+    { "id": 46, "code": "kytryl", "name": { "en": "Vesper Quill", "ru": "Веспер Квилл" }, "title": { "en": "Privateer", "ru": "Капер" }, "kind": "SHIP", "race": null, "startExperience": 60,
+      "skills": [{ "ability": "HELMSMAN", "value": 7, "perLevel": 7.5 }, { "ability": "NAVIGATOR", "value": 1, "perLevel": 1 }, { "ability": "WEAPONRY", "value": 5, "perLevel": 5 }, { "ability": "FAMOUS", "value": 60, "perLevel": 60 }, { "ability": "TRADER", "value": 10, "perLevel": 10 }] },
+    { "id": 65, "code": "loknar", "name": { "en": "Ashkarel", "ru": "Ашкарель" }, "title": { "en": "Last of the Wardens", "ru": "Последний из Стражей" }, "kind": "SHIP", "race": null, "startExperience": 1000,
+      "skills": [{ "ability": "FIGHTER_PILOT", "value": 7, "perLevel": 7.5 }, { "ability": "GALACTIC_LORE", "value": 7, "perLevel": 7.5 }, { "ability": "HELMSMAN", "value": 7, "perLevel": 7.5 }, { "ability": "ORDNANCE", "value": 7, "perLevel": 7.5 }, { "ability": "WEAPONRY", "value": 7, "perLevel": 7.5 }] },
+    { "id": 21, "code": "mukirr", "name": { "en": "Rrsha Vane", "ru": "Рша Вейн" }, "title": { "en": "Felyr Warrior", "ru": "Воитель фелиров" }, "kind": "SHIP", "race": "MRRSHAN", "startExperience": 60,
+      "skills": [{ "ability": "WEAPONRY", "value": 7, "perLevel": 7.5 }, { "ability": "COMMANDO", "value": 2, "perLevel": 2 }] },
+    { "id": 44, "code": "nhagg", "name": { "en": "Gorrund", "ru": "Горрунд" }, "title": { "en": "Weapons Master", "ru": "Мастер вооружений" }, "kind": "SHIP", "race": null, "startExperience": 60,
+      "skills": [{ "ability": "ORDNANCE", "value": 7, "perLevel": 7.5 }, { "ability": "WEAPONRY", "value": 5, "perLevel": 5 }, { "ability": "COMMANDO", "value": 3, "perLevel": 3 }] },
+    { "id": 40, "code": "nile", "name": { "en": "Tamsin Ferro", "ru": "Тамсин Ферро" }, "title": { "en": "Outcast Warrior", "ru": "Отверженный воин" }, "kind": "SHIP", "race": null, "startExperience": 60,
+      "skills": [{ "ability": "SECURITY", "value": 3, "perLevel": 3 }, { "ability": "WEAPONRY", "value": 7, "perLevel": 7.5 }, { "ability": "COMMANDO", "value": 3, "perLevel": 3 }] },
+    { "id": 0, "code": "ruola", "name": { "en": "Brisa Halloran", "ru": "Бриса Халлоран" }, "title": { "en": "Gunner", "ru": "Канонир" }, "kind": "SHIP", "race": null, "startExperience": 0,
+      "skills": [{ "ability": "WEAPONRY", "value": 5, "perLevel": 5 }] },
+    { "id": 54, "code": "skaine", "name": { "en": "Kaelith Roan", "ru": "Кэлит Роан" }, "title": { "en": "Legendary Pilot", "ru": "Легендарный пилот" }, "kind": "SHIP", "race": null, "startExperience": 150,
+      "skills": [{ "ability": "FIGHTER_PILOT", "value": 7, "perLevel": 7.5 }, { "ability": "HELMSMAN", "value": 7, "perLevel": 7.5 }, { "ability": "NAVIGATOR", "value": 1, "perLevel": 0.5 }, { "ability": "WEAPONRY", "value": 5, "perLevel": 5 }, { "ability": "FAMOUS", "value": 90, "perLevel": 90 }] },
+    { "id": 38, "code": "slag", "name": { "en": "Mordecai Flint", "ru": "Мордекай Флинт" }, "title": { "en": "Arms Dealer", "ru": "Торговец оружием" }, "kind": "SHIP", "race": null, "startExperience": 60,
+      "skills": [{ "ability": "HELMSMAN", "value": 5, "perLevel": 5 }, { "ability": "NAVIGATOR", "value": 1, "perLevel": 0.5 }, { "ability": "WEAPONRY", "value": 5, "perLevel": 5 }, { "ability": "MEGAWEALTH", "value": 10, "perLevel": 0 }, { "ability": "TRADER", "value": 15, "perLevel": 15 }] },
+    { "id": 27, "code": "slith", "name": { "en": "Zeph Arrow", "ru": "Зеф Эрроу" }, "title": { "en": "Rebel Pilot", "ru": "Пилот-повстанец" }, "kind": "SHIP", "race": null, "startExperience": 60,
+      "skills": [{ "ability": "HELMSMAN", "value": 5, "perLevel": 5 }, { "ability": "NAVIGATOR", "value": 1, "perLevel": 0.5 }, { "ability": "ORDNANCE", "value": 5, "perLevel": 5 }, { "ability": "WEAPONRY", "value": 5, "perLevel": 5 }] },
+    { "id": 17, "code": "sparky", "name": { "en": "Unit Lumen", "ru": "Юнит Люмен" }, "title": { "en": "Synthar Cybernaut", "ru": "Кибернавт синтаров" }, "kind": "SHIP", "race": "MEKLAR", "startExperience": 0,
+      "skills": [{ "ability": "ENGINEER", "value": 3, "perLevel": 3 }, { "ability": "ORDNANCE", "value": 5, "perLevel": 5 }],
+      "techs": ["advanced-damage-control"] },
+    { "id": 59, "code": "tellik", "name": { "en": "Ada Wrenfield", "ru": "Ада Ренфилд" }, "title": { "en": "Legendary Engineer", "ru": "Легендарный инженер" }, "kind": "SHIP", "race": null, "startExperience": 300,
+      "skills": [{ "ability": "ENGINEER", "value": 3, "perLevel": 3 }, { "ability": "ORDNANCE", "value": 7, "perLevel": 7.5 }, { "ability": "FAMOUS", "value": 90, "perLevel": 90 }, { "ability": "OPERATIONS", "value": 3, "perLevel": 3 }, { "ability": "RESEARCHER", "value": 7, "perLevel": 7.5 }] },
+    { "id": 48, "code": "tulock", "name": { "en": "Jonah Creed", "ru": "Джона Крид" }, "title": { "en": "Bounty Hunter", "ru": "Охотник за головами" }, "kind": "SHIP", "race": null, "startExperience": 150,
+      "skills": [{ "ability": "HELMSMAN", "value": 7, "perLevel": 7.5 }, { "ability": "NAVIGATOR", "value": 1, "perLevel": 0.5 }, { "ability": "WEAPONRY", "value": 7, "perLevel": 7.5 }, { "ability": "ASSASSIN", "value": 2, "perLevel": 2 }, { "ability": "COMMANDO", "value": 2, "perLevel": 2 }] },
+    { "id": 11, "code": "tyranous", "name": { "en": "Ssathrek", "ru": "Ссатрек" }, "title": { "en": "Saurath Armorer", "ru": "Оружейник сауратов" }, "kind": "SHIP", "race": "SAKKRA", "startExperience": 60,
+      "skills": [{ "ability": "SECURITY", "value": 2, "perLevel": 2 }, { "ability": "WEAPONRY", "value": 5, "perLevel": 5 }, { "ability": "COMMANDO", "value": 2, "perLevel": 2 }] },
+    { "id": 13, "code": "vlarr", "name": { "en": "Nadia Verne", "ru": "Надия Верн" }, "title": { "en": "Independent Trader", "ru": "Независимый торговец" }, "kind": "SHIP", "race": null, "startExperience": 0,
+      "skills": [{ "ability": "HELMSMAN", "value": 5, "perLevel": 5 }, { "ability": "NAVIGATOR", "value": 1, "perLevel": 0.5 }, { "ability": "WEAPONRY", "value": 5, "perLevel": 5 }, { "ability": "MEGAWEALTH", "value": 10, "perLevel": 0 }] },
+    { "id": 66, "code": "xyphys", "name": { "en": "Zorvath", "ru": "Зорват" }, "title": { "en": "Warrior from Beyond", "ru": "Воин из-за Предела" }, "kind": "SHIP", "race": null, "startExperience": 1000,
+      "skills": [{ "ability": "FIGHTER_PILOT", "value": 7, "perLevel": 7.5 }, { "ability": "HELMSMAN", "value": 7, "perLevel": 7.5 }, { "ability": "ORDNANCE", "value": 7, "perLevel": 7.5 }, { "ability": "SECURITY", "value": 3, "perLevel": 3 }, { "ability": "WEAPONRY", "value": 7, "perLevel": 7.5 }] }
+  ]
+}

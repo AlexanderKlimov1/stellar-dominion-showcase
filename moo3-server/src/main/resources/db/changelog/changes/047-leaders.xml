@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+        Лидеры — п. 6.
+
+        Сам лидер живёт в справочнике (resources/Leaders/leaders.json): имя, способности,
+        сила и прирост за звание. В базе остаётся только его служба у игрока — код лидера,
+        состояние, опыт и назначение. Так состав лидеров правится файлом, без миграций, а
+        партия помнит ровно то, чего в файле быть не может: кого этот игрок нанял и куда
+        поставил.
+
+        Строка заводится в тот ход, когда лидер предложил службу, и живёт дальше: наняли —
+        меняется состояние, отказали — тоже. Одного лидера один игрок может нанимать
+        несколько раз за партию (в MOO II отказанный приходит снова), поэтому пары
+        «игрок и лидер» уникальными не объявляем.
+    -->
+    <changeSet id="047-01-player-leader" author="moo3">
+        <createTable tableName="player_leader">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="player_id" type="UUID">
+                <constraints nullable="false"
+                             foreignKeyName="fk_player_leader_player"
+                             referencedTableName="player" referencedColumnNames="id"
+                             deleteCascade="true"/>
+            </column>
+            <!-- Код лидера в справочнике: ссылка в JSON, а не копия его характеристик. -->
+            <column name="leader_code" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <!-- Род лидера дублируется из справочника: по нему считаются занятые места,
+                 и выборка «сколько корабельных нанято» не должна читать файл. -->
+            <column name="kind" type="VARCHAR(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="state" type="VARCHAR(16)">
+                <constraints nullable="false"/>
+            </column>
+            <!-- Опыт растёт на службе: очко за ход, как в оригинале. -->
+            <column name="experience" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <!-- Ход, когда лидер предложил службу: предложение живёт тридцать ходов. -->
+            <column name="offered_turn" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="hired_turn" type="INT"/>
+            <!-- Цена и жалованье считаются при появлении и дальше не пересчитываются:
+                 иначе нанятый лидер дорожал бы у игрока на руках. -->
+            <column name="hire_cost" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="salary" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <!-- Назначение: колониальный лидер служит в системе, корабельный — во флоте. -->
+            <column name="star_system_id" type="UUID">
+                <constraints foreignKeyName="fk_player_leader_system"
+                             referencedTableName="star_system" referencedColumnNames="id"
+                             deleteCascade="true"/>
+            </column>
+            <column name="fleet_id" type="UUID">
+                <constraints foreignKeyName="fk_player_leader_fleet"
+                             referencedTableName="fleet" referencedColumnNames="id"
+                             deleteCascade="true"/>
+            </column>
+            <!-- Ход, с которого назначение начинает действовать: до места лидер добирается
+                 пять ходов, а в систему офицерского резерва попадает сразу. -->
+            <column name="arrives_turn" type="INT"/>
+        </createTable>
+
+        <!-- Выборка «лидеры игрока» идёт каждый ход и на каждом экране лидеров. -->
+        <createIndex tableName="player_leader" indexName="idx_player_leader_player">
+            <column name="player_id"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

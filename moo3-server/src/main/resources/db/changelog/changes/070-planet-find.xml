@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+      Находка на планете — п. 4.1: золотые жилы, самоцветы, туземцы, артефакты.
+
+      Поле у самой планеты, а не своя таблица: находка — такое же свойство планеты, как
+      климат и недра, и спрашивается там же, где они, — в каждом расчёте колонии. Пусто
+      значит «планета обыкновенная», и старые партии такими и остаются: находок в них не
+      было, а раздавать их задним числом значило бы менять уже сыгранную карту.
+
+      Вторая колонка — отметка о том, что находка отдала выдаваемое ОДИН раз (технологии
+      артефактов достаются первому, кто разведал систему).
+    -->
+    <changeSet id="070-planet-find" author="moo3">
+        <addColumn tableName="planet">
+            <column name="find_code" type="varchar(32)"/>
+            <column name="find_claimed" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

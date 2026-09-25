@@ -1,0 +1,115 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1286" height="1004" viewBox="0 0 1286 1004" font-family="'Segoe UI', 'Trebuchet MS', sans-serif">
+<rect width="100%%" height="100%%" fill="#f7f7f4"/>
+<defs>
+<marker id="open" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto"><path d="M0 0 L10 5 L0 10" fill="none" stroke="#33383d" stroke-width="1.4"/></marker>
+<marker id="solid" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#33383d"/></marker>
+<marker id="hollow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="10" markerHeight="10" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#f7f7f4" stroke="#33383d" stroke-width="1.2"/></marker>
+<marker id="dot" viewBox="0 0 8 8" refX="4" refY="4" markerWidth="7" markerHeight="7" orient="auto"><circle cx="4" cy="4" r="3" fill="#33383d"/></marker>
+<marker id="diamond" viewBox="0 0 12 8" refX="1" refY="4" markerWidth="11" markerHeight="9" orient="auto"><path d="M0 4 L6 1 L12 4 L6 7 z" fill="#33383d"/></marker>
+</defs>
+<text x="28" y="34" font-size="20" font-weight="600" fill="#20242a">1. Обзор</text>
+<text x="28" y="56" font-size="12.5" fill="#5a6068">Кто чем пользуется: игрок и разработчик баланса, клиент, три службы REST, сервер и то, на чём всё стоит.</text>
+<line x1="341.0" y1="140.7" x2="210.0" y2="187.3" stroke="#33383d" stroke-width="1.3" opacity="0.75" marker-start="url(#dot)" marker-end="url(#solid)"/>
+<line x1="397.4" y1="146.0" x2="363.6" y2="182.0" stroke="#33383d" stroke-width="1.3" opacity="0.75" marker-start="url(#dot)" marker-end="url(#solid)"/>
+<line x1="468.6" y1="146.0" x2="502.4" y2="182.0" stroke="#33383d" stroke-width="1.3" opacity="0.75" marker-start="url(#dot)" marker-end="url(#solid)"/>
+<line x1="525.0" y1="140.7" x2="656.0" y2="187.3" stroke="#33383d" stroke-width="1.3" opacity="0.75" marker-start="url(#dot)" marker-end="url(#solid)"/>
+<line x1="1076.0" y1="132.5" x2="840.0" y2="195.5" stroke="#33383d" stroke-width="1.3" opacity="0.75" marker-start="url(#dot)" marker-end="url(#solid)"/>
+<line x1="1168.0" y1="146.0" x2="1168.0" y2="182.0" stroke="#33383d" stroke-width="1.3" opacity="0.75" marker-start="url(#dot)" marker-end="url(#solid)"/>
+<line x1="326.1" y1="294.0" x2="210.0" y2="252.7" stroke="#33383d" stroke-width="1.3" opacity="0.75" marker-end="url(#open)"/>
+<line x1="397.4" y1="294.0" x2="363.6" y2="258.0" stroke="#33383d" stroke-width="1.3" opacity="0.75" marker-end="url(#open)"/>
+<line x1="468.6" y1="294.0" x2="502.4" y2="258.0" stroke="#33383d" stroke-width="1.3" opacity="0.75" marker-end="url(#open)"/>
+<line x1="539.9" y1="294.0" x2="656.0" y2="252.7" stroke="#33383d" stroke-width="1.3" opacity="0.75" marker-end="url(#open)"/>
+<line x1="210.0" y1="411.3" x2="326.1" y2="370.0" stroke="#33383d" stroke-width="1.3" opacity="0.75" marker-end="url(#open)"/>
+<line x1="363.6" y1="406.0" x2="397.4" y2="370.0" stroke="#33383d" stroke-width="1.3" opacity="0.75" marker-end="url(#open)"/>
+<line x1="502.4" y1="406.0" x2="468.6" y2="370.0" stroke="#33383d" stroke-width="1.3" opacity="0.75" marker-end="url(#open)"/>
+<line x1="256.8" y1="518.0" x2="189.2" y2="482.0" stroke="#33383d" stroke-width="1.3" opacity="0.75" stroke-dasharray="7 5" marker-end="url(#hollow)"/>
+<line x1="328.0" y1="518.0" x2="328.0" y2="482.0" stroke="#33383d" stroke-width="1.3" opacity="0.75" stroke-dasharray="7 5" marker-end="url(#hollow)"/>
+<line x1="399.2" y1="518.0" x2="466.8" y2="482.0" stroke="#33383d" stroke-width="1.3" opacity="0.75" stroke-dasharray="7 5" marker-end="url(#hollow)"/>
+<line x1="470.5" y1="518.0" x2="656.0" y2="468.5" stroke="#33383d" stroke-width="1.3" opacity="0.75" marker-start="url(#diamond)"/>
+<line x1="363.6" y1="594.0" x2="502.4" y2="742.0" stroke="#33383d" stroke-width="1.3" opacity="0.75" stroke-dasharray="2 4" marker-end="url(#open)"/>
+<line x1="399.2" y1="594.0" x2="676.8" y2="742.0" stroke="#33383d" stroke-width="1.3" opacity="0.75" stroke-dasharray="2 4" marker-end="url(#open)"/>
+<line x1="866.0" y1="332.0" x2="840.0" y2="332.0" stroke="#33383d" stroke-width="1.3" opacity="0.75" marker-start="url(#dot)" marker-end="url(#solid)"/>
+<line x1="189.2" y1="630.0" x2="256.8" y2="594.0" stroke="#33383d" stroke-width="1.3" opacity="0.75" marker-start="url(#dot)" marker-end="url(#solid)"/>
+<line x1="328.0" y1="630.0" x2="328.0" y2="594.0" stroke="#33383d" stroke-width="1.3" opacity="0.75" marker-end="url(#open)"/>
+<line x1="538.0" y1="854.0" x2="538.0" y2="818.0" stroke="#33383d" stroke-width="1.3" opacity="0.75" stroke-dasharray="7 5" marker-end="url(#hollow)"/>
+<line x1="748.0" y1="854.0" x2="748.0" y2="818.0" stroke="#33383d" stroke-width="1.3" opacity="0.75" stroke-dasharray="7 5" marker-end="url(#hollow)"/>
+<line x1="630.0" y1="444.0" x2="866.0" y2="444.0" stroke="#33383d" stroke-width="1.3" opacity="0.75" marker-end="url(#open)"/>
+<line x1="993.6" y1="406.0" x2="1132.4" y2="258.0" stroke="#33383d" stroke-width="1.3" opacity="0.75" marker-end="url(#open)"/>
+<line x1="958.0" y1="482.0" x2="958.0" y2="518.0" stroke="#33383d" stroke-width="1.3" opacity="0.75" stroke-dasharray="2 4" marker-end="url(#open)"/>
+<rect x="343" y="72" width="180" height="72" rx="3" fill="#FFFFB5" stroke="#33383d" stroke-width="1.1"/>
+<g fill="none" stroke="#33383d" stroke-width="1.2"><circle cx="507" cy="81" r="3"/><path d="M507 84 v5 M503 86 h9 M507 89 l-4 4 M507 89 l4 4"/></g>
+<text x="433" y="112.2" font-size="12.5" fill="#20242a" text-anchor="middle">Игрок</text>
+<rect x="1078" y="72" width="180" height="72" rx="3" fill="#FFFFB5" stroke="#33383d" stroke-width="1.1"/>
+<g fill="none" stroke="#33383d" stroke-width="1.2"><circle cx="1242" cy="81" r="3"/><path d="M1242 84 v5 M1238 86 h9 M1242 89 l-4 4 M1242 89 l4 4"/></g>
+<text x="1168" y="112.2" font-size="12.5" fill="#20242a" text-anchor="middle">Разработчик баланса</text>
+<rect x="28" y="184" width="180" height="72" rx="3" fill="#FFFFB5" stroke="#33383d" stroke-width="1.1"/>
+<path d="M184 191 h9 l5 5 l-5 5 h-9 z" fill="none" stroke="#33383d" stroke-width="1.2"/>
+<text x="118" y="217.0" font-size="12.5" fill="#20242a" text-anchor="middle">Спроектировать</text>
+<text x="118" y="231.4" font-size="12.5" fill="#20242a" text-anchor="middle">корабль</text>
+<rect x="238" y="184" width="180" height="72" rx="3" fill="#FFFFB5" stroke="#33383d" stroke-width="1.1"/>
+<path d="M394 191 h9 l5 5 l-5 5 h-9 z" fill="none" stroke="#33383d" stroke-width="1.2"/>
+<text x="328" y="217.0" font-size="12.5" fill="#20242a" text-anchor="middle">Провести тактический</text>
+<text x="328" y="231.4" font-size="12.5" fill="#20242a" text-anchor="middle">бой</text>
+<rect x="448" y="184" width="180" height="72" rx="3" fill="#FFFFB5" stroke="#33383d" stroke-width="1.1"/>
+<path d="M604 191 h9 l5 5 l-5 5 h-9 z" fill="none" stroke="#33383d" stroke-width="1.2"/>
+<text x="538" y="217.0" font-size="12.5" fill="#20242a" text-anchor="middle">Посмотреть</text>
+<text x="538" y="231.4" font-size="12.5" fill="#20242a" text-anchor="middle">демонстрационный бой</text>
+<rect x="658" y="184" width="180" height="72" rx="3" fill="#FFFFB5" stroke="#33383d" stroke-width="1.1"/>
+<path d="M814 191 h9 l5 5 l-5 5 h-9 z" fill="none" stroke="#33383d" stroke-width="1.2"/>
+<text x="748" y="217.0" font-size="12.5" fill="#20242a" text-anchor="middle">Настроить стоимости</text>
+<text x="748" y="231.4" font-size="12.5" fill="#20242a" text-anchor="middle">особенностей рас</text>
+<rect x="1078" y="184" width="180" height="72" rx="3" fill="#FFFFB5" stroke="#33383d" stroke-width="1.1"/>
+<path d="M1234 191 h9 l5 5 l-5 5 h-9 z" fill="none" stroke="#33383d" stroke-width="1.2"/>
+<text x="1168" y="224.2" font-size="12.5" fill="#20242a" text-anchor="middle">Записать бой в GIF</text>
+<rect x="28" y="296" width="810" height="72" rx="3" fill="#B5FFFF" stroke="#33383d" stroke-width="1.1"/>
+<g fill="none" stroke="#33383d" stroke-width="1.2"><rect x="817" y="302" width="14" height="11"/><rect x="813" y="304" width="6" height="3" fill="#fff"/><rect x="813" y="309" width="6" height="3" fill="#fff"/></g>
+<text x="433" y="336.2" font-size="12.5" fill="#20242a" text-anchor="middle">moo3-client (React + Phaser)</text>
+<rect x="868" y="296" width="180" height="72" rx="3" fill="#C9E7B7" stroke="#33383d" stroke-width="1.1"/>
+<g fill="none" stroke="#33383d" stroke-width="1.2"><rect x="1024" y="305" width="13" height="9"/><path d="M1024 305 l4 -4 h13 v9 l-4 4"/></g>
+<text x="958" y="336.2" font-size="12.5" fill="#20242a" text-anchor="middle">Браузер</text>
+<rect x="28" y="408" width="180" height="72" rx="3" fill="#B5FFFF" stroke="#33383d" stroke-width="1.1"/>
+<rect x="184" y="415" width="17" height="10" rx="5" fill="none" stroke="#33383d" stroke-width="1.2"/>
+<text x="118" y="448.2" font-size="12.5" fill="#20242a" text-anchor="middle">API проектов кораблей</text>
+<rect x="238" y="408" width="180" height="72" rx="3" fill="#B5FFFF" stroke="#33383d" stroke-width="1.1"/>
+<rect x="394" y="415" width="17" height="10" rx="5" fill="none" stroke="#33383d" stroke-width="1.2"/>
+<text x="328" y="448.2" font-size="12.5" fill="#20242a" text-anchor="middle">API тактического боя</text>
+<rect x="448" y="408" width="180" height="72" rx="3" fill="#B5FFFF" stroke="#33383d" stroke-width="1.1"/>
+<rect x="604" y="415" width="17" height="10" rx="5" fill="none" stroke="#33383d" stroke-width="1.2"/>
+<text x="538" y="441.0" font-size="12.5" fill="#20242a" text-anchor="middle">API справочников и</text>
+<text x="538" y="455.4" font-size="12.5" fill="#20242a" text-anchor="middle">демонстрации</text>
+<rect x="658" y="408" width="180" height="72" rx="3" fill="#B5FFFF" stroke="#33383d" stroke-width="1.1"/>
+<g fill="none" stroke="#33383d" stroke-width="1.2"><rect x="817" y="414" width="14" height="11"/><rect x="813" y="416" width="6" height="3" fill="#fff"/><rect x="813" y="421" width="6" height="3" fill="#fff"/></g>
+<text x="748" y="448.2" font-size="12.5" fill="#20242a" text-anchor="middle">GlobalExceptionHandler</text>
+<rect x="868" y="408" width="180" height="72" rx="3" fill="#B5FFFF" stroke="#33383d" stroke-width="1.1"/>
+<g fill="none" stroke="#33383d" stroke-width="1.2"><rect x="1027" y="414" width="14" height="11"/><rect x="1023" y="416" width="6" height="3" fill="#fff"/><rect x="1023" y="421" width="6" height="3" fill="#fff"/></g>
+<text x="958" y="448.1" font-size="12.4" fill="#20242a" text-anchor="middle">tools/demo_battle_gif.py</text>
+<rect x="28" y="520" width="600" height="72" rx="3" fill="#B5FFFF" stroke="#33383d" stroke-width="1.1"/>
+<g fill="none" stroke="#33383d" stroke-width="1.2"><rect x="607" y="526" width="14" height="11"/><rect x="603" y="528" width="6" height="3" fill="#fff"/><rect x="603" y="533" width="6" height="3" fill="#fff"/></g>
+<text x="328" y="560.2" font-size="12.5" fill="#20242a" text-anchor="middle">moo3-server (Spring Boot)</text>
+<rect x="868" y="520" width="180" height="72" rx="3" fill="#C9E7B7" stroke="#33383d" stroke-width="1.1"/>
+<g fill="none" stroke="#33383d" stroke-width="1.2"><path d="M1024 527 h9 l5 5 v8 h-14 z"/><path d="M1033 532 h5 v-5"/></g>
+<text x="958" y="560.2" font-size="12.5" fill="#20242a" text-anchor="middle">demo-battle.gif</text>
+<rect x="28" y="632" width="180" height="72" rx="3" fill="#C9E7B7" stroke="#33383d" stroke-width="1.1"/>
+<g fill="none" stroke="#33383d" stroke-width="1.2"><rect x="184" y="641" width="13" height="9"/><path d="M184 641 l4 -4 h13 v9 l-4 4"/></g>
+<text x="118" y="665.0" font-size="12.5" fill="#20242a" text-anchor="middle">Spring Boot 3.4 /</text>
+<text x="118" y="679.4" font-size="12.5" fill="#20242a" text-anchor="middle">Java 23</text>
+<rect x="238" y="632" width="180" height="72" rx="3" fill="#C9E7B7" stroke="#33383d" stroke-width="1.1"/>
+<g fill="none" stroke="#33383d" stroke-width="1.2"><path d="M396 650 h13 a5 5 0 0 0 0 -10 h-13 a5 5 0 0 1 0 10 z"/></g>
+<text x="328" y="665.0" font-size="12.5" fill="#20242a" text-anchor="middle">PostgreSQL 15 (порт</text>
+<text x="328" y="679.4" font-size="12.5" fill="#20242a" text-anchor="middle">5433)</text>
+<rect x="448" y="744" width="180" height="72" rx="3" fill="#B5FFFF" stroke="#33383d" stroke-width="1.1"/>
+<g fill="none" stroke="#33383d" stroke-width="1.2"><rect x="604" y="751" width="17" height="11"/><path d="M604 755 h17"/></g>
+<text x="538" y="777.0" font-size="12.5" fill="#20242a" text-anchor="middle">Каталог корпусов и</text>
+<text x="538" y="791.4" font-size="12.5" fill="#20242a" text-anchor="middle">компонентов</text>
+<rect x="658" y="744" width="180" height="72" rx="3" fill="#B5FFFF" stroke="#33383d" stroke-width="1.1"/>
+<g fill="none" stroke="#33383d" stroke-width="1.2"><rect x="814" y="751" width="17" height="11"/><path d="M814 755 h17"/></g>
+<text x="748" y="777.0" font-size="12.5" fill="#20242a" text-anchor="middle">Стоимости</text>
+<text x="748" y="791.4" font-size="12.5" fill="#20242a" text-anchor="middle">особенностей рас</text>
+<rect x="448" y="856" width="180" height="72" rx="3" fill="#C9E7B7" stroke="#33383d" stroke-width="1.1"/>
+<g fill="none" stroke="#33383d" stroke-width="1.2"><path d="M604 863 h9 l5 5 v8 h-14 z"/><path d="M613 868 h5 v-5"/></g>
+<text x="538" y="894.8" font-size="8.3" fill="#20242a" text-anchor="middle">resources/Ships/ship-components.json</text>
+<rect x="658" y="856" width="180" height="72" rx="3" fill="#C9E7B7" stroke="#33383d" stroke-width="1.1"/>
+<g fill="none" stroke="#33383d" stroke-width="1.2"><path d="M814 863 h9 l5 5 v8 h-14 z"/><path d="M823 868 h5 v-5"/></g>
+<text x="748" y="895.1" font-size="9.3" fill="#20242a" text-anchor="middle">resources/Races/race-traits.json</text>
+<g font-size="11.5" fill="#5a6068"><line x1="28" y1="964" x2="62" y2="964" stroke="#33383d" stroke-width="1.3" marker-end="url(#open)"/><text x="68" y="968">обслуживает</text><line x1="154" y1="964" x2="188" y2="964" stroke="#33383d" stroke-width="1.3" marker-start="url(#dot)" marker-end="url(#solid)"/><text x="194" y="968">назначен</text><line x1="260" y1="964" x2="294" y2="964" stroke="#33383d" stroke-width="1.3" stroke-dasharray="7 5" marker-end="url(#hollow)"/><text x="300" y="968">реализует</text><line x1="373" y1="964" x2="407" y2="964" stroke="#33383d" stroke-width="1.3" stroke-dasharray="2 4" marker-end="url(#open)"/><text x="413" y="968">обращается к данным</text><line x1="552" y1="964" x2="586" y2="964" stroke="#33383d" stroke-width="1.3" marker-start="url(#diamond)"/><text x="592" y="968">состоит из</text></g>
+</svg>

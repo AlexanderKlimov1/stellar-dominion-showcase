@@ -1,0 +1,17 @@
+# сборки
+target/
+dist/
+node_modules/
+*.class
+__pycache__/
+*.pyc
+
+# то, что не публикуется никогда
+showcase-key.txt
+admin.txt
+admin-dev.txt
+mail-outbox/
+mail-outbox-dev/
+*.log
+.tmp*
+.env
