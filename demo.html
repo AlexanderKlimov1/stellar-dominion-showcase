@@ -310,6 +310,25 @@
     font-size: 13px;
   }
 
+  /* Счётчик просмотров: пока не ответил сервис счёта — скрыт, а не пуст. */
+  .views { margin-top: 18px; display: none; }
+  .views.ready { display: block; }
+  .views-nums { display: flex; flex-wrap: wrap; gap: 6px 22px; font-family: var(--mono); font-size: 12px; }
+  .views-nums b { color: var(--ink-soft); font-weight: 500; }
+  .views-days {
+    display: flex; align-items: flex-end; gap: 3px;
+    height: 44px; max-width: 360px; margin-top: 10px;
+  }
+  .views-days span {
+    flex: 1; min-height: 2px; background: var(--accent-dim); border-radius: 1px;
+  }
+  .views-days span.today { background: var(--accent); }
+  .views-days span.gap { background: var(--edge); }
+  .views-axis {
+    display: flex; justify-content: space-between; max-width: 360px;
+    font-family: var(--mono); font-size: 11px; margin-top: 4px;
+  }
+
   @media (min-width: 1000px) {
     .shell { grid-template-columns: 220px 1fr; column-gap: 48px; }
     .toc {
@@ -1385,6 +1404,93 @@
     <footer>
       Stellar Dominion · перенос Master of Orion II на Spring Boot и React + Phaser.
       Снимки сделаны с работающей сборки 25.09.2026.
+      <div class="views" id="views" aria-live="polite">
+        <div class="views-nums">
+          <span>просмотров <b id="views-total">—</b></span>
+          <span>уникальных <b id="views-uniq">—</b></span>
+          <span>сегодня <b id="views-today">—</b></span>
+        </div>
+        <div class="views-days" id="views-days" role="img"></div>
+        <div class="views-axis"><span id="views-from"></span><span>просмотры по дням, МСК</span><span>сегодня</span></div>
+      </div>
     </footer>
   </main>
 </div>
+<script>
+/*
+  Счётчик просмотров. Страница статическая (GitHub Pages), поэтому числа хранит внешний
+  сервис Abacus — без регистрации и ключей, по одному счётчику на имя:
+    views     — все открытия страницы;
+    uniq      — первые открытия в браузере (отметка в localStorage, так что очистка
+                данных сайта или другой браузер — это новый уникальный);
+    d-ГГГГММДД — открытия за сутки по Москве.
+  Считаются только открытия с github.io: копия demo.html, открытая с диска, числа
+  показывает, но не накручивает. Сервис ограничивает 30 запросов за 10 секунд с адреса —
+  на загрузку уходит 16, и сбой любого из них просто оставляет прочерк.
+*/
+(function () {
+  var API = 'https://abacus.jasoncameron.dev';
+  var NS = 'stellar-dominion-showcase';
+  var DAYS = 14;
+  var counting = /\.github\.io$/.test(location.hostname);
+
+  function call(op, key) {
+    return fetch(API + '/' + op + '/' + NS + '/' + key)
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (j) { return j && typeof j.value === 'number' && j.value >= 0 ? j.value : null; })
+      .catch(function () { return null; });
+  }
+
+  // Сутки берутся по Москве у всех посетителей, иначе один день разъезжался бы по поясам.
+  var dayFmt = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Moscow' });
+  function dayKey(offset) {
+    return dayFmt.format(new Date(Date.now() - offset * 864e5)).replace(/-/g, '');
+  }
+
+  var firstVisit = false;
+  if (counting) {
+    try {
+      firstVisit = !localStorage.getItem('sd-showcase-seen');
+      if (firstVisit) localStorage.setItem('sd-showcase-seen', '1');
+    } catch (e) { /* хранилище закрыто — не считаем уникальным, чтобы не накручивать */ }
+  }
+
+  var days = [];
+  for (var i = DAYS - 1; i >= 0; i--) days.push(dayKey(i));
+
+  Promise.all([
+    call(counting ? 'hit' : 'get', 'views'),
+    call(firstVisit ? 'hit' : 'get', 'uniq'),
+    Promise.all(days.map(function (d, i) {
+      return call(counting && i === DAYS - 1 ? 'hit' : 'get', 'd-' + d);
+    }))
+  ]).then(function (res) {
+    var total = res[0], uniq = res[1], perDay = res[2];
+    if (total === null && uniq === null) return;   // сервис недоступен — блока нет вовсе
+
+    var fmt = function (n) { return n === null ? '—' : n.toLocaleString('ru-RU'); };
+    document.getElementById('views-total').textContent = fmt(total);
+    document.getElementById('views-uniq').textContent = fmt(uniq);
+    document.getElementById('views-today').textContent = fmt(perDay[DAYS - 1] === null ? 0 : perDay[DAYS - 1]);
+
+    // Несуществующий счётчик дня Abacus отдаёт как 404 — это день без просмотров, а не сбой.
+    var max = Math.max.apply(null, perDay.map(function (v) { return v || 0; })) || 1;
+    var bars = document.getElementById('views-days');
+    var label = [];
+    days.forEach(function (d, i) {
+      var v = perDay[i] || 0;
+      var dm = d.slice(6, 8) + '.' + d.slice(4, 6);
+      var bar = document.createElement('span');
+      bar.style.height = Math.max(4, Math.round(v / max * 100)) + '%';
+      if (!v) bar.className = 'gap';
+      if (i === DAYS - 1) bar.className = 'today';
+      bar.title = dm + ': ' + v;
+      bars.appendChild(bar);
+      label.push(dm + ' — ' + v);
+    });
+    bars.setAttribute('aria-label', 'Просмотры по дням: ' + label.join(', '));
+    document.getElementById('views-from').textContent = days[0].slice(6, 8) + '.' + days[0].slice(4, 6);
+    document.getElementById('views').className = 'views ready';
+  });
+})();
+</script>
