@@ -1397,10 +1397,11 @@
                 данных сайта или другой браузер — это новый уникальный);
     d-ГГГГММДД — открытия за сутки по Москве.
   Считаются только открытия с github.io: копия demo.html, открытая с диска, числа
-  читает, но не накручивает. На странице счётчика не видно: итог дописывается
-  комментарием в самый конец документа — смотреть в инструментах разработчика (F12,
-  вкладка Elements, последняя строка перед </body>). В «Просмотре кода» (Ctrl+U) его нет:
-  там исходник файла, а числа приходят уже после загрузки. Сервис ограничивает
+  читает, но не накручивает. На странице счётчика не видно: его показывает клавиша V
+  на 10 секунд, а итог ещё дописывается комментарием в самый конец документа —
+  смотреть в инструментах разработчика (F12, вкладка Elements, последняя строка перед
+  </body>). В «Просмотре кода» (Ctrl+U) его нет: там исходник файла, а числа приходят
+  уже после загрузки. Сервис ограничивает
   30 запросов за 10 секунд с адреса — на загрузку уходит 16, и сбой любого из них
   оставляет прочерк.
 */
@@ -1455,6 +1456,59 @@
       '    сегодня     ' + (perDay[DAYS - 1] || 0),
       '    по дням, МСК:'
     ].concat(byDay).join('\n') + '\n'));
+    stats = { total: total, uniq: uniq, perDay: perDay };
+    if (panel) fill();
+  });
+
+  // Клавиша V (на русской раскладке — М: проверяется физическая клавиша) показывает
+  // числа на 10 секунд; повторное нажатие продлевает, Esc или щелчок прячут сразу.
+  var stats = null, panel = null, timer = 0;
+
+  function fill() {
+    if (!stats) { panel.textContent = 'просмотры: загружаются…'; return; }
+    var p = stats.perDay, max = Math.max.apply(null, p.map(function (v) { return v || 0; })) || 1;
+    var dm = function (d) { return d.slice(6, 8) + '.' + d.slice(4, 6); };
+    var bars = days.map(function (d, i) {
+      var v = p[i] || 0;
+      return '<span title="' + dm(d) + ': ' + v + '" style="flex:1;min-height:2px;border-radius:1px;height:' +
+        Math.max(4, Math.round(v / max * 100)) + '%;background:var(' +
+        (i === DAYS - 1 ? '--accent' : v ? '--accent-dim' : '--edge') + ')"></span>';
+    }).join('');
+    var n = function (v) { return '<b style="color:var(--ink-bright);font-weight:500">' + (v === null ? '—' : v.toLocaleString('ru-RU')) + '</b>'; };
+    panel.innerHTML =
+      '<div style="display:flex;gap:18px">' +
+        '<span>всего ' + n(stats.total) + '</span><span>уникальных ' + n(stats.uniq) + '</span>' +
+        '<span>сегодня ' + n(p[DAYS - 1] || 0) + '</span></div>' +
+      '<div style="display:flex;align-items:flex-end;gap:3px;height:44px;margin-top:10px">' + bars + '</div>' +
+      '<div style="display:flex;justify-content:space-between;margin-top:4px;color:var(--ink-faint)">' +
+        '<span>' + dm(days[0]) + '</span><span>по дням, МСК</span><span>сегодня</span></div>';
+  }
+
+  function hide() { clearTimeout(timer); if (panel) panel.style.display = 'none'; }
+
+  function show() {
+    if (!panel) {
+      panel = document.createElement('div');
+      panel.setAttribute('role', 'status');
+      panel.style.cssText = 'position:fixed;right:16px;bottom:16px;z-index:1000;width:300px;' +
+        'max-width:calc(100vw - 32px);box-sizing:border-box;padding:12px 14px;' +
+        'background:var(--panel);border:1px solid var(--edge);border-radius:8px;' +
+        'box-shadow:0 8px 30px rgba(0,0,0,.5);color:var(--ink-soft);font:12px/1.5 var(--mono);cursor:pointer';
+      panel.addEventListener('click', hide);
+      document.body.appendChild(panel);
+    }
+    fill();
+    panel.style.display = 'block';
+    clearTimeout(timer);
+    timer = setTimeout(hide, 10000);
+  }
+
+  document.addEventListener('keydown', function (e) {
+    if (e.code === 'Escape') return hide();
+    if (e.code !== 'KeyV' || e.ctrlKey || e.metaKey || e.altKey || e.repeat) return;
+    var t = e.target;
+    if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
+    show();
   });
 })();
 </script>
