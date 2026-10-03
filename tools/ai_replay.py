@@ -43,7 +43,7 @@ for arg in sys.argv[1:]:
         TRAITS = [one.strip() for one in arg.split('=', 1)[1].split(',') if one.strip()]
 
 # Пароль один на оба режима сервера: учётные записи живут в постоянном источнике данных.
-ADMIN_FILES = (r'C:\Works\moo3\admin.txt',)
+ADMIN_FILES = (r'C:\stellar-dominion\admin.txt',)
 
 
 def call(method, path, body=None, token=None):
@@ -58,8 +58,8 @@ def call(method, path, body=None, token=None):
 
 
 def sql(query):
-    env = dict(os.environ, PGPASSWORD='moo3', PGCLIENTENCODING='UTF8')
-    done = subprocess.run([PSQL, '-h', 'localhost', '-p', '5433', '-U', 'moo3', '-d', 'moo3',
+    env = dict(os.environ, PGPASSWORD='sddnw', PGCLIENTENCODING='UTF8')
+    done = subprocess.run([PSQL, '-h', 'localhost', '-p', '5433', '-U', 'sddnw', '-d', 'sddnw',
                            '-t', '-A', '-F', '|', '-c', query],
                           capture_output=True, text=True, encoding='utf-8', env=env)
     if done.returncode != 0:

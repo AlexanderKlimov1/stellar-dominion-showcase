@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+      Голос игрока в Высшем совете (п. 3). Совет, у которого есть избиратели-люди, не
+      считается в тот же ход, а остаётся ОТКРЫТЫМ до конца следующего: человек голосует сам,
+      а не правилом доверия. `game.council_open` — совет ждёт голосов, `council_vote.asked` —
+      этого избирателя спрашивают, `council_vote.pending` — он ещё не ответил.
+    -->
+    <changeSet id="075-council-ballot" author="sddnw">
+        <addColumn tableName="game">
+            <column name="council_open" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <addColumn tableName="council_vote">
+            <column name="asked" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pending" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

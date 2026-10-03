@@ -33,7 +33,7 @@ import shot_cdp
 sys.stdout.reconfigure(encoding='utf-8', errors='replace')
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-PUBLIC = os.path.join(ROOT, 'moo3-client', 'public')
+PUBLIC = os.path.join(ROOT, 'sddnw-client', 'public')
 OUT = os.path.join(ROOT, 'docs', 'shots')
 PROFILE = os.path.join(ROOT, '.tmp-shot-profile')
 CHROME = r'C:\Program Files\Google\Chrome\Application\chrome.exe'
@@ -63,7 +63,7 @@ def admin():
     return call('/api/auth/login', {'login': login, 'password': password})
 
 
-#: Страница-затравка. Живёт здесь, а не в `moo3-client/public`, потому что оттуда она
+#: Страница-затравка. Живёт здесь, а не в `sddnw-client/public`, потому что оттуда она
 #: попала бы в сборку клиента и уехала бы наружу вместе с игрой: пишется на время съёмки
 #: и стирается после.
 SEED_PAGE = r"""<!doctype html>
@@ -76,20 +76,20 @@ SEED_PAGE = r"""<!doctype html>
   const what = new URLSearchParams(location.search).get('what') || 'clean';
   const say = document.getElementById('say');
   try {
-    for (const key of ['moo3.account', 'moo3.session.active', 'moo3.session.view',
-                       'moo3.session.menu']) {
+    for (const key of ['sddnw.account', 'sddnw.session.active', 'sddnw.session.view',
+                       'sddnw.session.menu']) {
       localStorage.removeItem(key);
     }
-    localStorage.setItem('moo3.locale', 'ru');
+    localStorage.setItem('sddnw.locale', 'ru');
     if (what !== 'clean') {
       const seed = await (await fetch('/shot-seed.json', { cache: 'no-store' })).json();
-      localStorage.setItem('moo3.account', JSON.stringify(seed.account));
+      localStorage.setItem('sddnw.account', JSON.stringify(seed.account));
       if (what === 'milkyway') {
-        localStorage.setItem('moo3.session.menu', 'milkyway');
+        localStorage.setItem('sddnw.session.menu', 'milkyway');
       } else {
-        localStorage.setItem('moo3.session.active', JSON.stringify(seed.active));
+        localStorage.setItem('sddnw.session.active', JSON.stringify(seed.active));
         const view = { ...seed.view, overlay: what === 'research' ? 'research' : 'none' };
-        localStorage.setItem('moo3.session.view', JSON.stringify(view));
+        localStorage.setItem('sddnw.session.view', JSON.stringify(view));
       }
     }
     say.textContent = 'готово: ' + what;

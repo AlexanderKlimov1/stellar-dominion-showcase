@@ -5,15 +5,15 @@
 
 | Файл | Без него нельзя |
 |---|---|
-| `moo3-server/pom.xml` | без него не собрать сервер: Maven не знает ни зависимостей, ни сборки jar |
-| `moo3-server/src/main/resources/application.yml` | без него сервер не поднимется: нет ни базы, ни путей к справочникам |
-| `moo3-server/src/main/resources/application-balance.yml` | то же для режима балансовых прогонов |
-| `moo3-server/src/main/resources/db/changelog/db.changelog-master.xml` | без него Liquibase не построит схему базы |
-| `moo3-client/package.json` | без него клиент не собрать: нет ни зависимостей, ни команд |
-| `moo3-client/vite.config.ts` | без него нет сборки и dev-сервера |
-| `moo3-client/tsconfig.json` | без него не проходит проверка типов |
-| `moo3-client/tailwind.config.js` | без него нет ролей цвета и шкалы размеров |
-| `moo3-client/postcss.config.js` | без него не собирается стиль |
+| `sddnw-server/pom.xml` | без него не собрать сервер: Maven не знает ни зависимостей, ни сборки jar |
+| `sddnw-server/src/main/resources/application.yml` | без него сервер не поднимется: нет ни базы, ни путей к справочникам |
+| `sddnw-server/src/main/resources/application-balance.yml` | то же для режима балансовых прогонов |
+| `sddnw-server/src/main/resources/db/changelog/db.changelog-master.xml` | без него Liquibase не построит схему базы |
+| `sddnw-client/package.json` | без него клиент не собрать: нет ни зависимостей, ни команд |
+| `sddnw-client/vite.config.ts` | без него нет сборки и dev-сервера |
+| `sddnw-client/tsconfig.json` | без него не проходит проверка типов |
+| `sddnw-client/tailwind.config.js` | без него нет ролей цвета и шкалы размеров |
+| `sddnw-client/postcss.config.js` | без него не собирается стиль |
 
 Шифр: AES-256-CBC, ключ выведен PBKDF2 (300 000 итераций), соль своя у каждого файла.
 

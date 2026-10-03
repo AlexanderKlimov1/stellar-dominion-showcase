@@ -1325,6 +1325,25 @@
       ],
       "sort_order": 97
     },
+    {
+      "code": "extended-fuel-tanks",
+      "name": { "en": "Extended Fuel Tanks", "ru": "Дополнительные баки" },
+      "description": {
+        "en": "Extended fuel tanks: this ship flies half again as far from the nearest own colony — s. 8.",
+        "ru": "Дополнительные баки: этот корабль уходит от своих колоний в полтора раза дальше — п. 8."
+      },
+      "slot": "SPECIAL",
+      "space": 2,
+      "cost": 10,
+      "required_tech": "extended-fuel-tanks",
+      "effects": [
+        {
+          "type": "FUEL_RANGE_PERCENT",
+          "amount": 50
+        }
+      ],
+      "sort_order": 98
+    },
 
     {
       "code": "monster-claws",

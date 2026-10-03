@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+      Ракеты летят по полю боя (backlog-promo, пункт 30): залп, не долетевший в круг пуска,
+      хранится в самом бою и долетает на смене круга. Номер залпа нужен сцене, чтобы узнавать
+      ракету от хода к ходу.
+    -->
+    <changeSet id="089-battle-missiles" author="sddnw">
+        <addColumn tableName="space_battle">
+            <column name="missiles" type="text"/>
+            <column name="missile_counter" type="integer" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

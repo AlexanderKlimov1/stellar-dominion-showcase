@@ -49,7 +49,7 @@ SIZE = sys.argv[4] if len(sys.argv) > 4 else 'HUGE'
 
 # Пароль администратора один на оба режима: учётные записи живут в постоянном источнике
 # данных, а не в памятной базе партий (см. run-balance.cmd).
-ADMIN_FILES = (r'C:\Works\moo3\admin.txt',)
+ADMIN_FILES = (r'C:\stellar-dominion\admin.txt',)
 
 report = []
 

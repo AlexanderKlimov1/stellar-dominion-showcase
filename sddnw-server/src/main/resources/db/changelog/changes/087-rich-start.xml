@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+      Богатый старт (backlog-promo, пункт 15): империи гостевой партии начинают с двигателем и
+      химией и с кораблями у родной звезды — двумя разведчиками и колониальным кораблём.
+      Прочие партии — как прежде, с пустой головой и без флота.
+    -->
+    <changeSet id="087-rich-start" author="sddnw">
+        <addColumn tableName="game">
+            <column name="rich_start" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

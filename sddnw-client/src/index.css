@@ -1,0 +1,328 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /*
+    Тема текста: шесть ступеней яркости и три состояния. Числа — sRGB через пробел, как
+    требует `rgb(var(--x) / <alpha-value>)` в `tailwind.config.js`: так у ролей работают
+    модификаторы прозрачности.
+
+    Контраст на основном фоне (#05070f) измерен и подписан у каждой ступени. Всё, кроме
+    `off`, проходит 4,5 : 1 даже на самой светлой панели (#121829); `off` — это
+    НЕДОСТУПНОЕ, а не текст, и к нему требование читаемости не относится вовсе.
+  */
+  :root {
+    --ink-bright: 238 244 255; /* 18,2 : 1 — заголовки и числа, на которые смотрят */
+    --ink: 204 216 234; /*        14,0 : 1 — основной текст */
+    --ink-soft: 163 180 204; /*    9,5 : 1 — второстепенный */
+    --ink-dim: 138 155 180; /*     7,1 : 1 — подписи полей и столбцов */
+    --ink-faint: 115 131 156; /*   5,2 : 1 — примечания, единицы, сноски */
+    --ink-off: 85 99 122; /*       3,3 : 1 — недоступное и выключенное */
+    --accent: 127 212 255;
+    --danger: 251 138 138;
+    --warn: 251 191 36;
+    --good: 74 222 128;
+
+    /*
+      Масштаб текста — п. 11.1. Всё в игре меряется в `rem`, поэтому одна эта величина
+      правит кегль, отступы и высоту панелей разом. Ставит её `applyTextScale` по выбору
+      игрока; 1 значит «как было».
+    */
+    --sddnw-text-scale: 1;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  /* Корень шкалы: 16 пикселей при стократном масштабе — отсюда растёт весь интерфейс. */
+  html {
+    font-size: calc(16px * var(--sddnw-text-scale));
+  }
+
+  body {
+    @apply bg-space-950 text-ink font-mono antialiased;
+    margin: 0;
+    overflow: hidden;
+  }
+}
+
+@layer components {
+  /* Меню, HUD и дерево технологий — текстовые ссылки (п. 11.1). */
+  .link {
+    @apply cursor-pointer text-ink underline decoration-dotted underline-offset-4
+           hover:text-accent disabled:cursor-not-allowed disabled:text-ink-off disabled:no-underline;
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    text-align: left;
+  }
+
+  .link-active {
+    @apply text-accent no-underline;
+  }
+
+  /*
+    ТИХАЯ ССЫЛКА — та же ссылка, но без подчёркивания (30.09.2026, решение хозяина
+    проекта).
+
+    Экран колонии и окно стройки состоят из таких кнопок почти целиком: стрелки очереди,
+    крестики, «строить», «купить», названия построек в списках. Пунктир под каждой
+    превращал сцену в решето — подчёркнутого текста там оказывалось больше, чем обычного,
+    и он переставал что-либо выделять. Цвет и наведение остались прежними: ссылка
+    остаётся ссылкой, просто не кричит.
+
+    Правила повторены, а не собраны из `.link`: `@apply` своего же классa из того же слоя
+    Tailwind понимает не всегда, а расходиться этим двум наборам негде — они рядом.
+  */
+  .link-quiet {
+    @apply cursor-pointer text-ink no-underline
+           hover:text-accent disabled:cursor-not-allowed disabled:text-ink-off;
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    text-align: left;
+  }
+
+  .panel {
+    @apply border border-space-600 bg-space-900/95 p-4 shadow-lg shadow-black/60;
+  }
+
+  /*
+    ПОДСВЕТКА ПОСТРОЙКИ ПОД УКАЗАТЕЛЕМ на поверхности колонии (30.09.2026, решение хозяина
+    проекта): светлее и с холодным ореолом по контуру рисунка. Фильтр висит на самой группе
+    рисунка, а не на подложке, поэтому светится форма здания, а не прямоугольник вокруг.
+  */
+  .cs-hit {
+    transition: filter 120ms ease-out;
+  }
+  .cs-hit:hover {
+    filter: brightness(1.35) drop-shadow(0 0 6px rgba(159, 230, 255, 0.95));
+  }
+
+  .panel-title {
+    @apply mb-3 text-12 uppercase tracking-[0.2em] text-ink-dim;
+  }
+
+  .field {
+    @apply w-full border border-space-600 bg-space-800 px-2 py-1 text-ink-bright
+           outline-none focus:border-accent;
+  }
+}
+
+/*
+  Гибель корабля в тактическом бою — п. 8: прямоугольник разлетается кусками и гаснет.
+  Куда лететь каждому куску, задаёт он сам переменными --fly-x, --fly-y и --spin, а сами
+  кадры общие — так браузер считает десяток обломков одной анимацией.
+*/
+@keyframes sddnw-debris {
+  from {
+    transform: translate(0, 0) rotate(0deg);
+    opacity: 1;
+  }
+  to {
+    transform: translate(var(--fly-x), var(--fly-y)) rotate(var(--spin));
+    opacity: 0;
+  }
+}
+
+/*
+  Выстрелы в тактическом бою — п. 8. Луч вспыхивает и гаснет на месте, снаряд летит от
+  ствола к цели (куда именно — говорит он сам переменными --fly-x и --fly-y), след ракеты
+  проявляется и гаснет вслед за ней. Сама ракета идёт по дуге средствами SVG.
+*/
+@keyframes sddnw-beam {
+  0% {
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/*
+  Жар в точке попадания луча (пункт 30): разгорается быстро, держится и остывает медленно —
+  дольше самого луча, как раскалённый металл.
+*/
+@keyframes sddnw-heat {
+  0% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  15% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  45% {
+    opacity: 0.85;
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+}
+
+@keyframes sddnw-projectile {
+  from {
+    transform: translate(0, 0);
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  to {
+    transform: translate(var(--fly-x), var(--fly-y));
+    opacity: 0;
+  }
+}
+
+/*
+  Попадание — вспышка в точке удара, когда выстрел долетел (п. 8). Без неё залп читался
+  «прилетело и пропало»: попал выстрел или нет, было видно лишь по яркости линии.
+*/
+@keyframes sddnw-impact {
+  /* Первый кадр невидим: вспышка ждёт своего мига задержкой (`both`) и до него не видна. */
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  12% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.5);
+  }
+}
+
+/* Гибель корабля: огненный шар раздувается и гаснет, ударная волна уходит шире. */
+@keyframes sddnw-fireball {
+  0% {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.3);
+  }
+}
+
+@keyframes sddnw-shockwave {
+  from {
+    opacity: 0.9;
+    transform: scale(0.2);
+  }
+  to {
+    opacity: 0;
+    transform: scale(2.2);
+  }
+}
+
+/*
+  Огонь двигателей дышит — поле боя с неподвижными картинками читалось стоп-кадром. Срок
+  у каждого корабля свой (задаёт рисунок), иначе весь строй мигал бы в такт.
+*/
+@keyframes sddnw-engine {
+  from {
+    opacity: 0.55;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Залп в полёте появляется, когда его донесла анимация пуска (backlog-promo, пункт 30). */
+@keyframes sddnw-missile-wait {
+  0%,
+  70% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes sddnw-missile-trail {
+  0% {
+    opacity: 0;
+  }
+  40% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/*
+  Излучение чёрной дыры в центре Галактики (демонстрационная сцена «Млечный Путь»).
+
+  Светится не сама дыра, а вещество вокруг неё, поэтому разгорается и гаснет кольцо, а
+  не чёрный кружок. Пузыри Ферми дышат вдвое медленнее кольца: это след давней вспышки,
+  а не сама вспышка, и быстрое мигание врало бы о том, что там происходит.
+*/
+@keyframes sddnw-accretion {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes sddnw-fermi {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 0.85;
+  }
+}
+
+/*
+  Лучи выброса и аккреционный диск («Млечный Путь»).
+
+  Дымка, луч и ядро дышат РАЗНЫМИ сроками: совпади они — свечение мигало бы разом, как
+  лампочка, а так один слой ещё разгорается, когда другой уже гаснет, и луч выглядит
+  живым. Вещество диска течёт разметкой: едет смещение пунктира, а не сам круг, — круг
+  посчитан проекцией и поворачиваться в плоскости экрана не должен.
+*/
+@keyframes sddnw-jet {
+  0%,
+  100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes sddnw-jet-haze {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 0.95;
+  }
+}
+
+@keyframes sddnw-accretion-flow {
+  to {
+    stroke-dashoffset: -104;
+  }
+}

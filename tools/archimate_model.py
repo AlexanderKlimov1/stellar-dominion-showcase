@@ -7,9 +7,9 @@
 вместе с ним. Модель описана здесь списками элементов и связей, а на выходе получаются
 два представления одного и того же:
 
-* ``moo3-architecture.archimate`` — модель для Archi (открывается File → Open), с
+* ``sddnw-architecture.archimate`` — модель для Archi (открывается File → Open), с
   четырьмя видами и документацией на каждом элементе;
-* ``moo3-architecture-*.svg`` — те же виды картинками, чтобы посмотреть без Archi.
+* ``sddnw-architecture-*.svg`` — те же виды картинками, чтобы посмотреть без Archi.
 
 Раскладка задаётся сеткой (столбец, строка): координаты в файле модели и в SVG берутся
 из одного места, поэтому вид в Archi и картинка совпадают.
@@ -70,7 +70,7 @@ ELEMENTS = [
     ("B7", "process", u"Записать бой в GIF",
      u"Съёмка показательного боя в файл: нужна, чтобы показывать игру там, где сервера нет."),
 
-    ("C0", "component", u"moo3-client (React + Phaser)",
+    ("C0", "component", u"sddnw-client (React + Phaser)",
      u"Клиент партии. Правила повторяет только для предпросмотра и подсветки — считает всё сервер."),
     ("C1", "component", u"ShipDesignScreen",
      u"Окно проекта: ячейки проектов, состав корпуса, список компонентов гнезда (ui/ship)."),
@@ -97,7 +97,7 @@ ELEMENTS = [
     ("API3", "appservice", u"API справочников и демонстрации",
      u"/api/reference: справочники игры, стоимости особенностей рас, демонстрационный бой."),
 
-    ("S0", "component", u"moo3-server (Spring Boot)",
+    ("S0", "component", u"sddnw-server (Spring Boot)",
      u"Сервер партии: все игровые правила здесь, клиент им только пользуется."),
     ("ERR", "component", u"GlobalExceptionHandler",
      u"Ошибки клиента не выглядят поломкой сервера: 400/404/405/415 вместо общего 500."),
@@ -145,9 +145,9 @@ ELEMENTS = [
     ("T1", "node", u"Браузер",
      u"Клиент отдаётся Vite в разработке и статикой в сборке."),
     ("T2", "node", u"Spring Boot 3.4 / Java 23",
-     u"Сервер на 8080, запускается из moo3-server: пути к справочникам относительные."),
+     u"Сервер на 8080, запускается из sddnw-server: пути к справочникам относительные."),
     ("T3", "software", u"PostgreSQL 15 (порт 5433)",
-     u"База moo3, схему накатывает Liquibase при старте."),
+     u"База sddnw, схему накатывает Liquibase при старте."),
     ("T4", "artifact", u"resources/Ships/ship-components.json",
      u"Корпуса и компоненты. Читается на лету — правится без миграций."),
     ("T5", "artifact", u"resources/Races/race-traits.json",
@@ -326,7 +326,7 @@ def write_archimate(path):
     lines = [u'<?xml version="1.0" encoding="UTF-8"?>',
              u'<archimate:model xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"'
              u' xmlns:archimate="http://www.archimatetool.com/archimate"'
-             u' name="moo3 — бой и дизайн кораблей" id="id-moo3" version="5.0.0">',
+             u' name="sddnw — бой и дизайн кораблей" id="id-sddnw" version="5.0.0">',
              u'  <purpose>%s</purpose>' % esc(
                  u"Подсистемы, выросшие вокруг корабля: проект корабля, тактический бой, "
                  u"показательный бой и правка стоимостей особенностей рас. "
@@ -577,13 +577,13 @@ def main():
     if not os.path.isdir(out_dir):
         os.makedirs(out_dir)
 
-    model = os.path.join(out_dir, "moo3-architecture.archimate")
+    model = os.path.join(out_dir, "sddnw-architecture.archimate")
     write_archimate(model)
     ElementTree.parse(model)  # разбор на месте: битый XML Archi просто не откроет
     print(u"модель: %s" % model)
 
     for view in VIEWS:
-        name = "moo3-architecture-%s.svg" % view["id"]
+        name = "sddnw-architecture-%s.svg" % view["id"]
         path = os.path.join(out_dir, name)
         write_svg(view, path)
         ElementTree.parse(path)

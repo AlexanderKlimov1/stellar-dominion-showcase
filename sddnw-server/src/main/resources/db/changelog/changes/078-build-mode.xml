@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+      Две кнопки оригинала под очередью стройки — `REPEAT BUILD` и `AUTO BUILD`
+      (`docs/moo2/README.md`, снимок окна стройки). Разметку окна мы перенесли, а эти две
+      потеряли, и вместе с ними — весь ответ MOO II на «построй мне пять фрегатов» и на
+      «у меня двадцать колоний, и я не хочу открывать каждую».
+
+      `repeat_build` — очередь идёт по кругу: взятое с неё дописывается в конец. Вернётся
+      при этом только ПОВТОРЯЕМОЕ (корабли, шпион, грузовики): здание строится на планете
+      один раз, и возвращённое в очередь оно упёрлось бы в уникальность
+      (planet_id, building_code) — те же грабли, на которых однажды встала вся партия ИИ.
+
+      `auto_build` — колония сама берёт следующее дело, когда очередь опустела, и берёт
+      его по ОКУПАЕМОСТИ (`AiEmpireService.paybackTurns`): то самое правило, по которому
+      выбирает ИИ, и второго свода правил для этого заводить незачем.
+
+      Оба признака живут в САМОЙ ПЛАНЕТЕ, как и очередь (`build_queue`), и по той же
+      причине: фаза производства спрашивает их у каждой колонии каждый ход, а своя таблица
+      дала бы выборку «на планету» изнутри посчитанного хода.
+    -->
+    <changeSet id="078-build-mode" author="sddnw">
+        <addColumn tableName="planet">
+            <column name="repeat_build" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="auto_build" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

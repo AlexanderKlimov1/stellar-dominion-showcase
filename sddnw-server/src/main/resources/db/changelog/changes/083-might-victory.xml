@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+      Итог по могуществу (п. 3, backlog-promo, пункт 2): партия, не кончившаяся ничем к
+      трёхсотому ходу, отдаёт победу сильнейшей империи по первой линии графика «Инфо».
+
+      Признак партии, а не правило сервера: его включает окно новой игры (по умолчанию —
+      включён), а партии, начатые раньше, доигрываются по тем правилам, с которыми их
+      начинали, — поэтому у старых строк здесь «нет».
+    -->
+    <changeSet id="083-might-victory" author="sddnw">
+        <addColumn tableName="game">
+            <column name="might_victory" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

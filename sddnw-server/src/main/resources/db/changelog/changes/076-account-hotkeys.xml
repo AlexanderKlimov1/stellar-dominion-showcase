@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+      Раскладка горячих клавиш живёт в учётной записи — п. 11.1, там же, где язык (п. 3.5)
+      и размер текста.
+
+      Причина та же и проверена дважды: настройка, лежащая только в localStorage, теряется
+      на второй машине, а переназначенные клавиши — это то, что игрок настраивает один раз
+      и помнит пальцами. Хранится ОДНОЙ колонкой в виде JSON «действие: клавиша»
+      ({"turn":"KeyT","colonies":"KeyC"}), а не таблицей на пару: строк у неё полдесятка,
+      меняются они все разом одним нажатием «сохранить», и выбирать из них по одной
+      незачем.
+
+      Колонка не обязательная: пусто значит «игрок клавиш не переназначал» — раскладка по
+      умолчанию, которая живёт на клиенте (ui/hotkeys.ts). Пустой она остаётся и у
+      администратора, которого заводит первый запуск сервера: никакого браузера там нет.
+    -->
+    <changeSet id="076-account-hotkeys" author="sddnw">
+        <addColumn tableName="account">
+            <column name="hotkeys" type="varchar(512)"/>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

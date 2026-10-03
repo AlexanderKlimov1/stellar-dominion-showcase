@@ -7,7 +7,7 @@
 входные параметры, результат и то, что прогон изменил на сервере. Строки «OK | такая-то
 проверка» в файл не идут — их пятьсот, и за ними терялось единственное, что нужно:
 провалы. Провалившиеся проверки печатаются полностью, с пояснением. Подробный ход
-проверок включается переменной MOO3_TRACE и идёт в stderr.
+проверок включается переменной SDDNW_TRACE и идёт в stderr.
 
 Проверка создаёт свои партии И СВОИ УЧЁТНЫЕ ЗАПИСИ и удаляет за собой и то, и другое,
 поэтому её можно гонять на той же базе, где идёт разработка. Записей она заводит
@@ -27,12 +27,12 @@ sys.stdout.reconfigure(encoding='utf-8', errors='replace')
 # Адрес сервера можно переопределить переменной окружения: когда на 8080 висит зависший
 # процесс (Windows не всегда даёт его снять), проверку гоняют против запасного экземпляра
 # на другом порту, не трогая скрипт.
-BASE = os.environ.get('MOO3_BASE', 'http://localhost:8080')
+BASE = os.environ.get('SDDNW_BASE', 'http://localhost:8080')
 #: Папка исходящих писем: у сервера разработки она своя (`mail-outbox-dev`), и без этого
 #: две проверки письма проваливались на КАЖДОМ прогоне против него — прогон искал письмо
 #: там, где его никто не кладёт. Провал, о котором известно заранее, хуже отсутствия
 #: проверки: он приучает не смотреть на список провалов.
-OUTBOX = os.environ.get('MOO3_OUTBOX',
+OUTBOX = os.environ.get('SDDNW_OUTBOX',
                         os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
                                      'mail-outbox'))
 run_started = time.time()
@@ -170,7 +170,7 @@ def register(body, expect_limit=False):
     if answer.get('ERROR') == 429 and not expect_limit and not REGISTRATIONS_SPENT:
         REGISTRATIONS_SPENT.append(answer.get('body', {}).get('message', 'отказ 429'))
         print('ВНИМАНИЕ: предел регистраций с этого адреса исчерпан '
-              '(moo3.auth.registrations-per-hour). Перезапустите сервер или подождите час, '
+              '(sddnw.auth.registrations-per-hour). Перезапустите сервер или подождите час, '
               'иначе проверки регистрации не выполняются.')
     return answer
 
@@ -209,6 +209,42 @@ def end_turn(game_id, *tokens):
     for token in tokens:
         result = call('POST', f'/api/games/{game_id}/turn/end', {'accessToken': token})
     return result
+
+
+_tree_cache = {}
+
+
+def study(game_id, token, refs, max_turns=60):
+    """
+    Изучить уровни дерева, как это сделал бы игрок, — п. 9: цель на уровень, конец хода, пока
+    уровень не изучен. Ссылки — «раздел:номер» (`power:1`), по порядку.
+
+    Стартовых технологий нет с 01.10.2026 (решение хозяина проекта): первые уровни тоже
+    исследуются. Проверке, которой нужен корабль, лазер или грузовик, приходится сперва их
+    изучить — так же, как игроку. Возвращает коды изученных технологий партии.
+    """
+    if 'tree' not in _tree_cache:
+        _tree_cache['tree'] = call('GET', '/api/reference/research')
+    tree_ = _tree_cache['tree']
+
+    def acquired():
+        rs = call('GET', f'/api/games/{game_id}/research?accessToken={token}')
+        return {(t['categoryCode'], t['levelOrder']) for t in rs.get('acquired', [])}, \
+            {t['optionCode'] for t in rs.get('acquired', [])}
+
+    for ref in refs:
+        code, order = ref.split(':')
+        order = int(order)
+        level = next(lv for cat in tree_['categories'] if cat['code'] == code
+                     for lv in cat['levels'] if lv['order'] == order)
+        for _ in range(max_turns):
+            if (code, order) in acquired()[0]:
+                break
+            call('POST', f'/api/games/{game_id}/research',
+                 {'accessToken': token, 'categoryCode': code, 'levelOrder': order,
+                  'optionCode': level['options'][0]['code']})
+            end_turn(game_id, token)
+    return acquired()[1]
 
 
 def ship_project(game_id, token, planet_id):
@@ -298,6 +334,18 @@ def build_civil(game_id, token, planet_id, project, role, *others, limit=40):
     return None
 
 
+def reachable_ids(ships):
+    """
+    Куда долетают корабли империи — п. 8.
+
+    Дальностей две: своя у кораблей БЕЗ дополнительных баков и своя у кораблей С баками
+    (баки — особый модуль, 29.09.2026). Прогон строит корабли не руками — их собирает сама
+    игра, а она ставит баки в каждый свой проект, как только они изучены, — поэтому берётся
+    дальний список. Баков нет — оба списка одинаковы, и правило вырождается само.
+    """
+    return ships.get('reachableFarSystemIds') or ships['reachableSystemIds']
+
+
 def research_fuel(game_id, token, *others, limit=140):
     """
     Изучает Deuterium Fuel Cells — п. 8: дальность империи растёт с 4 парсеков до 6, а с
@@ -335,56 +383,99 @@ def reach_towards(game_id, token, planet_id, target_id, *others, hops=6):
               for st in call_auth('GET', f'/api/games/{game_id}/map?revealAll=true', token)['systems']}
     tx, ty = coords[target_id]
 
-    if target_id in call_auth('GET', f'/api/games/{game_id}/ships', token)['reachableSystemIds']:
+    if target_id in reachable_ids(call_auth('GET', f'/api/games/{game_id}/ships', token)):
         return True
     research_fuel(game_id, token, *others)
 
     for _ in range(hops):
         ships = call_auth('GET', f'/api/games/{game_id}/ships', token)
-        if target_id in ships['reachableSystemIds']:
+        if target_id in reachable_ids(ships):
             return True
-
-        systems = call_auth('GET', f'/api/games/{game_id}/map?revealAll=true', token)['systems']
-        # СИСТЕМУ ПОД ЧУДИЩЕМ ОБХОДИМ. Застава туда не ставится (сервер честно отказывает —
-        # п. 11.1), да и корабль-застава гибнет, не долетев: сторож бьёт на подлёте. Игрок
-        # обошёл бы такую звезду, и цепочка застав обязана делать то же — иначе прогон
-        # встаёт на ровном месте. Особая звезда стоит в центре галактики и попадается на
-        # пути чаще прочих, а стережёт её Страж, сильнейшее чудище игры.
-        free = [st for st in systems
-                if st['id'] in ships['reachableSystemIds']
-                and st['planets']
-                and not st.get('monster')
-                and all(pl.get('ownerPlayerId') is None for pl in st['planets'])]
-        if not free:
-            return False
-        spot = min(free, key=lambda st: (st['x'] - tx) ** 2 + (st['y'] - ty) ** 2)
-
-        carrier = build_civil(game_id, token, planet_id, 'OUTPOST_SHIP', 'OUTPOST', *others)
-        if carrier is None:
+        if not plant_outpost_towards(game_id, token, planet_id, tx, ty, *others):
             return False
 
-        # Ведём именно тот флот, в котором стоит корабль-застава: флотов у империи бывает
-        # несколько, и «первый попавшийся» оказывался пустым как раз тогда, когда застава
-        # была в другом.
-        call('POST', f"/api/games/{game_id}/fleets/{carrier['id']}/move",
-             {'accessToken': token, 'targetSystemId': spot['id']})
-        landed = None
-        for _ in range(30):
-            end_turn(game_id, token, *others)
-            landed = next(
-                (f for f in call_auth('GET', f'/api/games/{game_id}/fleets', token)
-                 if f['starSystemId'] == spot['id'] and not f.get('targetSystemId')
-                 and any(sh['role'] == 'OUTPOST' and sh['ships'] > 0 for sh in f['composition'])),
-                None)
-            if landed:
-                break
-        if landed is None:
+    return target_id in reachable_ids(call_auth('GET', f'/api/games/{game_id}/ships', token))
+
+
+def meet_by_range(game_id, token, planet_id, target_id, other_ids, *others, hops=8):
+    """
+    Знакомит империю с хозяевами чужой звезды так, как это делается в MOO II, — п. 15.
+
+    Знакомство возникает только по дальности: одна из империй дотягивается БЕЗ баков до
+    системы, занятой другой (колонией или заставой). Прилёт флота не знакомит. Поэтому
+    помощник делает то же, что сделал бы игрок: изучает топливо и ставит заставы в сторону
+    соседа, пока знакомство не случится в конце хода. Возвращает True, если знакомы со
+    всеми из `other_ids`.
+    """
+    coords = {st['id']: (st['x'], st['y'])
+              for st in call_auth('GET', f'/api/games/{game_id}/map?revealAll=true', token)['systems']}
+    tx, ty = coords[target_id]
+    research_fuel(game_id, token, *others)
+    for _ in range(hops):
+        known = {r['playerId'] for r in call_auth('GET', f'/api/games/{game_id}/diplomacy', token)}
+        if set(other_ids) <= known:
+            return True
+        if not plant_outpost_towards(game_id, token, planet_id, tx, ty, *others):
             return False
+        # Знакомство считается в конце хода, по положению на его конец.
+        end_turn(game_id, token, *others)
+        now = {r['playerId'] for r in call_auth('GET', f'/api/games/{game_id}/diplomacy', token)}
+        if now - known:
+            report = call_auth('GET', f'/api/games/{game_id}/turn/report', token)
+            CONTACT_REPORTED.append(any(e['code'] == 'DIPLOMACY' for e in report.get('events', [])))
+    known = {r['playerId'] for r in call_auth('GET', f'/api/games/{game_id}/diplomacy', token)}
+    return set(other_ids) <= known
 
-        call('POST', f"/api/games/{game_id}/fleets/{landed['id']}/outpost",
-             {'accessToken': token, 'targetPlanetId': spot['planets'][0]['id']})
 
-    return target_id in call_auth('GET', f'/api/games/{game_id}/ships', token)['reachableSystemIds']
+#: Попало ли знакомство в итоги хода, на котором оно случилось, — по разу на знакомство,
+#: замеченное помощником meet_by_range сразу после конца хода.
+CONTACT_REPORTED = []
+
+
+def plant_outpost_towards(game_id, token, planet_id, tx, ty, *others):
+    """Ставит одну заставу в досягаемой свободной системе, ближайшей к точке (tx, ty)."""
+    ships = call_auth('GET', f'/api/games/{game_id}/ships', token)
+    systems = call_auth('GET', f'/api/games/{game_id}/map?revealAll=true', token)['systems']
+    # СИСТЕМУ ПОД ЧУДИЩЕМ ОБХОДИМ. Застава туда не ставится (сервер честно отказывает —
+    # п. 11.1), да и корабль-застава гибнет, не долетев: сторож бьёт на подлёте. Игрок
+    # обошёл бы такую звезду, и цепочка застав обязана делать то же — иначе прогон
+    # встаёт на ровном месте. Особая звезда стоит в центре галактики и попадается на
+    # пути чаще прочих, а стережёт её Страж, сильнейшее чудище игры.
+    free = [st for st in systems
+            if st['id'] in reachable_ids(ships)
+            and st['planets']
+            and not st.get('monster')
+            and all(pl.get('ownerPlayerId') is None for pl in st['planets'])]
+    if not free:
+        return False
+    spot = min(free, key=lambda st: (st['x'] - tx) ** 2 + (st['y'] - ty) ** 2)
+
+    carrier = build_civil(game_id, token, planet_id, 'OUTPOST_SHIP', 'OUTPOST', *others)
+    if carrier is None:
+        return False
+
+    # Ведём именно тот флот, в котором стоит корабль-застава: флотов у империи бывает
+    # несколько, и «первый попавшийся» оказывался пустым как раз тогда, когда застава
+    # была в другом.
+    call('POST', f"/api/games/{game_id}/fleets/{carrier['id']}/move",
+         {'accessToken': token, 'targetSystemId': spot['id']})
+    landed = None
+    for _ in range(30):
+        end_turn(game_id, token, *others)
+        landed = next(
+            (f for f in call_auth('GET', f'/api/games/{game_id}/fleets', token)
+             if f['starSystemId'] == spot['id'] and not f.get('targetSystemId')
+             and any(sh['role'] == 'OUTPOST' and sh['ships'] > 0 for sh in f['composition'])),
+            None)
+        if landed:
+            break
+    if landed is None:
+        return False
+
+    call('POST', f"/api/games/{game_id}/fleets/{landed['id']}/outpost",
+         {'accessToken': token, 'targetPlanetId': spot['planets'][0]['id']})
+
+    return True
 
 
 def fly_to(game_id, token, target_id, *others, limit=40):
@@ -438,9 +529,14 @@ def fly_to(game_id, token, target_id, *others, limit=40):
         # Ближайшая к цели из достижимых. Обычно это шаг вперёд, но если вперёд дороги нет
         # (разрыв шире дальности), годится и шаг вбок — лишь бы не туда, где уже были:
         # иначе флот принялся бы ходить между двумя звёздами.
-        hops = [x for x in ships['reachableSystemIds'] if x not in visited and x not in guarded]
+        # Список берётся по дальности ЭТОГО флота — п. 8: дополнительные баки стоят на
+        # кораблях, и флот с ними долетает дальше соседнего.
+        reach = (ships['reachableFarSystemIds']
+                 if fleet.get('rangeParsecs', 0) > ships['rangeParsecs']
+                 else ships['reachableSystemIds'])
+        hops = [x for x in reach if x not in visited and x not in guarded]
         forward = [x for x in hops if far(x) < far(fleet['starSystemId'])]
-        hop = target_id if target_id in ships['reachableSystemIds'] else (
+        hop = target_id if target_id in reach else (
             min(forward or hops, key=far) if hops else None)
         if hop is None:
             return None
@@ -473,12 +569,12 @@ def research_shipbuilding(game_id, token, *others, limit=40):
     return call_auth('GET', f'/api/games/{game_id}/research', token)['acquired']
 
 
-# След по проверкам: `MOO3_TRACE=1` печатает каждую пройденную проверку сразу, в stderr.
+# След по проверкам: `SDDNW_TRACE=1` печатает каждую пройденную проверку сразу, в stderr.
 # Заведено после того, как прогон завис НАСМЕРТЬ и узнать, на чём именно, было нечем:
 # отчёт пишется одним куском в самом конце, сервер при этом не обрабатывал ни одного
 # запроса, а база не держала ни одного замка. Последняя напечатанная строка и есть ответ
 # на вопрос «где он стоит».
-trace = os.environ.get('MOO3_TRACE') == '1'
+trace = os.environ.get('SDDNW_TRACE') == '1'
 
 
 def check(name, ok, detail=''):
@@ -519,7 +615,7 @@ check('администратор входит без регистрации —
 # партию на этом сервере трогать нельзя, даже брошенную.
 HARNESS_NAMES = ('Регресс', 'Наблюдение', 'Расселение', 'Тактика', 'Баланс прогон',
                  'Прогон', 'Дипломатия', 'Шпионаж', 'Лидеры', 'Сохранение', 'Загруженная',
-                 'Совет')
+                 'Совет', 'Находки', 'Часы')
 # ПАРТИИ ИДУЩЕГО БАЛАНСОВОГО ПРОГОНА УБИРАТЬ НЕЛЬЗЯ. Пульт называет свои партии
 # «Прогон <зерно>» (`BalanceGameRunner.play`), а «Прогон» стоит в списке выше — и уборка
 # сносила живые партии замера прямо посреди счёта. Замер собирает их по порядку и на
@@ -616,12 +712,107 @@ if account_token is None:
           + str(signed.get('body', {}).get('message', signed)))
     if signed.get('ERROR') == 429:
         print('Это счётчики защиты входа: они в памяти сервера. Перезапустите '
-              'moo3-server\\run.cmd и повторите прогон.')
+              'sddnw-server\\run.cmd и повторите прогон.')
     raise SystemExit(1)
 
 wrong = call('POST', '/api/auth/login', {'login': 'admin', 'password': 'не тот пароль'})
 check('неверный пароль не пускает — п. 3.1', wrong.get('ERROR') == 403,
       str(wrong.get('body', {}).get('message')))
+
+# ИГРА БЕЗ РЕГИСТРАЦИИ — backlog-promo, пункт 1. Гость получает запись одним нажатием, а
+# настройки его партии назначает СЕРВЕР: проверяется это запросом, который просит
+# огромную галактику на восьмерых без совета, — клиент такого не пошлёт, а гость может.
+# Записи и партии гостя прогон убирает сам: у гостя нет почты `.test`, и общая уборка
+# записей его не узнает.
+saved_token, account_token = account_token, None
+guest_session = call('POST', '/api/auth/guest')
+account_token = saved_token
+guest_token = guest_session.get('token') if isinstance(guest_session, dict) else None
+guest_account = (guest_session or {}).get('account') or {}
+check('гость входит одним нажатием, без почты и пароля — backlog-promo, п. 1',
+      bool(guest_token) and guest_account.get('role') == 'GUEST',
+      str(guest_session)[:200])
+check('имя гостя хранится номером, без слова на каком-либо языке',
+      str(guest_account.get('name', '')).isdigit(), str(guest_account.get('name')))
+if guest_token:
+    guest_game = call_account('POST', '/api/games', guest_token,
+                              {'name': 'Регресс гость', 'playerName': 'Guest',
+                               'galaxySize': 'HUGE', 'totalPlayers': 8,
+                               'council': False, 'observer': True})
+    gg = (guest_game or {}).get('game') or {}
+    check('гостевая партия — малая галактика на четверых, что бы гость ни просил',
+          gg.get('galaxySize') == 'SMALL' and gg.get('totalPlayers') == 4,
+          f"{gg.get('galaxySize')}, империй {gg.get('totalPlayers')}")
+    check('в гостевой партии побеждает удержание Wardenhold',
+          gg.get('wardenholdVictory') is True, str(gg.get('wardenholdVictory')))
+    check('гость играет сам, а не наблюдает',
+          all(p.get('playerType') == 'HUMAN' for p in (guest_game or {}).get('players', [])),
+          str([p.get('playerType') for p in (guest_game or {}).get('players', [])]))
+    foreign = call('POST', '/api/games', {'name': 'Регресс чужая для гостя', 'galaxySize': 'SMALL',
+                                          'playerName': 'Хозяин'})
+    foreign_id = ((foreign or {}).get('game') or {}).get('id')
+    joined = call_account('POST', f'/api/games/{foreign_id}/join', guest_token,
+                          {'playerName': 'Guest'})
+    check('в чужую партию гость не входит — зовут зарегистрироваться',
+          joined.get('ERROR') == 403, str(joined.get('ERROR')))
+    loaded = call_account('POST', '/api/saves/00000000-0000-0000-0000-000000000000/load', guest_token)
+    check('сохранений гость не поднимает', loaded.get('ERROR') == 403, str(loaded.get('ERROR')))
+    if gg.get('id'):
+        started = call('POST', f"/api/games/{gg['id']}/start",
+                       {'accessToken': guest_game['credentials']['accessToken']})
+        sg = (started or {}).get('game') or {}
+        check('гостевая партия стартует с тремя империями ИИ',
+              sg.get('status') == 'IN_PROGRESS' and len((started or {}).get('players', [])) == 4,
+              f"{sg.get('status')}, участников {len((started or {}).get('players', []))}")
+        end_turn(gg['id'], guest_game['credentials']['accessToken'])
+        after = call('GET', f"/api/games/{gg['id']}") or {}
+        check('пока Wardenhold никто не держит, счёта удержания нет',
+              after.get('game', {}).get('wardenholdTurnsLeft') is None
+              and after.get('game', {}).get('turn') == 2,
+              str(after.get('game', {}))[:200])
+        call('DELETE', f"/api/games/{gg['id']}/admin")
+    if foreign_id:
+        call('DELETE', f'/api/games/{foreign_id}/admin')
+    if guest_account.get('id'):
+        call('DELETE', f"/api/auth/accounts/{guest_account['id']}")
+plain_game = call('POST', '/api/games', {'name': 'Регресс без Wardenhold', 'galaxySize': 'SMALL',
+                                         'playerName': 'Хозяин'})
+check('запрос без полей не включает ни Wardenhold, ни итог по могуществу — замеры не обрываются',
+      ((plain_game or {}).get('game') or {}).get('wardenholdVictory') is False
+      and ((plain_game or {}).get('game') or {}).get('mightVictory') is False,
+      str(((plain_game or {}).get('game') or {}))[:200])
+if ((plain_game or {}).get('game') or {}).get('id'):
+    call('DELETE', f"/api/games/{plain_game['game']['id']}/admin")
+
+# ИТОГ ПО МОГУЩЕСТВУ — п. 3, backlog-promo, пункт 2: партия, не кончившаяся ничем к
+# трёхсотому ходу, отдаёт победу сильнейшей империи. Совет и Wardenhold выключены, чтобы
+# партия дошла до срока; зерно своё и постоянное (лотерея с тихим проигрышем — см.
+# правила проекта). Покорение раньше срока проверке не мешает, но тогда о сроке она молчит.
+verdict_game = call('POST', '/api/games', {'name': 'Регресс итог', 'galaxySize': 'SMALL',
+                                           'playerName': 'Наблюдатель', 'observer': True,
+                                           'seed': 20261002, 'totalPlayers': 3,
+                                           'galacticEvents': False, 'council': False,
+                                           'wardenholdVictory': False, 'mightVictory': True})
+vg = (verdict_game or {}).get('game') or {}
+check('итог по могуществу включается признаком партии, срок — трёхсотый ход',
+      vg.get('mightVictory') is True and vg.get('mightVictoryTurn') == 300,
+      f"{vg.get('mightVictory')}, ход {vg.get('mightVictoryTurn')}")
+if vg.get('id'):
+    v_tok = verdict_game['credentials']['accessToken']
+    call('POST', f"/api/games/{vg['id']}/start", {'accessToken': v_tok})
+    for _ in range(4):
+        call('POST', f"/api/games/{vg['id']}/turn/advance", {'accessToken': v_tok, 'turns': 100})
+        if (call('GET', f"/api/games/{vg['id']}") or {}).get('game', {}).get('status') == 'FINISHED':
+            break
+    ended = (call('GET', f"/api/games/{vg['id']}") or {}).get('game', {})
+    check('партия без иной победы кончается к трёхсотому ходу итогом по могуществу',
+          ended.get('status') == 'FINISHED'
+          and (ended.get('victoryKind') == 'MIGHT' or ended.get('victoryKind') == 'CONQUEST')
+          and ended.get('winnerPlayerId'),
+          f"{ended.get('status')}, {ended.get('victoryKind')}, ход {ended.get('turn')}")
+    if ended.get('victoryKind') == 'MIGHT':
+        check('итог подведён ровно на сроке', ended.get('turn') == 301, str(ended.get('turn')))
+    call('DELETE', f"/api/games/{vg['id']}/admin")
 
 # Регистрация игрока: запись заводится, но до подтверждения почты вход закрыт — п. 3.1.
 # Логина в заявке нет: логином служит сама почта, а имя идёт только на показ в игре.
@@ -741,6 +932,37 @@ if player_token:
     check('ступень не из списка не записывается — п. 11.1',
           call('PUT', '/api/auth/text-scale', {'textScale': 180}).get('ERROR') == 400)
     call('PUT', '/api/auth/text-scale', {'textScale': 100})
+
+    # Раскладка горячих клавиш карты — п. 11.1: третья настройка вида, которая живёт в
+    # записи. Клавиши помнят пальцами, и стандартные на второй машине — та же потеря, что
+    # английский язык или мелкий шрифт.
+    check('новая запись клавиш не переназначала — п. 11.1',
+          confirmed['account'].get('hotkeys') is None,
+          str(confirmed['account'].get('hotkeys')))
+    own = {'turn': 'KeyT', 'research': 'F2', 'fleet': 'F3', 'colonies': 'KeyQ',
+           'homeworld': 'F4'}
+    bound = call('PUT', '/api/auth/hotkeys', {'hotkeys': own})
+    check('раскладка записывается целиком — п. 11.1', bound.get('hotkeys') == own, str(bound))
+    check('записанная раскладка видна при следующем входе — п. 11.1',
+          call('GET', '/api/auth/me').get('hotkeys') == own,
+          str(call('GET', '/api/auth/me').get('hotkeys')))
+    # ЧТО значат эти пары, сервер не знает и знать не должен: горячая клавиша — дело
+    # клиента. Поэтому проверяется ВИД записи, а не список действий: в колонку не должны
+    # попасть ни разметка, ни словарь.
+    check('разметка вместо клавиши не записывается — п. 11.1',
+          call('PUT', '/api/auth/hotkeys',
+               {'hotkeys': {'turn': '<script>alert(1)</script>'}}).get('ERROR') == 400)
+    check('раскладка длиннее дюжины пар не записывается — п. 11.1',
+          call('PUT', '/api/auth/hotkeys',
+               {'hotkeys': {('a%d' % i): 'KeyA' for i in range(13)}}).get('ERROR') == 400)
+    check('отказ не портит уже записанную раскладку — п. 11.1',
+          call('GET', '/api/auth/me').get('hotkeys') == own,
+          str(call('GET', '/api/auth/me').get('hotkeys')))
+    # «Вернуть как было» — это ПУСТАЯ раскладка: у состояния «игрок клавиш не трогал» один
+    # вид, а не два. Иначе поменявшаяся раскладка по умолчанию не догнала бы тех, кто
+    # однажды нажал эту кнопку.
+    check('пустая раскладка стирает переназначенное — п. 11.1',
+          call('PUT', '/api/auth/hotkeys', {'hotkeys': {}}).get('hotkeys') is None)
     account_token = saved_account
 
 check('без входа язык записи не меняется — п. 3.5',
@@ -750,6 +972,10 @@ check('без входа язык записи не меняется — п. 3.5
 check('без входа размер текста не меняется — п. 11.1',
       probe('PUT', '/api/auth/text-scale',
             json.dumps({'textScale': 130}).encode())['status'] in (401, 403))
+
+check('без входа раскладка клавиш не меняется — п. 11.1',
+      probe('PUT', '/api/auth/hotkeys',
+            json.dumps({'hotkeys': {'turn': 'KeyT'}}).encode())['status'] in (401, 403))
 
 # Повторная отправка письма — п. 3.1. Без неё регистрация была ловушкой: письмо не дошло —
 # логин занят, вход закрыт, и сделать нельзя ничего. Проверяется на своей записи, целиком:
@@ -965,12 +1191,20 @@ call('DELETE', f'/api/games/{on_id}?accessToken={on_tok}')
 # партиями выше (раздел 0.5), а здесь только мешают: событие успевает разрушить звёздную
 # базу родного мира посреди проверки зданий, и тогда содержание колонии падает вместо
 # того, чтобы вырасти на цену построенного, а снесённая база возвращается в список
-# стройки. Зерно у партии остаётся случайным — галактики должны быть разными, — а вот
-# беда посреди замера делает проверку плавающей, и она дважды провалилась именно так.
+# стройки. Беда посреди замера делает проверку плавающей, и она дважды провалилась
+# именно так.
+#
+# ЗЕРНО ПОСТОЯННОЕ (трек техдолга, пункт 16). Прежде оно было случайным — «галактики должны
+# быть разными», — и от сгенерированной галактики зависело, сколько проверок вообще дойдёт
+# до дела: за один день прогоны давали 591, 594, 596, 599 и 603. При таком разбросе
+# выпавший блок проверок не виден — счётчик и без того каждый раз другой. С зерном число
+# одно, и его падение сразу значит пропуск. Разными галактики остаются у всех прочих
+# партий прогона, у которых зерна нет.
+MAIN_SEED = 20260927
 g = call('POST', '/api/games', {'name': 'Регресс', 'playerName': 'Тест',
                                 'homeStarName': 'Родная', 'galaxySize': 'SMALL',
                                 'raceName': 'Безликие', 'raceTraits': [],
-                                'galacticEvents': False})
+                                'galacticEvents': False, 'seed': MAIN_SEED})
 gid, tok, pid = g['game']['id'], g['credentials']['accessToken'], g['credentials']['playerId']
 check('создание игры', g['game']['name'] == 'Регресс' and g['credentials']['host'] is True)
 check('игра в списке открытых', any(x['id'] == gid for x in call('GET', '/api/games?openOnly=true')))
@@ -979,6 +1213,35 @@ check('состав лобби', len(call('GET', f'/api/games/{gid}')['players']
 start = call('POST', f'/api/games/{gid}/start', {'accessToken': tok})
 check('старт: добор ИИ до 8', len(start['players']) == 8,
       f"игроков {len(start['players'])}")
+# Знамя — цвет империи, п. 3.2 (01.10.2026): у каждой своё. Прежде цвет был цветом РАСЫ, и
+# у тринадцати рас оттенки перекликались — разных соседей на карте было не различить.
+check('у восьми империй восемь разных цветов — п. 3.2',
+      len({x['color'].lower() for x in start['players']}) == 8,
+      str(sorted(x['color'] for x in start['players'])))
+
+# Знамя выбирают перед партией, как в MOO II: своё берётся, занятое другим — нет.
+bg = call('POST', '/api/games', {'name': 'Знамёна', 'playerName': 'Знаменосец',
+                                 'galaxySize': 'SMALL', 'totalPlayers': 4, 'banner': 'BROWN'})
+bg_id, bg_tok = bg['game']['id'], bg['credentials']['accessToken']
+bg_host = [x for x in call('GET', f'/api/games/{bg_id}')['players'] if x['id'] == bg['credentials']['playerId']]
+check('создатель получает выбранное знамя — п. 3.2',
+      bool(bg_host) and bg_host[0]['color'].lower() == '#b07a4a',
+      str(bg_host[0]['color'] if bg_host else None))
+bg_same = call('POST', f'/api/games/{bg_id}/join', {'playerName': 'Двойник', 'banner': 'BROWN'})
+check('занятое знамя второму не взять — п. 3.2', bg_same.get('ERROR') == 409,
+      str(bg_same.get('body', {}).get('message')))
+bg_other = call('POST', f'/api/games/{bg_id}/join', {'playerName': 'Сосед', 'banner': 'SILVER'})
+check('свободное знамя берётся при входе в чужую партию — п. 3.2',
+      bg_other.get('ERROR') is None
+      and any(x['color'].lower() == '#c9d1dc' for x in call('GET', f'/api/games/{bg_id}')['players']),
+      str(bg_other.get('body', {}).get('message')))
+bg_start = call('POST', f'/api/games/{bg_id}/start', {'accessToken': bg_tok})
+bg_colors = [x['color'].lower() for x in bg_start.get('players', [])]
+check('ИИ разбирает оставшиеся знамёна, не повторяя людей — п. 3.2',
+      len(bg_colors) == 4 and len(set(bg_colors)) == 4
+      and '#b07a4a' in bg_colors and '#c9d1dc' in bg_colors,
+      str(bg_colors))
+call('DELETE', f'/api/games/{bg_id}?accessToken={bg_tok}')
 
 # --- 2. Карта галактики (п. 4.2, 11.3) ---
 m = call('GET', f'/api/games/{gid}/map?accessToken={tok}')
@@ -995,19 +1258,52 @@ check('метка особой звезды скрыта у неразведан
 # Особую звезду СТЕРЕЖЁТ Страж — п. 4.2.1: её не находят, её берут боем, и за бой
 # полагается клад из трёх технологий. Без стража Wardenhold была бы просто звездой с
 # хорошим именем. Подпись чудища приходит на языке запроса, а прогон просит русский.
+#
+# ЖРЕБИЯ В ЭТИХ ТРЁХ ПРОВЕРКАХ НЕТ — и не было, пока партия жила на случайном зерне: особая звезда
+# занимает первую позицию галактики всегда и ровно одна (`GalaxyGenerator.generate`),
+# Страж ставится ей без всякого жребия (`settleMonster`), в родные звёзды она не попадает
+# вовсе (`HomeworldAllocator` отбирает их из НЕособых) — а значит, и чудище с неё никто не
+# снимет, — а метка у неразведанной системы прибита к `FALSE` в самом ответе
+# (`GameMapper.toUnexploredSystem`). Случайное зерно тут ничего не решает, и переносить их
+# на свою партию, как перенесены находки ниже, незачем.
 check('особую звезду стережёт Страж — п. 4.2.1',
       special and special[0].get('monster') == 'Страж', str(special[0].get('monster')))
 
 # --- Находки на планетах (п. 4.1) ---
+# ПАРТИЯ ЗДЕСЬ СВОЯ, И ЗЕРНО У НЕЁ ПОСТОЯННОЕ — иначе «находки есть» это лотерея.
+# Находка достаётся шести процентам ПРИГОДНЫХ планет (`PlanetFind.SHARE_PERCENT`), а у
+# главной партии галактика малая (и зерно было случайным): пригодных планет там пять-шесть
+# десятков, то есть три находки ожидаемых, и замер по семи зёрнам дал разброс от ОДНОЙ до
+# шести. 26.09.2026 прогон так и провалился («находок 1 на 101 планетах»), а следующий на
+# том же коде прошёл — плавающая проверка не отличает поломку от невезения. На самой
+# большой галактике пригодных планет под двести, находок выходит полтора десятка, и
+# постоянное зерно делает их число одним и тем же: сломается проверка одинаково у всех.
+# Зерно вдобавок подобрано так, чтобы на карте оказались находки ВСЕХ ЧЕТЫРЁХ видов —
+# проверка туземцев без единого туземца не проверяет ничего, и молчит она незаметно.
+#
 # Проверяются КОДЫ, а не подписи: подпись приходит на языке запроса, и проверка,
 # держащаяся на показанном тексте, ломается от первого же перевода.
-all_planets = [p for st in revealed['systems'] for p in st['planets']]
+finds = call('POST', '/api/games', {'name': 'Находки', 'playerName': 'Геолог',
+                                    'homeStarName': 'Жила', 'galaxySize': 'HUGE',
+                                    'galacticEvents': False, 'seed': 20261001})
+fnd_id, fnd_tok = finds['game']['id'], finds['credentials']['accessToken']
+call('POST', f'/api/games/{fnd_id}/start', {'accessToken': fnd_tok})
+fnd_map = call('GET', f'/api/games/{fnd_id}/map?accessToken={fnd_tok}')
+fnd_revealed = call('GET', f'/api/games/{fnd_id}/map?accessToken={fnd_tok}&revealAll=true')
+all_planets = [p for st in fnd_revealed['systems'] for p in st['planets']]
 found = [p for p in all_planets if p.get('find')]
 check('в галактике есть находки — п. 4.1', len(found) >= 2,
       f"находок {len(found)} на {len(all_planets)} планетах")
 check('находки — редкость, а не украшение каждой планеты',
       len(found) <= len(all_planets) // 5,
       f"находок {len(found)} из {len(all_planets)}")
+# Видов находок четыре, и список закрыт (`PlanetFind`). Проверка стоит здесь не ради
+# самого генератора, а ради СОСЕДНИХ проверок: те, что смотрят на туземцев и артефакты,
+# при пустом наборе проходят молча. Провалилась она — значит, жребий на этом зерне сдвинулся
+# (правили веса или порядок обращений к случаю), и зерно надо подобрать заново.
+check('находки бывают всех четырёх видов — п. 4.1',
+      len({p['find'] for p in found}) == 4,
+      str(sorted({p['find'] for p in found})))
 check('у находки есть имя и описание',
       all(p.get('findLabel') and p.get('findDescription') for p in found),
       str([p.get('find') for p in found if not p.get('findDescription')]))
@@ -1022,18 +1318,19 @@ check('туземцы селятся только там, где хватит м
 # Стартовая система у всех империй одна и та же (чертёж один на партию), и находка в ней
 # досталась бы всем разом — это сдвинутый старт, а не удача. Проверяется по ВСЕМ родным
 # мирам раскрытой карты, а не по своему: чертёж общий.
-home_systems = {st['id'] for st in revealed['systems']
+home_systems = {st['id'] for st in fnd_revealed['systems']
                 for p in st['planets'] if p.get('homeworld')}
 check('в стартовых системах находок нет — п. 4.1',
-      not any(p.get('find') for st in revealed['systems'] if st['id'] in home_systems
+      not any(p.get('find') for st in fnd_revealed['systems'] if st['id'] in home_systems
               for p in st['planets']),
-      str([p.get('find') for st in revealed['systems'] if st['id'] in home_systems
+      str([p.get('find') for st in fnd_revealed['systems'] if st['id'] in home_systems
            for p in st['planets'] if p.get('find')]))
 # Находка видна только там, где побывал флот: у неразведанной системы сервер не отдаёт
 # планет вовсе, и разведка находкой не подменяется.
 check('находки скрыты у неразведанных систем — п. 15',
-      not any(p.get('find') for st in m['systems'] if not st.get('explored')
+      not any(p.get('find') for st in fnd_map['systems'] if not st.get('explored')
               for p in st['planets']))
+call('DELETE', f'/api/games/{fnd_id}?accessToken={fnd_tok}')
 mine = [p for s in m['systems'] for p in s['planets'] if p.get('ownerPlayerId') == pid]
 check('родной мир выдан', len(mine) == 1)
 home = mine[0]
@@ -1110,39 +1407,22 @@ bad = call('POST', f'/api/games/{gid}/research',
            {'accessToken': tok, 'categoryCode': 'engineering', 'levelOrder': 3, 'optionCode': 'battle-pods'})
 check('через уровень не перепрыгнуть', bad.get('ERROR') == 409)
 
-# Стартовые технологии — п. 9: три первых уровня дерева есть у каждой империи с первого
-# хода, они же перечислены в самом описании дерева. Это не мелочь для удобства: пока их
-# не выдавали никому, империя ИИ, чьё устремление не любит химию, не строила НИ ОДНОГО
-# корабля за всю партию — кораблестроение требует Power и Chemistry разом. На зерне 777
-# у восьми империй за 150 ходов выходило шесть перелётов, ноль знакомств и ноль войн.
+# Стартовых технологий нет — п. 9, решение хозяина проекта (01.10.2026): уровни за 50 очков,
+# выданные даром, игрок видел открытыми и не понимал, почему их нельзя исследовать. Механизм
+# выдачи остался, пуст только список в дереве. Когда-то выдача лечила ИИ, не строивший
+# кораблей вовсе (кораблестроение требует Power и Chemistry разом), — теперь ИИ ведёт науку
+# по нуждам и начинает именно с двигателя и топлива (`AiEmpireService.wantedTechnologies`).
 starting = call('GET', f'/api/games/{gid}/research?accessToken={tok}')['acquired']
 started = {t['optionCode'] for t in starting}
-check('стартовые технологии выданы — п. 9',
-      {'nuclear-drive', 'standard-fuel-cells', 'laser-cannon'} <= started, str(sorted(started)))
-# Стартовые уровни названы ССЫЛКАМИ «раздел:номер»: названия переводятся, а ссылка нет,
-# и сверять её можно на любом языке ответа. Проверяется, что каждая ссылка находит в дереве
-# свой уровень и что все они первые — империя начинает у подножия лестниц.
-refs = tree['startingLevels']
-found = [(c['code'], lv['order']) for c in tree['categories'] for lv in c['levels']
-         if f"{c['code']}:{lv['order']}" in refs]
-check('стартовые уровни названы деревом — п. 9',
-      len(found) == len(refs) == 3 and all(order == 1 for _, order in found)
-      and all(t['levelOrder'] == 1 for t in starting),
-      f"{refs} -> {found}")
-check('стартовые технологии достались на первом ходу — п. 9',
-      all(t['acquiredTurn'] == 1 for t in starting),
-      str(sorted({t['acquiredTurn'] for t in starting})))
+check('стартовых технологий нет: первые уровни тоже исследуются — п. 9',
+      starting == [] and tree['startingLevels'] == [],
+      f"{sorted(started)}, в дереве {tree['startingLevels']}")
 
-# Цель выбирается уже НАД стартовым уровнем: физика, химия и Power первого уровня изучены,
-# и переспросить их нельзя — через изученное не исследуют заново.
-again = call('POST', f'/api/games/{gid}/research',
-             {'accessToken': tok, 'categoryCode': 'physics', 'levelOrder': 1, 'optionCode': 'laser-cannon'})
-check('стартовый уровень заново не исследуют — п. 9', again.get('ERROR') == 409)
-
+# Первый уровень физики — общий: изучают его целиком, все три технологии разом.
 call('POST', f'/api/games/{gid}/research',
-     {'accessToken': tok, 'categoryCode': 'power', 'levelOrder': 2, 'optionCode': 'colony-ship'})
+     {'accessToken': tok, 'categoryCode': 'physics', 'levelOrder': 1, 'optionCode': 'laser-cannon'})
 rs = call('GET', f'/api/games/{gid}/research?accessToken={tok}')
-check('цель исследования выбрана', rs['optionCode'] == 'colony-ship' and rs['levelCost'] == 80,
+check('цель исследования выбрана', rs['optionCode'] == 'laser-cannon' and rs['levelCost'] == 50,
       f"{rs['optionCode']} ({rs['optionName']}), цена {rs['levelCost']}")
 
 # --- 5. Ход: рост, производство, исследования ---
@@ -1160,11 +1440,34 @@ for _ in range(20):
 check('до базовой стоимости шанса прорыва нет — п. 9', paid is True,
       f"шанс до оплаты нулевой: {paid}")
 rs = call('GET', f'/api/games/{gid}/research?accessToken={tok}')
-# Сравнивается ПРИБАВИВШЕЕСЯ, а не весь список: со стартовыми технологиями (п. 9) он
-# больше не пуст, и «изучено ровно три» было бы проверкой не уровня, а старта партии.
+# Сравнивается ПРИБАВИВШЕЕСЯ, а не весь список: проверяется уровень, а не старт партии.
 got = sorted(t['optionCode'] for t in rs['acquired'] if t['optionCode'] not in started)
 check('общий уровень выдал все технологии',
-      got == ['colony-ship', 'outpost-ship', 'transport'], str(got))
+      got == ['laser-cannon', 'laser-rifle', 'space-scanner'], str(got))
+check('после прорыва цель пуста — экран выбора откроется сам — п. 9',
+      rs.get('optionCode') is None, str(rs.get('optionCode')))
+
+# Изученное заново не исследуют: цель ставится только на непройденный уровень.
+again = call('POST', f'/api/games/{gid}/research',
+             {'accessToken': tok, 'categoryCode': 'physics', 'levelOrder': 1, 'optionCode': 'laser-cannon'})
+check('изученный уровень заново не исследуют — п. 9', again.get('ERROR') == 409)
+
+# Не выбрав цель, человек не теряет ход науки: фаза продолжает раздел последнего прорыва
+# следующим уровнем (п. 9, 30.09.2026) — прежде очки такого хода пропадали целиком.
+end_turn(gid, tok)
+kept = call('GET', f'/api/games/{gid}/research?accessToken={tok}')
+check('без выбора наука продолжает прежний раздел — п. 9',
+      kept.get('categoryCode') == 'physics' and kept.get('levelOrder') == 2
+      and kept.get('optionCode') is not None and kept.get('researchPoints', 0) > 0,
+      f"{kept.get('categoryCode')}:{kept.get('levelOrder')} {kept.get('optionCode')}, "
+      f"очков {kept.get('researchPoints')}")
+
+# Дальше партии нужны корабли, как и игроку: двигатель (Power), топливо (Chemistry) и
+# гражданские корабли (Cold Fusion). Без стартовой выдачи их изучают — тем же путём.
+known_main = study(gid, tok, ['power:1', 'chemistry:1', 'power:2'])
+check('основа кораблестроения и гражданские корабли изучаются за несколько десятков ходов — п. 9',
+      {'nuclear-drive', 'standard-fuel-cells', 'colony-ship', 'outpost-ship', 'transport'} <= known_main,
+      str(sorted(known_main)))
 
 
 def planet():
@@ -1175,7 +1478,7 @@ def planet():
 p = planet()
 check('население выросло', p['colony']['populationK'] > 8000, f"{p['colony']['populationK']} тыс.")
 credits_now = [x for x in call('GET', f'/api/games/{gid}')['players'] if x['id'] == pid][0]['credits']
-check('казна пополняется товарами', credits_now > 0, f'{credits_now} кр.')
+check('казна пополняется товарами', credits_now > 0, f'{credits_now} gc')
 
 # --- 6. Здания (п. 10) ---
 avail = [x['code'] for x in p['colony']['available']]
@@ -1356,8 +1659,26 @@ check('проект очереди поднимается на стапель �
       f"строит {promoted.get('colony', {}).get('projectCode')}, очередь"
       f" {[x['code'] for x in promoted.get('colony', {}).get('queue', [])]}")
 
-# Бесконечная стройка очередь не запирает: взятая из середины, она не кончилась бы никогда,
-# и всё, что стоит за ней, колония не заложила бы вовсе.
+# «На первое место», а не «вместо» (01.10.2026): строку очереди перетаскивают на текущую
+# стройку — она встаёт на стапель, а прежняя сдвигается первой в очередь. Прежде бросок туда
+# УБИРАЛ строку из очереди вовсе, а «строить сейчас» молча выбрасывал то, что строилось.
+call('POST', f"/api/games/{gid}/planets/{p['id']}/project",
+     {'accessToken': tok, 'projectCode': 'SPY'})
+enqueue('HOUSING')
+kept = call('POST', f"/api/games/{gid}/planets/{p['id']}/project",
+            {'accessToken': tok, 'projectCode': 'HOUSING', 'keepCurrent': True})
+check('поднятое на первое место не выбрасывает прежнюю стройку: она первая в очереди — п. 10',
+      kept.get('colony', {}).get('projectCode') == 'HOUSING'
+      and [x['code'] for x in kept.get('colony', {}).get('queue', [])][:1] == ['SPY'],
+      f"строит {kept.get('colony', {}).get('projectCode')}, очередь"
+      f" {[x['code'] for x in kept.get('colony', {}).get('queue', [])]}")
+remove_spy = [i for i, x in enumerate(kept.get('colony', {}).get('queue', [])) if x['code'] == 'SPY']
+if remove_spy:
+    call('DELETE', f"/api/games/{gid}/planets/{p['id']}/queue/{remove_spy[0]}?accessToken={tok}")
+
+# Дома и товары встают в очередь как любая стройка (30.09.2026): дойдя до них, колония
+# берёт их на стапель и остаётся на них, а то, что стоит за ними, ждёт. Раньше бесконечное из
+# середины очереди молча пропускалось — игрок ставил дома, а они не строились.
 call('POST', f"/api/games/{gid}/planets/{p['id']}/project",
      {'accessToken': tok, 'projectCode': 'SPY'})
 enqueue('HOUSING')
@@ -1367,13 +1688,24 @@ check('дома стоят в очереди перед шпионом — п. 1
       str([x['code'] for x in colony_now()['queue']]))
 for _ in range(25):
     end_turn(gid, tok)
-    if colony_now()['projectCode'] != 'SPY' or colony_now()['queue'] == []:
+    if colony_now()['projectCode'] != 'SPY':
         break
 after_endless = colony_now()
-check('бесконечное в середине очереди пропускается — п. 10',
-      after_endless['projectCode'] == 'SPY' and after_endless['queue'] == [],
+check('дома из очереди берутся на стапель, а не пропускаются — п. 10',
+      after_endless['projectCode'] == 'HOUSING'
+      and [x['code'] for x in after_endless['queue']] == ['SPY'],
       f"строит {after_endless['projectCode']}, очередь"
       f" {[x['code'] for x in after_endless['queue']]}")
+call('DELETE', f"/api/games/{gid}/planets/{p['id']}/queue/0?accessToken={tok}")
+
+# Дома в очереди убираются, как и всё прочее.
+call('POST', f"/api/games/{gid}/planets/{p['id']}/project",
+     {'accessToken': tok, 'projectCode': 'SPY'})
+enqueue('HOUSING')
+dropped_housing = call('DELETE', f"/api/games/{gid}/planets/{p['id']}/queue/0?accessToken={tok}")
+check('дома из очереди убираются — п. 10',
+      [x['code'] for x in dropped_housing['colony']['queue']] == [],
+      str([x['code'] for x in dropped_housing['colony']['queue']]))
 
 # Бесконечная стройка стапеля не держит: поставленное за домами и товарами ждало бы
 # вечно — очередь забирают только за достроенным. Поэтому новый проект встаёт на их
@@ -1483,10 +1815,20 @@ def spies_now():
 call('POST', f"/api/games/{gid}/planets/{p['id']}/project",
      {'accessToken': tok, 'projectCode': 'SPY'})
 # Копим до половины: с неё выкуп вдвое дешевле — то самое место, где его и делают.
-for _ in range(25):
+#
+# Колония приходит сюда С ЗАПАСОМ вложенного: разделом выше продавали постройки, а продажа
+# возвращает половину цены единицами производства (п. 10). Запаса хватает, чтобы шпион
+# достроился в первый же ход, — поэтому ждём не «накопится», а «накопится, но не достроится»,
+# и берёмся за шпиона заново, если он успел уйти. Прежний цикл ломался на первом же ходу и
+# мерил не то: это та самая проверка, которая держалась на стартовом состоянии.
+for _ in range(40):
     end_turn(gid, tok)
     half = colony_now()
-    if half['projectCode'] != 'SPY' or half['projectPoints'] * 2 >= half['projectCost']:
+    if half['projectCode'] != 'SPY':
+        call('POST', f"/api/games/{gid}/planets/{p['id']}/project",
+             {'accessToken': tok, 'projectCode': 'SPY'})
+        continue
+    if half['projectPoints'] * 2 >= half['projectCost']:
         break
 half = colony_now()
 check('колония накопила половину стройки — п. 10',
@@ -1530,7 +1872,18 @@ check('пока нет половины, единица производства
       and fresh['buyCost'] == (fresh['projectCost'] - fresh['projectPoints']) * 4,
       f"вложено {fresh['projectPoints']} из {fresh['projectCost']}, выкуп {fresh.get('buyCost')}")
 
-if credits_now() < fresh['buyCost']:
+# Отказ «без денег» проверяется на стройке ДОРОЖЕ казны. Прежде он стоял под условием
+# «если на шпиона не хватает» и молча пропадал, когда казна росла (без стартовых технологий
+# главная партия идёт на три десятка ходов дольше — 01.10.2026). Не хватает на шпиона —
+# берётся он, хватает — колониальный корабль за 500: его выкуп стоит до двух тысяч.
+if credits_now() >= fresh['buyCost']:
+    call('POST', f"/api/games/{gid}/planets/{p['id']}/project",
+         {'accessToken': tok, 'projectCode': 'COLONY_SHIP'})
+pricey = colony_now()
+check('для отказа нашлась стройка дороже казны — п. 10',
+      pricey.get('buyCost') is not None and credits_now() < pricey['buyCost'],
+      f"строит {pricey.get('projectCode')}, выкуп {pricey.get('buyCost')}, казна {credits_now()}")
+if pricey.get('buyCost') is not None and credits_now() < pricey['buyCost']:
     poor = buy()
     check('без денег стройку не выкупить — п. 10', poor.get('ERROR') == 409,
           str(poor.get('body', {}).get('message')))
@@ -1687,6 +2040,251 @@ check('удалённого сохранения в списке нет — п. 
       not any(x['id'] == doomed['id'] for x in call('GET', '/api/saves')))
 check('удалить сохранение дважды нельзя — п. 3.1',
       call('DELETE', f"/api/saves/{doomed['id']}").get('ERROR') == 404)
+
+# --- 8.0. Повтор очереди и автострой (п. 10) ---
+#
+# Две кнопки оригинала под очередью стройки — REPEAT BUILD и AUTO BUILD. Проверяется не
+# нажатие, а МЕХАНИКА: что делает фаза производства, когда очередь дошла до дела.
+mode_game = call('POST', '/api/games', {'name': 'Регресс стройка', 'playerName': 'Строитель',
+                                        'galaxySize': 'SMALL', 'totalPlayers': 2,
+                                        'galacticEvents': False, 'seed': 2121})
+mg = mode_game['game']['id']
+m_tok = mode_game['credentials']['accessToken']
+m_pid = mode_game['credentials']['playerId']
+call('POST', '/api/games/%s/start' % mg, {'accessToken': m_tok})
+
+
+def mode_colony():
+    """Родной мир этой партии из карты: своего адреса «дай планету» у сервера нет."""
+    game_map = call('GET', '/api/games/%s/map?accessToken=%s' % (mg, m_tok))
+    for system in game_map['systems']:
+        for one in system['planets']:
+            if one.get('ownerPlayerId') == m_pid and one.get('homeworld'):
+                return one
+    return None
+
+
+home = mode_colony()
+check('признаки стройки выключены у новой колонии — п. 10',
+      home['colony']['repeatBuild'] is False and home['colony']['autoBuild'] is False)
+
+# Шпион повторяем, и на нём проверяется круг очереди: здание вернуться в неё не может
+# вовсе (строится однажды), а корабль требует изученного кораблестроения.
+call('POST', '/api/games/%s/planets/%s/project' % (mg, home['id']),
+     {'accessToken': m_tok, 'projectCode': 'SPY'})
+call('POST', '/api/games/%s/planets/%s/queue' % (mg, home['id']),
+     {'accessToken': m_tok, 'projectCode': 'SPY'})
+switched = call('POST', '/api/games/%s/planets/%s/build-mode' % (mg, home['id']),
+                {'accessToken': m_tok, 'repeatBuild': True})
+check('повтор очереди включается — п. 10', switched['colony']['repeatBuild'] is True)
+check('автострой при этом не тронут — п. 10', switched['colony']['autoBuild'] is False,
+      'пустое поле значит «оставить как было»')
+
+# Ходов хватит, чтобы шпион достроился хотя бы раз и очередь повернулась.
+call('POST', '/api/games/%s/turn/advance' % mg, {'accessToken': m_tok, 'turns': 40})
+after = mode_colony()
+check('повтор вернул взятое в очередь — п. 10',
+      any(x['code'] == 'SPY' for x in after['colony']['queue'])
+      or after['colony']['projectCode'] == 'SPY',
+      'очередь %s, стройка %s' % ([x['code'] for x in after['colony']['queue']],
+                                  after['colony']['projectCode']))
+
+# Автострой: выключаем повтор, чистим очередь и смотрим, что колония возьмёт сама.
+#
+# Сперва изучаем ЗДАНИЕ: у империи без технологий в списке стройки нет ни одного здания
+# (кроме казарм, которые родной мир получает готовыми), и автострою нечего было бы взять —
+# проверка мерила бы пустоту, и ровно на этом она однажды и провалилась. Завод стоит на
+# втором уровне инженерии, а уровни берутся по порядку, поэтому целей две.
+for level, option in ((1, 'reinforced-hull'), (2, 'automated-factory')):
+    call('POST', '/api/games/%s/research' % mg,
+         {'accessToken': m_tok, 'categoryCode': 'engineering', 'levelOrder': level,
+          'optionCode': option})
+    call('POST', '/api/games/%s/turn/advance' % mg, {'accessToken': m_tok, 'turns': 60})
+home = mode_colony()
+check('здание изучено и попало в список стройки — п. 9',
+      any(x['code'] == 'automated-factory' for x in home['colony']['available'])
+      or any(x['code'] == 'automated-factory' for x in home['colony']['buildings']),
+      'доступно %s' % [x['code'] for x in home['colony']['available']])
+call('POST', '/api/games/%s/planets/%s/build-mode' % (mg, home['id']),
+     {'accessToken': m_tok, 'repeatBuild': False, 'autoBuild': True})
+after = mode_colony()
+for _ in range(len(after['colony']['queue'])):
+    call_auth('DELETE', '/api/games/%s/planets/%s/queue/0' % (mg, home['id']), m_tok)
+call('POST', '/api/games/%s/planets/%s/project' % (mg, home['id']),
+     {'accessToken': m_tok, 'projectCode': 'TRADE_GOODS'})
+call('POST', '/api/games/%s/turn/advance' % mg, {'accessToken': m_tok, 'turns': 30})
+after = mode_colony()
+check('автострой взял здание, а не товары — п. 10',
+      after['colony']['projectCode'] not in ('TRADE_GOODS', 'HOUSING', None)
+      or len(after['colony']['buildings']) > 2,
+      'стройка %s, построек %d' % (after['colony']['projectCode'],
+                                   len(after['colony']['buildings'])))
+# --- 8.0.1. Шаблоны стройки и возврат труда при продаже (п. 10) ---
+#
+# Шаблон принадлежит УЧЁТНОЙ ЗАПИСИ, а не партии, поэтому и проверяется он двумя пропусками:
+# записи — чтобы завести, игрока — чтобы заложить колонии.
+template = call_account('POST', '/api/build-templates', account_token,
+                        {'name': 'Регресс: раннее развитие', 'tier': 1,
+                         'projects': ['research-laboratory', 'SPY']})
+check('шаблон стройки сохраняется — п. 10', template.get('id') is not None, str(template)[:120])
+check('шаблон помнит порядок — п. 10',
+      template.get('projects') == ['research-laboratory', 'SPY'],
+      str(template.get('projects')))
+check('шаблон виден в своём списке — п. 10',
+      any(x['id'] == template['id'] for x in call_account('GET', '/api/build-templates', account_token)))
+if player_token:
+    check('чужой шаблон не отдаётся — п. 10',
+          not any(x['id'] == template['id']
+                  for x in call_account('GET', '/api/build-templates', player_token)))
+
+# Закладка: берётся то, что колония может построить СЕЙЧАС, остальное пропускается молча.
+# У родного мира казармы уже стоят, а лаборатория не изучена — значит, лечь должен один завод.
+laid = call_account('POST', '/api/games/%s/planets/%s/queue/template' % (mg, home['id']),
+                    account_token, {'accessToken': m_tok, 'templateId': template['id']})
+queued = [x['code'] for x in (laid.get('colony') or {}).get('queue', [])]
+check('шаблон лёг в очередь — п. 10',
+      'SPY' in queued or (laid.get('colony') or {}).get('projectCode') == 'SPY',
+      'очередь %s, стройка %s, отказ %s'
+      % (queued, (laid.get('colony') or {}).get('projectCode'),
+         (laid.get('body') or {}).get('message') if laid.get('ERROR') else '-'))
+check('неизученное из шаблона пропущено, а не отвергло его целиком — п. 10',
+      'research-laboratory' not in queued
+      and (laid.get('colony') or {}).get('projectCode') != 'research-laboratory',
+      str(queued))
+
+check('шаблон удаляется — п. 10',
+      call_account('DELETE', '/api/build-templates/%s' % template['id'], account_token) is None)
+check('удалённого шаблона в списке нет — п. 10',
+      not any(x['id'] == template['id']
+              for x in call_account('GET', '/api/build-templates', account_token)))
+
+# Возврат труда при продаже — отступление от MOO II (решение хозяина проекта): разобранное
+# здание отдаёт столько же единиц производства, сколько кредитов.
+sell_home = mode_colony()
+built_codes = [x['code'] for x in sell_home['colony']['buildings']]
+if 'marine-barracks' in built_codes:
+    before_points = sell_home['colony']['projectPoints']
+    before_credits = [x for x in call('GET', '/api/games/%s' % mg)['players']
+                      if x['id'] == m_pid][0]['credits']
+    sold = call('POST', '/api/games/%s/planets/%s/sell' % (mg, sell_home['id']),
+                {'accessToken': m_tok, 'buildingCode': 'marine-barracks'})
+    after_credits = [x for x in call('GET', '/api/games/%s' % mg)['players']
+                     if x['id'] == m_pid][0]['credits']
+    gained_credits = after_credits - before_credits
+    gained_points = (sold.get('colony') or {}).get('projectPoints', 0) - before_points
+    check('продажа даёт кредиты — п. 10', gained_credits > 0, 'прибавка %d' % gained_credits)
+    check('продажа возвращает СТОЛЬКО ЖЕ труда в стройку — п. 10',
+          gained_points == gained_credits,
+          'кредитов %d, единиц %d' % (gained_credits, gained_points))
+
+call_account('DELETE', '/api/games/%s/admin' % mg, account_token)
+
+# --- 8.1. Автосохранение в конце хода (п. 3) ---
+#
+# Проверяется не только то, что слепок появился, но и ПРАВИЛО: автосохранение партии
+# поднимают только те, кто в ней играл. Правило держится на учётной записи, а не на имени
+# игрока, поэтому проверке нужны ДВЕ записи — администратор и та, которую прогон завёл
+# разделом выше. Без второй записи проверять нечего: свой же слепок поднимается всегда.
+if player_token:
+    auto_game = call_account('POST', '/api/games', account_token,
+                             {'name': 'Регресс автосейв', 'playerName': 'Первый',
+                              'galaxySize': 'SMALL', 'totalPlayers': 4,
+                              'galacticEvents': False, 'seed': 3131})
+    ag = auto_game['game']['id']
+    a_tok = auto_game['credentials']['accessToken']
+    second = call_account('POST', '/api/games/%s/join' % ag, player_token,
+                          {'playerName': 'Второй'})
+    check('второй человек вошёл в партию — п. 3.2', second.get('credentials') is not None,
+          str(second)[:120])
+    b_tok = second['credentials']['accessToken']
+    call('POST', '/api/games/%s/start' % ag, {'accessToken': a_tok})
+
+    check('до первого хода автосохранения нет — п. 3',
+          not any(x['gameId'] == ag and x['auto'] for x in call('GET', '/api/saves')))
+
+    call('POST', '/api/games/%s/turn/end' % ag, {'accessToken': a_tok})
+    advanced = call('POST', '/api/games/%s/turn/end' % ag, {'accessToken': b_tok})
+    check('ход считается, когда закончили оба — п. 11.1', advanced.get('advanced') is True)
+
+    autos = [x for x in call('GET', '/api/saves') if x['gameId'] == ag and x['auto']]
+    check('конец хода оставил автосохранение — п. 3', len(autos) == 1,
+          'слепков %d' % len(autos))
+    check('автосохранение снято на конец сыгранного хода — п. 3',
+          bool(autos) and autos[0]['turn'] == 1, str(autos[0]['turn']) if autos else 'слепка нет')
+
+    # Второй ход переписывает ТОТ ЖЕ слепок: смысл автосохранения — вернуться туда, где
+    # партию бросили, а не хранить её историю. Иначе за сотню ходов партия оставила бы
+    # сотню слепков по сотне килобайт.
+    call('POST', '/api/games/%s/turn/end' % ag, {'accessToken': a_tok})
+    call('POST', '/api/games/%s/turn/end' % ag, {'accessToken': b_tok})
+    autos = [x for x in call('GET', '/api/saves') if x['gameId'] == ag and x['auto']]
+    check('автосохранение у партии ОДНО и переписывается — п. 3',
+          len(autos) == 1 and autos[0]['turn'] == 2,
+          'слепков %d, ход %s' % (len(autos), autos[0]['turn'] if autos else '-'))
+    auto_id = autos[0]['id'] if autos else None
+
+    # Правило «только те же люди». Посторонним выступает СВЕЖАЯ запись: у записи прогона
+    # место в этой партии есть, а у новой — нет.
+    outsider_token = None
+    outsider_login = 'outsider-%s@example.test' % uuid.uuid4().hex[:8]
+    outsider = register({'email': outsider_login, 'name': 'Посторонний',
+                         'password': 'orion-2026'})
+    if not outsider.get('ERROR') and os.path.isdir(OUTBOX):
+        letters = sorted(f for f in os.listdir(OUTBOX) if outsider_login.split('@')[0] in f)
+        if letters:
+            letter = io.open(os.path.join(OUTBOX, letters[-1]), encoding='utf-8').read()
+            found = re.search(r'confirm=(\S+)', letter)
+            if found:
+                outsider_token = call('POST', '/api/auth/confirm?token=' + found.group(1)).get('token')
+    if auto_id and outsider_token:
+        mine = [x for x in call_account('GET', '/api/saves', player_token) if x['id'] == auto_id]
+        check('участнику партии автосохранение помечено доступным — п. 3',
+              bool(mine) and mine[0]['loadable'] is True)
+        theirs = [x for x in call_account('GET', '/api/saves', outsider_token) if x['id'] == auto_id]
+        check('постороннему автосохранение помечено НЕдоступным — п. 3',
+              bool(theirs) and theirs[0]['loadable'] is False)
+        check('посторонний поднять автосохранение не может — п. 3',
+              call_account('POST', '/api/saves/%s/load' % auto_id, outsider_token)
+              .get('ERROR') == 403)
+        check('посторонний не возвращается в чужую партию — п. 3',
+              call_account('POST', '/api/games/%s/rejoin' % ag, outsider_token)
+              .get('ERROR') == 403)
+
+    # Поднявший садится за СВОЮ империю, а не за первую по порядку мест: в партии на двоих
+    # это разные вещи, и раньше вернувшийся мог оказаться за соседом.
+    if auto_id:
+        raised = call_account('POST', '/api/saves/%s/load' % auto_id, player_token)
+        check('участник поднял автосохранение — п. 3', raised.get('game') is not None,
+              str(raised)[:120])
+        if raised.get('game'):
+            raised_id = raised['game']['id']
+            who = raised['credentials']['playerId']
+            name = next((x['name'] for x in raised['players'] if x['id'] == who), None)
+            check('поднявший сел за свою империю — п. 3', name == 'Второй', name)
+            mine_games = [g['id'] for g in call_account('GET', '/api/games/mine', account_token)]
+            check('поднятая партия видна в своих у второго участника — п. 3',
+                  raised_id in mine_games)
+            back = call_account('POST', '/api/games/%s/rejoin' % raised_id, account_token)
+            back_name = next((x['name'] for x in back.get('players', [])
+                              if x['id'] == back.get('credentials', {}).get('playerId')), None)
+            check('второй участник вернулся за свою империю — п. 3', back_name == 'Первый',
+                  back_name)
+            call_account('DELETE', '/api/games/%s/admin' % raised_id, account_token)
+    call_account('DELETE', '/api/games/%s/admin' % ag, account_token)
+
+# Партия без людей автосохранения не заводит: возвращаться в неё некому, а балансовый
+# прогон играет сотни таких партий по сотням ходов — слепок на каждый ход был бы работой,
+# которой никто не увидит.
+observer_game = call('POST', '/api/games', {'name': 'Регресс наблюдатель', 'playerName': 'Никто',
+                                            'galaxySize': 'SMALL', 'observer': True,
+                                            'galacticEvents': False, 'seed': 3132})
+og = observer_game['game']['id']
+o_tok = observer_game['credentials']['accessToken']
+call('POST', '/api/games/%s/start' % og, {'accessToken': o_tok})
+call('POST', '/api/games/%s/turn/advance' % og, {'accessToken': o_tok, 'turns': 3})
+check('партия без людей не автосохраняется — п. 3',
+      not any(x['gameId'] == og and x['auto'] for x in call('GET', '/api/saves')))
+call_account('DELETE', '/api/games/%s/admin' % og, account_token)
 
 # --- 9. Колониальная база (п. 4.1) ---
 def planet_by_id(planet_id):
@@ -2458,10 +3056,12 @@ check('колония построила корабль для разведки 
 # Недостижимая звезда: приказ к ней сервер обязан отвергнуть, какой бы соблазнительной
 # она ни была, — дальность считается от своих миров (п. 8).
 #
-# Достижимое спрашивается заново: пока строился корабль, империя изучила Chemistry первого
-# уровня, а с ней и Extended Fuel Tanks — дальность выросла в полтора раза, и звезда,
-# бывшая недостижимой в начале, могла попасть в пузырь.
-far_now = set(call_auth('GET', f'/api/games/{shadow_id}/ships', shadow_tok)['reachableSystemIds'])
+# Достижимое спрашивается заново и ПО ДАЛЬНЕМУ списку: пока строился корабль, империя
+# могла изучить топливо, а её корабли — получить дополнительные баки (п. 8), и звезда,
+# бывшая недостижимой в начале, попала бы в пузырь. Недостижимой считается та, куда не
+# долетает даже корабль с баками, — иначе отрицательная проверка держалась бы на том,
+# чего у флота нет.
+far_now = set(reachable_ids(call_auth('GET', f'/api/games/{shadow_id}/ships', shadow_tok)))
 far_away = next((st for st in shadow_map('true')['systems'] if st['id'] not in far_now), None)
 if far_away:
     order = call('POST', f"/api/games/{shadow_id}/fleets/{shadow_fleet[0]['id']}/move",
@@ -2502,18 +3102,25 @@ if bridged and scouts:
     check('разведанных систем стало больше — п. 15',
           len([st for st in shadow_map()['systems'] if st['explored']]) > explored_before)
 
+# ЗНАКОМСТВО — ТОЛЬКО ПО ДАЛЬНОСТИ, как в MOO II (п. 15, backlog-promo, пункт 5): прилёт
+# флота к чужой колонии больше не знакомит. Знакомятся, когда одна из империй дотягивается
+# БЕЗ баков до системы, занятой другой, — колонией или заставой. Поэтому до хозяев чужой
+# звезды дотягиваются заставами, как игрок и делал бы.
+met_alien = alien_system is not None and meet_by_range(
+    shadow_id, shadow_tok, home['id'], alien_system['id'], alien_owners)
 relations = call('GET', f'/api/games/{shadow_id}/diplomacy?accessToken={shadow_tok}')
-# Знакомых может оказаться и больше одного: до далёкой звезды флот идёт цепочкой
-# перелётов и знакомится с хозяевами всех колоний, какие встретит по дороге (см. проверку
-# разведки выше). Сколько именно их будет, зависит от сгенерированной галактики, поэтому
-# проверяется правило, а не число: знакомство состоялось, и у каждого знакомства есть ход.
+# Знакомых может оказаться и больше одного: по дороге заставы дотягиваются и до других
+# соседей. Сколько их будет, зависит от галактики, поэтому проверяется правило: хозяева
+# цели знакомы, и у каждого знакомства есть ход.
 #
-# Нейтралитет здесь уже не требуется: пока флот летел, сосед мог объявить войну сам
+# Нейтралитет здесь уже не требуется: пока ставились заставы, сосед мог объявить войну сам
 # (п. 15, дипломатия ИИ). Что знакомство начинается с нейтралитета, проверяется ниже, на
 # партии, где никто ещё не успел ничего сделать.
-check('приход флота знакомит с хозяевами колоний — п. 15',
-      alien_owners <= {r['playerId'] for r in relations}
-      and len(relations) > 0
+check('знакомство попадает в итоги хода, на котором случилось — п. 11.1, п. 15',
+      bool(CONTACT_REPORTED) and all(CONTACT_REPORTED), str(CONTACT_REPORTED))
+check('заставы у соседа знакомят по дальности — п. 15',
+      met_alien
+      and alien_owners <= {r['playerId'] for r in relations}
       and all(r['metTurn'] >= 1 for r in relations),
       str([(r['raceName'], r['stance'], r['metTurn']) for r in relations]))
 
@@ -2703,12 +3310,37 @@ check('в окне «Инфо» только знакомые империи —
 
 call('DELETE', f'/api/games/{range_id}?accessToken={range_tok}')
 
+# «Инфо» ДО первого конца хода — п. 11.1. Окно само считает первую точку летописи, пока
+# летопись пуста, и прежде СОХРАНЯЛО её с номером текущего хода; фаза летописи в конце того
+# же хода писала вторую такую же, уникальность (player_id, turn) рвалась, и ход не считался
+# вовсе — 500 на каждый конец хода. Нашлось 27.09.2026 сетью обучения, которая спрашивает
+# окно каждый ход.
+early_game = call('POST', '/api/games', {'name': 'Регресс ранняя летопись', 'playerName': 'Летописец',
+                                         'galaxySize': 'SMALL', 'seed': 2727,
+                                         'galacticEvents': False})
+if 'game' in early_game:
+    early_id, early_tok = early_game['game']['id'], early_game['credentials']['accessToken']
+    call('POST', f'/api/games/{early_id}/start', {'accessToken': early_tok})
+    early_info = call_auth('GET', f'/api/games/{early_id}/info', early_tok) or {}
+    early_own = [e for e in early_info.get('empires', []) if e.get('own')]
+    early_end = end_turn(early_id, early_tok) or {}
+    check('«Инфо» до первого конца хода не ломает ход — п. 11.1',
+          early_own and early_own[0].get('history') and not early_end.get('ERROR')
+          and early_end.get('report') is not None,
+          str(early_end.get('ERROR', early_end.get('body', 'ok')))[:120])
+    call('DELETE', f'/api/games/{early_id}?accessToken={early_tok}')
+
 # Отталкивающая раса — п. 7, п. 15: договоров с ней не бывает, только война и мир.
-# Знакомство добывается флотом, иначе отказ пришёл бы за незнакомство, а не за расу —
+# Знакомство добывается заставами (по дальности, п. 15), иначе отказ пришёл бы за незнакомство, а не за расу —
 # и проверка молча проходила бы не тем путём.
+#
+# ЗЕРНО ПОСТОЯННОЕ (трек техдолга, п. 16): на случайной галактике знакомство выходило раз
+# на пять-шесть партий, и три проверки под ним то были, то молча пропадали — число
+# проверок прогона плавало на три. На зерне 505 знакомых двое, и так каждый раз.
+REPULSIVE_SEED = 505
 rep_game = call('POST', '/api/games', {'name': 'Отталкивающие', 'playerName': 'Р',
                                        'galaxySize': 'SMALL', 'raceName': 'Силикоид',
-                                       'raceTraits': ['repulsive']})
+                                       'raceTraits': ['repulsive'], 'seed': REPULSIVE_SEED})
 rep_id, rep_tok = rep_game['game']['id'], rep_game['credentials']['accessToken']
 rep_pid = rep_game['credentials']['playerId']
 call('POST', f'/api/games/{rep_id}/start', {'accessToken': rep_tok})
@@ -2718,10 +3350,16 @@ rep_home = [pl for st in rep_map['systems'] for pl in st['planets']
 rep_alien = [st for st in rep_map['systems']
              if any(pl.get('ownerPlayerId') and pl['ownerPlayerId'] != rep_pid
                     for pl in st['planets'])][0]
-build_ship(rep_id, rep_tok, rep_home['id'])
-fly_to(rep_id, rep_tok, rep_alien['id'])
+# Знакомство — по дальности (п. 15): заставы к соседу, а не прилёт флота.
+meet_by_range(rep_id, rep_tok, rep_home['id'], rep_alien['id'],
+              {pl['ownerPlayerId'] for pl in rep_alien['planets']
+               if pl.get('ownerPlayerId') and pl['ownerPlayerId'] != rep_pid})
 rep_known = call_auth('GET', f'/api/games/{rep_id}/diplomacy', rep_tok)
-if rep_known:
+# Без знакомства проверять нечего — но это провал, а не тихий пропуск: блок под условием
+# уже однажды прятал за собой три проверки.
+check('отталкивающая раса знакомится с соседями — п. 7, п. 15',
+      isinstance(rep_known, list) and len(rep_known) > 0, str(rep_known))
+if isinstance(rep_known, list) and rep_known:
     target = rep_known[0]['playerId']
     treaty = call('POST', f'/api/games/{rep_id}/diplomacy',
                   {'accessToken': rep_tok, 'targetPlayerId': target,
@@ -3307,7 +3945,12 @@ check('сохранение удалённой партии не осталос�
 # восемь проверок разом. У 2010 родные звёзды стоят в двенадцати парсеках.
 navy = call('POST', '/api/games', {'name': 'Флоты', 'playerName': 'Адмирал',
                                    'homeStarName': 'Флагман', 'galaxySize': 'SMALL',
-                                   'seed': 2010})
+                                   'seed': 2010,
+                                   # Соседи ИИ есть, но не ходят: сценарий про двух людей, а
+                                   # живой ИИ однажды сбил флот соперника до боя, и вся
+                                   # гроздь проверок боя упала без поломки (02.10.2026, после
+                                   # пункта 8 backlog-promo ИИ стал строить прикрытие раньше).
+                                   'aiActive': False})
 navy_id, navy_tok, navy_pid = (navy['game']['id'], navy['credentials']['accessToken'],
                                navy['credentials']['playerId'])
 foe = call('POST', f'/api/games/{navy_id}/join', {'playerName': 'Сосед', 'homeStarName': 'Соседняя'})
@@ -3328,13 +3971,11 @@ def navy_home(pid):
 navy_sys, navy_planet = navy_home(navy_pid)
 foe_sys, foe_planet = navy_home(foe_pid)
 
-# Корабль в стройке стоит с ПЕРВОГО хода: двигатель и топливо выданы стартовыми
-# технологиями (п. 9). Раньше здесь проверялось обратное — что до этих уровней корабля
-# нет, — и проверка проходила ровно потому, что стартовые технологии не выдавались
-# никому: империя ИИ, чьё устремление не любит химию, так и не строила ни одного корабля
-# за партию (зерно 777: шесть перелётов и ноль войн на восемь империй за 150 ходов).
-check('корабль в стройке есть с первого хода — п. 8, п. 9',
-      any(x['code'].startswith('SHIP:') for x in navy_planet['colony']['available']),
+# До двигателя и топлива корабля в стройке нет — п. 8, п. 9: стартовых технологий нет с
+# 01.10.2026, и кораблестроение открывают базовые уровни Power и Chemistry, изученные самим
+# игроком. Проверка держится на запрете (нет двух уровней — нет корабля), а не на старте.
+check('до двигателя и топлива корабля в стройке нет — п. 8, п. 9',
+      not any(x['code'].startswith('SHIP:') for x in navy_planet['colony']['available']),
       str([x['code'] for x in navy_planet['colony']['available']]))
 
 # Двигатель и топливо: обе империи учат базовые уровни Power и Chemistry — п. 8.
@@ -3437,9 +4078,14 @@ navy_report = call_auth('GET', f'/api/games/{navy_id}/turn/report', navy_tok)
 check('встреча попала в итоги хода — п. 11.1',
       any(e['code'] == 'ENCOUNTER' for e in navy_report['events']),
       str([e['code'] for e in navy_report['events']]))
-check('знакомство с расой попало в итоги хода — п. 11.1',
-      any(e['code'] == 'DIPLOMACY' for e in navy_report['events']),
-      str([e['code'] for e in navy_report['events']]))
+# Знакомство случается по дальности — п. 15: заставы, проложившие дорогу флоту, уже
+# дотянулись до соседа, и знакомы стороны с того хода, а не с прилёта. В итогах ЭТОГО хода
+# строки о знакомстве поэтому нет; что она попадает в итоги хода знакомства, проверяется
+# помощником meet_by_range.
+check('соперники знакомы — по дальности, а не прилётом — п. 15',
+      any(r['playerId'] == foe_pid
+          for r in call_auth('GET', f'/api/games/{navy_id}/diplomacy', navy_tok)),
+      'знакомства нет')
 
 # Первым решает тот, у кого yourTurn: он расходится, очередь переходит второму.
 #
@@ -3488,6 +4134,16 @@ check('бой попал в итоги хода обеих сторон — п. 
       any(e['code'] == 'BATTLE' for e in navy_after['events'])
       and any(e['code'] == 'BATTLE' for e in foe_after['events']),
       f"{[e['code'] for e in navy_after['events']]} / {[e['code'] for e in foe_after['events']]}")
+# Исход «авто» решает сравнение сил, и обе стороны читают эти силы в строке боя
+# (backlog-promo, пункт 6): поражение без чисел читается как произвол, а не как урок.
+BATTLE_WITH_CAUSE = {'turn.battle.wonBy', 'turn.battle.wonByBlasts', 'turn.battle.lostBy',
+                     'turn.battle.mutualBy', 'turn.battle.attackedWonBy',
+                     'turn.battle.attackedWonByBlasts', 'turn.battle.attackedLostBy'}
+battle_lines = [e for e in navy_after['events'] + foe_after['events'] if e['code'] == 'BATTLE']
+check('строка боя «авто» называет силы обеих сторон — backlog-promo, пункт 6',
+      bool(battle_lines) and all(e.get('key') in BATTLE_WITH_CAUSE and 'сил' in e['text']
+                                 for e in battle_lines),
+      str([(e.get('key'), e['text']) for e in battle_lines]))
 
 # Дипломатия соседа тоже попадает в итоги хода — п. 11.1.
 call('POST', f'/api/games/{navy_id}/diplomacy',
@@ -3498,7 +4154,87 @@ check('чужое объявление войны видно в итогах х�
       any('войну' in e['text'] for e in war_report['events']),
       str([e['text'] for e in war_report['events']]))
 
+# Предупреждение об угрозе ДО потери — backlog-promo, пункт 9. Война объявлена: соперник
+# тянет заставы к родному миру игрока и шлёт туда транспорт с десантом. Десант — угроза при
+# любой силе обороны, а родной мир — настоящая колония (у заставы предупреждать не о чем:
+# беззащитная застава боя не даёт и десантом не берётся). Сканеров у игрока нет, значит
+# заметить транспорт он может только на подлёте — и строка «Угрозы» обязана прийти РАНЬШЕ,
+# чем транспорт сядет.
+threat_seen, threat_detail, flight_turns = False, 'дороги к родному миру нет', 0
+if reach_towards(navy_id, foe_tok, foe_planet['id'], navy_sys['id'], navy_tok):
+    lander = build_civil(navy_id, foe_tok, foe_planet['id'], 'TRANSPORT', 'TRANSPORT', navy_tok)
+    threat_detail = 'транспорт не построен'
+    if lander:
+        sent = call('POST', f"/api/games/{navy_id}/fleets/{lander['id']}/move",
+                    {'accessToken': foe_tok, 'targetSystemId': navy_sys['id']})
+        flight_turns = (sent.get('arrivalTurn') or 0) - (sent.get('departureTurn') or 0)
+        threat_detail = f"перелёт к {navy_sys['name']} в {flight_turns} ход."
+        for _ in range(max(1, flight_turns)):
+            end_turn(navy_id, navy_tok, foe_tok)
+            threats = [e for e in call_auth('GET', f'/api/games/{navy_id}/turn/report', navy_tok)['events']
+                       if e['code'] == 'THREAT']
+            still_flying = any(f['id'] == lander['id'] and f.get('targetSystemId')
+                               for f in call_auth('GET', f'/api/games/{navy_id}/fleets', foe_tok))
+            if threats:
+                threat_seen = still_flying and all(e.get('key') == 'turn.threat.landing' for e in threats)
+                threat_detail += f"; строка: {threats[0]['text']}; транспорт ещё в пути: {still_flying}"
+                break
+            if not still_flying:
+                threat_detail += '; транспорт сел без предупреждения'
+                break
+check('вражеский десант на подлёте к своей колонии — предупреждение ДО посадки — backlog-promo, пункт 9',
+      threat_seen and flight_turns >= 2, threat_detail)
+
 call('DELETE', f'/api/games/{navy_id}?accessToken={navy_tok}')
+
+# --- 18.9. Часы хода и ушедшие (backlog-promo, пункт 11) ---
+# Срок хода — настройка партии: годятся только сроки окна новой игры. Сам срок прогоном не
+# дождаться (полторы минуты на проверку), его правило держат юнит-тесты (TurnClockRulesTest);
+# здесь живая партия: срок доезжает до сводки, ушедшего не ждут и за него играет ИИ, а
+# вернувшийся снова за столом.
+bad_clock = call('POST', '/api/games', {'name': 'Часы', 'playerName': 'Первый', 'galaxySize': 'SMALL',
+                                        'totalPlayers': 2, 'turnSeconds': 1})
+check('срок хода не из окна новой игры отвергается — backlog-promo, пункт 11',
+      bad_clock.get('ERROR') == 400, str(bad_clock.get('ERROR') or bad_clock.get('game', {}).get('id')))
+
+clock = call('POST', '/api/games', {'name': 'Часы', 'playerName': 'Первый', 'galaxySize': 'SMALL',
+                                    'totalPlayers': 2, 'seed': 2011, 'turnSeconds': 90})
+if 'game' in clock:
+    clock_id, clock_tok = clock['game']['id'], clock['credentials']['accessToken']
+    second = call('POST', f'/api/games/{clock_id}/join', {'playerName': 'Второй', 'homeStarName': 'Вторая'})
+    second_tok2, second_pid2 = second['credentials']['accessToken'], second['credentials']['playerId']
+    call('POST', f'/api/games/{clock_id}/start', {'accessToken': clock_tok})
+    summary = call('GET', f'/api/games/{clock_id}')['game']
+    check('срок хода и его конец доезжают до сводки партии — backlog-promo, пункт 11',
+          summary.get('turnSeconds') == 90 and bool(summary.get('turnDeadline')),
+          f"срок {summary.get('turnSeconds')}, конец {summary.get('turnDeadline')}")
+
+    left_game = call('POST', f'/api/games/{clock_id}/leave', {'accessToken': second_tok2})
+    gone = next((pl for pl in left_game.get('players', []) if pl['id'] == second_pid2), {})
+    check('покинувший партию помечен ушедшим — backlog-promo, пункт 11',
+          gone.get('away') is True, str(gone.get('away')))
+
+    turn_before = call('GET', f'/api/games/{clock_id}')['game']['turn']
+    ended = call('POST', f'/api/games/{clock_id}/turn/end', {'accessToken': clock_tok})
+    check('ушедшего не ждут: ход считается, когда закончил оставшийся — backlog-promo, пункт 11',
+          ended.get('advanced') is True
+          and call('GET', f'/api/games/{clock_id}')['game']['turn'] == turn_before + 1,
+          f"посчитан {ended.get('advanced')}, ждём {ended.get('waitingFor')}")
+    # Цель науки человеку без цели не назначает никто, кроме ИИ: за ушедшего выбирает он.
+    gone_research = call('GET', f'/api/games/{clock_id}/research?accessToken={second_tok2}')
+    check('за ушедшего играет ИИ: он сам выбрал цель науки — backlog-promo, пункт 11',
+          bool(gone_research.get('optionCode')), str(gone_research.get('optionCode')))
+
+    # Вернулся — любым действием: закончив ход, игрок снова за столом, и партия ждёт первого.
+    back = call('POST', f'/api/games/{clock_id}/turn/end', {'accessToken': second_tok2})
+    back_players = call('GET', f'/api/games/{clock_id}')['players']
+    check('вернувшийся снова за столом: его не ведёт ИИ, а партия ждёт соседа — backlog-promo, пункт 11',
+          back.get('advanced') is False
+          and not next((pl for pl in back_players if pl['id'] == second_pid2), {}).get('away'),
+          f"посчитан {back.get('advanced')}, ждём {back.get('waitingFor')}")
+    call('DELETE', f'/api/games/{clock_id}?accessToken={clock_tok}')
+else:
+    check('партия с часами заведена — backlog-promo, пункт 11', False, str(clock))
 
 # --- 19. Сканеры: присутствие без состава (п. 15) ---
 scan = call('POST', '/api/games', {'name': 'Сканеры', 'playerName': 'Наблюдатель',
@@ -3519,12 +4255,11 @@ def foreign_systems():
                    for pl in st['planets'])]
 
 
-# Space Scanner — первая же технология физики, и она есть у империи с первого хода
-# (п. 9, стартовые технологии): «партии до сканеров» больше не бывает. Поэтому здесь
-# проверяется его ПРЕДЕЛ, а не отсутствие: дальше своей дальности (4 парсека) сканер не
-# видит ничего, иначе карта была бы разведкой сильнее всякого флота.
-acquired = [t['optionCode'] for t in
-            call_auth('GET', f'/api/games/{scan_id}/research', scan_tok)['acquired']]
+# Space Scanner — первая же технология физики (общий уровень за 50 очков). Стартовых
+# технологий нет с 01.10.2026, поэтому сканер сперва изучают — как игрок. Проверяется его
+# ПРЕДЕЛ, а не отсутствие: дальше своей дальности (4 парсека) сканер не видит ничего, иначе
+# карта была бы разведкой сильнее всякого флота.
+acquired = sorted(study(scan_id, scan_tok, ['physics:1']))
 check('сканер изучен — п. 15', 'space-scanner' in acquired, str(acquired))
 
 before_scan = scan_map()['systems']
@@ -3572,14 +4307,14 @@ def cargo_home():
             if pl.get('homeworld') and pl.get('ownerPlayerId') == cargo_pid][0]
 
 
-# Freighters — первая технология раздела Power, а весь этот уровень империя получает на
-# старте (п. 9). Поэтому здесь проверяется не отказ до технологии, а то, что грузовой
-# флот стоит в списке стройки с первого хода: правило «только со своей технологией»
-# живёт в ColonyService и держится юнит-тестами, а зависеть от того, чего у империи
-# больше не бывает, сквозной прогон не должен.
-cargo_tech = [t['optionCode'] for t in
-              call_auth('GET', f'/api/games/{cargo_id}/research', cargo_tok)['acquired']]
-check('технология грузовиков есть на старте — п. 4.1.1, п. 9',
+# Freighters — первая технология раздела Power (общий уровень за 50 очков). Стартовых
+# технологий нет с 01.10.2026: до неё грузовой флот не строится, после — строится. Обе
+# половины правила проверяются на одной колонии.
+check('без технологии грузовой флот не строится — п. 4.1.1, п. 9',
+      not any(x['code'] == 'FREIGHTER' for x in cargo_home()['colony']['available']),
+      str([x['code'] for x in cargo_home()['colony']['available']]))
+cargo_tech = sorted(study(cargo_id, cargo_tok, ['power:1']))
+check('технология грузовиков изучена — п. 4.1.1, п. 9',
       'freighters' in cargo_tech, str(cargo_tech))
 
 home_colony = cargo_home()
@@ -3732,6 +4467,26 @@ if cargo_free and len(cargo_colonies()) > 1:
               overflow.get('ERROR') == 409,
               str(overflow.get('body', {}).get('message')))
 
+        # Уезжают ТЕ, кого взяли, и встают на то же дело; фермер там, где еду не растят, —
+        # на производство (01.10.2026). Донор стоит одними фермерами (выше), поэтому возим
+        # фермера и смотрим, кем он стал у получателя.
+        here = {c['id']: c for c in cargo_colonies()}
+        giver, taker = here[source['id']], here[destination['id']]
+        if giver['population'] >= 2 and taker['colony']['maxPopulation'] > taker['population']:
+            sent = call('POST', f"/api/games/{cargo_id}/planets/{giver['id']}/transfer",
+                        {'accessToken': cargo_tok, 'targetPlanetId': taker['id'],
+                         'population': 1, 'job': 'FARMERS'})
+            check('с колонии уходит взятый фермер, а не кто попало — п. 4.1.1',
+                  sent.get('colony', {}).get('farmers') == giver['colony']['farmers'] - 1,
+                  f"фермеров {giver['colony']['farmers']} -> {sent.get('colony', {}).get('farmers')}")
+            landed = {c['id']: c for c in cargo_colonies()}[taker['id']]['colony']
+            farms = taker['colony']['foodPerFarmer'] > 0
+            grew = 'farmers' if farms else 'workers'
+            check('прибывший фермер встаёт фермером, а где еду не растят — рабочим — п. 4.1.1',
+                  landed[grew] == taker['colony'][grew] + 1,
+                  f"еда с фермера {taker['colony']['foodPerFarmer']}: {grew} "
+                  f"{taker['colony'][grew]} -> {landed[grew]}")
+
 call('DELETE', f'/api/games/{cargo_id}?accessToken={cargo_tok}')
 
 # --- 21. Отчёт хода: что стоит показывать игроку (п. 11.1) ---
@@ -3805,6 +4560,27 @@ ship_tok = ship_game['credentials']['accessToken']
 ship_pid = ship_game['credentials']['playerId']
 call('POST', f'/api/games/{ship_id}/start', {'accessToken': ship_tok})
 
+# Кораблестроение открывается базовыми уровнями Power и Chemistry (п. 8), а стартовых
+# технологий нет с 01.10.2026 (п. 9): до них окно дизайна закрыто, проект не сохраняется и
+# корабля в стройке нет. Проверки держатся на ЗАПРЕТЕ, а не на старте партии.
+ship_catalog = call_auth('GET', f'/api/games/{ship_id}/ship-designs/catalog', ship_tok)
+check('до двигателя и топлива окно дизайна закрыто и называет, чего не хватает — п. 8, п. 9',
+      ship_catalog['available'] is False and bool(ship_catalog.get('requirement')),
+      str(ship_catalog.get('requirement')))
+early_save = call_auth('POST', f'/api/games/{ship_id}/ship-designs', ship_tok, {
+    'slot': 2, 'name': 'Ранний', 'hullCode': 'frigate',
+    'components': [{'code': 'nuclear-drive', 'count': 1}]})
+check('до двигателя и топлива проект не сохраняется — п. 8', early_save.get('ERROR') == 409,
+      str(early_save.get('body', {}).get('message')))
+ship_map = call_auth('GET', f'/api/games/{ship_id}/map', ship_tok)
+ship_home = [x for st in ship_map['systems'] for x in st['planets']
+             if x.get('ownerPlayerId') == ship_pid][0]
+check('до двигателя и топлива корабля в стройке нет — п. 8, п. 9',
+      not any(x['code'].startswith('SHIP:') for x in ship_home['colony']['available']),
+      str([x['code'] for x in ship_home['colony']['available']]))
+
+# Первые уровни Power, Chemistry и Physics — то, с чего игрок начинает флот.
+study(ship_id, ship_tok, ['power:1', 'chemistry:1', 'physics:1'])
 ship_catalog = call_auth('GET', f'/api/games/{ship_id}/ship-designs/catalog', ship_tok)
 hull_codes = [x['code'] for x in ship_catalog['hulls']]
 check('справочник отдаёт шесть корпусов MOO II — п. 8',
@@ -3815,11 +4591,12 @@ check('крупные корпуса закрыты до своих технол
       [x['code'] for x in ship_catalog['hulls'] if not x['available']] == ['titan', 'doom-star'],
       str([x['code'] for x in ship_catalog['hulls'] if not x['available']]))
 open_parts = [x['code'] for x in ship_catalog['components'] if x['available']]
-# Стартовые технологии (п. 9) дают не только двигатель: Chemistry несёт броню и ракету,
-# Physics — лазер. Ровно на это и опирается кораблестроение с первого хода.
-check('империя начинает с двигателя, брони и пушек — п. 8, п. 9',
-      set(open_parts) == {'nuclear-drive', 'titanium-armor', 'mass-driver',
-                          'laser-cannon', 'nuclear-missile'}, str(open_parts))
+# Первые уровни (п. 9) дают не только двигатель: Chemistry несёт броню, ракету и
+# дополнительные баки, Physics — лазер. Список проверяется НА ВХОЖДЕНИЕ, а не на
+# равенство: новый компонент на этих уровнях — это правка справочника, а не поломка игры.
+check('первые уровни дают двигатель, броню и пушки — п. 8, п. 9',
+      {'nuclear-drive', 'titanium-armor', 'mass-driver',
+       'laser-cannon', 'nuclear-missile'} <= set(open_parts), str(open_parts))
 
 # Вид выстрела нужен окну дизайна: им оно раскладывает пушки лучами, снарядами и
 # ракетами — полосой BEAM/MISSILE/BOMB оригинала. У всего, что не оружие, вида нет.
@@ -3880,17 +4657,13 @@ check('вытесненный автопроект уходит из окна д
       all(auto_before[slot] not in {x['id'] for x in designs_after} for slot in replaced),
       str(replaced))
 
-# Кораблестроение открывается базовыми уровнями Power и Chemistry (п. 8), и оба даются
-# на старте (п. 9): окно дизайна открыто с первого хода, а не после первых исследований.
-# Раньше здесь проверялось обратное — и проходило ровно потому, что стартовые технологии
-# не выдавались никому.
-check('окно дизайна открыто с первого хода — п. 8, п. 9',
+check('изучив двигатель и топливо, окно дизайна открыто — п. 8, п. 9',
       ship_catalog['available'] is True and ship_catalog.get('requirement') is None,
       str(ship_catalog.get('requirement')))
 early_save = call_auth('POST', f'/api/games/{ship_id}/ship-designs', ship_tok, {
     'slot': 2, 'name': 'Ранний', 'hullCode': 'frigate',
     'components': [{'code': 'nuclear-drive', 'count': 1}]})
-check('проект сохраняется с первого хода — п. 8', early_save.get('ERROR') is None,
+check('изучив двигатель и топливо, проект сохраняется — п. 8', early_save.get('ERROR') is None,
       str(early_save.get('body', {}).get('message')))
 
 ship_map = call_auth('GET', f'/api/games/{ship_id}/map', ship_tok)
@@ -3904,7 +4677,7 @@ check('родной мир начинает со звёздной базой —
 check('родной мир начинает с казармами — п. 12',
       any(b['code'] == 'marine-barracks' for b in ship_home['colony']['buildings']),
       str([b['code'] for b in ship_home['colony']['buildings']]))
-check('корабль в стройке есть с первого хода — п. 8, п. 9',
+check('изучив двигатель и топливо, корабль в стройке есть — п. 8, п. 9',
       any(x['code'].startswith('SHIP:') for x in ship_home['colony']['available']),
       str([x['code'] for x in ship_home['colony']['available']]))
 
@@ -4020,6 +4793,53 @@ two_engines = call_auth('POST', f'/api/games/{ship_id}/ship-designs', ship_tok, 
     'slot': 3, 'name': 'Двухмоторный', 'hullCode': 'frigate',
     'components': [{'code': 'nuclear-drive', 'count': 2}]})
 check('второй двигатель кораблю не поставить — п. 8', two_engines.get('ERROR') == 409)
+
+# --- Дополнительные баки: модуль КОРАБЛЯ, а не технология империи (п. 8) ---
+#
+# До 29.09.2026 изученные баки давали +50 % дальности всей империи разом, и поставить их
+# было некуда: в окне дизайна их не было вовсе. Теперь это особый модуль — он занимает
+# место, стоит денег и достаётся тому кораблю, которому его поставили.
+#
+# Ожидаемая дальность считается ЗДЕСЬ, по изученному топливу, а не берётся числом: партия
+# прогона успевает что-нибудь изучить, и вписанная четвёрка стала бы бомбой с часовым
+# механизмом (правила проекта, «проверка, держащаяся на стартовом состоянии»).
+FUEL_LADDER = {'standard-fuel-cells': 4, 'deuterium-fuel-cells': 6, 'iridium-fuel-cells': 9,
+               'uridium-fuel-cells': 12, 'thorium-fuel-cells': 1000}
+ship_known = {x['optionCode'] for x
+              in call_auth('GET', f'/api/games/{ship_id}/research', ship_tok)['acquired']}
+expected_range = max([FUEL_LADDER[code] for code in FUEL_LADDER if code in ship_known] or [4])
+
+tanks = [x for x in ship_catalog['components'] if x['code'] == 'extended-fuel-tanks']
+check('дополнительные баки — особый модуль справочника — п. 8',
+      bool(tanks) and tanks[0]['slot'] == 'SPECIAL'
+      and any(e['type'] == 'FUEL_RANGE_PERCENT' and e['amount'] == 50
+              for e in tanks[0]['effects']),
+      str(tanks)[:200])
+
+ships_now = call_auth('GET', f'/api/games/{ship_id}/ships', ship_tok)
+check('изученные баки сами по себе дальности империи не дают — п. 8',
+      'extended-fuel-tanks' in ship_known
+      and ships_now['rangeParsecs'] == expected_range,
+      f"дальность {ships_now['rangeParsecs']}, ждали {expected_range},"
+      f" баки изучены {'extended-fuel-tanks' in ship_known}")
+
+tanked = call_auth('POST', f'/api/games/{ship_id}/ship-designs', ship_tok, {
+    'slot': 3, 'name': 'Дальнобой', 'hullCode': 'frigate',
+    'components': [{'code': 'nuclear-drive', 'count': 1},
+                   {'code': 'extended-fuel-tanks', 'count': 1}]})
+check('баки ставятся в проект и прибавляют ему половину дальности — п. 8',
+      tanked.get('rangePercent') == 50,
+      str(tanked.get('message') or tanked.get('rangePercent')))
+check('баки занимают место на корабле — п. 8',
+      tanked.get('spaceUsed') == 4 + 2, f"занято {tanked.get('spaceUsed')} из 30")
+
+# Списка достижимого два: для кораблей с баками и без них. Дальше базового второй список
+# быть обязан, иначе баки ничего не меняют на карте.
+check('карта знает, куда долетают корабли с баками, — п. 8',
+      set(ships_now['reachableSystemIds']) <= set(ships_now['reachableFarSystemIds'])
+      and len(ships_now['reachableFarSystemIds']) >= len(ships_now['reachableSystemIds']),
+      f"без баков {len(ships_now['reachableSystemIds'])},"
+      f" с баками {len(ships_now['reachableFarSystemIds'])}")
 
 # Ячейка переписывается, а построенные корабли остаются прежними — п. 8.
 rewritten = call_auth('POST', f'/api/games/{ship_id}/ship-designs', ship_tok, {
@@ -4632,11 +5452,15 @@ if tac_encounters:
           str(far_move.get('body', {}).get('message')))
 
     far_enemy = next(s for s in tac_battle['ships'] if s['side'] != tac_current['side'])
-    far_shot = call_auth('POST', f"/api/games/{tac_id}/battles/{tac_battle['id']}/action",
-                         owner_token, {'shipId': tac_current['id'], 'action': 'FIRE',
-                                       'targetShipId': far_enemy['id']})
-    check('через всё поле залп не достаёт — п. 8', far_shot.get('ERROR') == 409,
-          str(far_shot.get('body', {}).get('message')))
+
+    # Залп идёт только выбранными строками оружия (п. 8, как в полосе боя оригинала), и
+    # строка, которой у корабля нет, не выбирает ничего — сервер отказывает словами, а не
+    # стреляет всем.
+    none_chosen = call_auth('POST', f"/api/games/{tac_id}/battles/{tac_battle['id']}/action",
+                            owner_token, {'shipId': tac_current['id'], 'action': 'FIRE',
+                                          'targetShipId': far_enemy['id'], 'weaponRows': [99]})
+    check('без выбранного ствола залпа нет — п. 8', none_chosen.get('ERROR') == 409,
+          str(none_chosen.get('body', {}).get('message')))
 
     friend_shot = call_auth('POST', f"/api/games/{tac_id}/battles/{tac_battle['id']}/action",
                             owner_token, {'shipId': tac_current['id'], 'action': 'FIRE',
@@ -4644,8 +5468,34 @@ if tac_encounters:
     check('по своим не стреляем — п. 8', friend_shot.get('ERROR') == 409,
           str(friend_shot.get('body', {}).get('message')))
 
-    # Играем бой до конца: сходимся и стреляем, пока одна сторона не кончится.
+    # Дальность залпа — по самому дальнобойному стволу, и у ракеты это её путь на топливе
+    # (backlog-promo, пункт 30: скорость на два круга), а не всё поле. Дальше неё — отказ;
+    # ближе — залп уходит, и ракета, не долетевшая за круг, остаётся на поле (LAUNCH). Залп
+    # кончает ход, поэтому проверка стоит последней, и состояние боя берётся из её ответа —
+    # иначе прогон пошёл бы дальше с тем, чей ход уже прошёл.
     tac_state = tac_battle
+    tac_missiles = any(w.get('kind') == 'MISSILE' and w['count'] > w.get('wrecked', 0)
+                       for w in tac_current.get('weapons', []))
+    far_distance = max(abs(far_enemy['x'] - tac_current['x']), abs(far_enemy['y'] - tac_current['y']))
+    far_shot = call_auth('POST', f"/api/games/{tac_id}/battles/{tac_battle['id']}/action",
+                         owner_token, {'shipId': tac_current['id'], 'action': 'FIRE',
+                                       'targetShipId': far_enemy['id']})
+    if far_distance > tac_current['weaponRange']:
+        check('за пределом дальности залпа нет, и у ракеты тоже — пункт 30',
+              far_shot.get('ERROR') == 409,
+              f"до цели {far_distance}, дальность {tac_current['weaponRange']}; "
+              + str(far_shot.get('body', {}).get('message')))
+    else:
+        check('в пределах дальности залп уходит — пункт 30', 'ERROR' not in far_shot,
+              str(far_shot.get('body', {}).get('message')))
+        if 'ERROR' not in far_shot:
+            tac_state = far_shot
+            if tac_missiles:
+                kinds = {e['type'] for e in far_shot.get('events', [])}
+                check('ракетный залп пущен или долетел — пункт 30', bool(kinds & {'LAUNCH', 'FIRE'}),
+                      str(sorted(kinds)))
+
+    # Играем бой до конца: сходимся и стреляем, пока одна сторона не кончится.
     tac_destroyed = 0
     for _ in range(400):
         if tac_state['state'] != 'IN_PROGRESS':
@@ -4756,6 +5606,23 @@ if 'ERROR' not in demo:
     demo_salvos = {(x['hullName'], x['attack']) for x in demo_battle['ships']}
     check('вооружение у кораблей разное — п. 8', len(demo_salvos) >= 6, str(sorted(demo_salvos)))
 
+    # Имена кораблей и подпись партии — на языке запроса (трек техдолга, пункт 18): прежде
+    # они были русскими строками в базе, и английский игрок читал их посреди английского
+    # журнала. Прогон просит по-русски, поэтому английский ответ спрашивается отдельно, и
+    # проверяется ГОТОВЫЙ текст: ключ на месте ещё не значит, что игрок увидит перевод.
+    # Спрашивается ТОТ ЖЕ бой (GET), а не новый: новая демонстрация убрала бы эту, а ею
+    # раздел ходит дальше.
+    demo_en = call_lang('GET', f"/api/reference/demo-battle/{demo_battle['id']}", 'en')
+    demo_en_names = [x.get('designName', '') for x in demo_en.get('ships', [])]
+    demo_en_system = demo_en.get('systemName', '')
+    check('имена демонстрации по-английски без кириллицы — пункт 18',
+          demo_en_names and not any(re.search('[А-Яа-яЁё]', n) for n in demo_en_names + [demo_en_system])
+          and not any(n.startswith('demo.') for n in demo_en_names),
+          f"{demo_en_system}: {demo_en_names[:3]}")
+    check('имена демонстрации по-русски — пункт 18',
+          all(re.search('[А-Яа-яЁё]', x.get('designName', '')) for x in demo_battle['ships']),
+          str([x.get('designName') for x in demo_battle['ships']][:3]))
+
     demo_cells = [(x['x'], x['y']) for x in demo_battle['ships']]
     check('корабли демонстрации стоят по своим клеткам — п. 8',
           len(demo_cells) == len(set(demo_cells)), str(demo_cells))
@@ -4799,8 +5666,10 @@ if 'ERROR' not in demo:
     check('у каждого залпа известен вид оружия — п. 8',
           demo_shots > 0 and None not in demo_kinds,
           f"залпов {demo_shots}, виды {sorted(k for k in demo_kinds if k)}")
-    check('в демонстрации стреляют всеми тремя видами оружия — п. 8',
-          demo_kinds >= {'BEAM', 'PROJECTILE', 'MISSILE'},
+    # Снарядов в демонстрации нет нарочно (backlog-promo, пункт 30): снаряд не слабеет, и
+    # корабль с ним стоял бы у края поля, пока остальные сходятся.
+    check('в демонстрации стреляют лучами и ракетами, без снарядов — пункт 30',
+          demo_kinds >= {'BEAM', 'MISSILE'} and 'PROJECTILE' not in demo_kinds,
           str(sorted(k for k in demo_kinds if k)))
 
     # Эндпоинт демонстрации открыт, поэтому он не должен двигать что попало: чужой бой
@@ -5088,6 +5957,61 @@ check('та же партия с тем же зерном повторяется
       f" расхождений {sum(1 for a, b in zip(twins[0][2], twins[1][2]) if a != b)}")
 
 
+# --- 13.7a. Повторимость, когда ходы заканчивает КЛИЕНТ (этап 0) ---
+#
+# Проверка выше играет партию ОДНИМ запросом `turn/advance`, и целый класс поломок она
+# пропускает: тот, что вылезает на сотне ходов и в многолюдной галактике, где флоты
+# сходятся у одной звезды. Именно так и нашли беду 25.09.2026 — обучение сети
+# (`tools/sddnw_learn.py`) играло партию через клиента, и доля мощи на зерне 1001 выходила
+# 0.1631, 0.1631 и 0.1445 при одних и тех же ходах игрока. Расходились соперники: фаза
+# прибытия вела флоты в порядке выборки, а не в порядке правил, и сторожевое чудище системы
+# доставалось то одному подошедшему флоту, то другому — первый его вскрывал и гибнул сам,
+# второй входил в расчищенную систему целым. Тем же страдали зерно боя «авто» (в него
+# входили биты случайного UUID системы), выбор слабейшего корабля и списание потерь боя
+# (спор равных решал UUID строки), очередь встреч, снос постройки «ужасной аварией» и
+# выбор соседа «династическим браком» — тот сортировал империи по идентификатору,
+# приведённому к строке. Шесть мест, и у пяти рядом стояла приписка, будто порядок задан.
+#
+# Поэтому здесь партия играется ХОДАМИ, как её играет клиент, и сверяется летопись всех
+# империй ход за ходом. Империй шесть, а не три: чем теснее галактика, тем чаще флоты
+# сходятся у одной звезды, а на ЭТОМ и держится чувствительность проверки. Своими глазами
+# она видит не всякую поломку такого рода — совпадение зависит от того, случился ли в партии
+# спор равных, — зато не провалится НИКОГДА на здоровой игре. Длинный и чувствительный
+# вариант живёт в балансовом прогоне: `--check-determinism --by-turn --games 24`
+# (двенадцать зёрен; до починки расходились четыре из двенадцати, после — ни одно).
+def client_driven(seed, turns, empires, name):
+    """Партия, где ходы заканчивает клиент по одному, и её летопись."""
+    made = call('POST', '/api/games', {
+        'name': name, 'galaxySize': 'SMALL', 'playerName': 'Наблюдатель',
+        'observer': True, 'seed': seed, 'totalPlayers': empires, 'galacticEvents': False})
+    gid, tok = made['game']['id'], made['credentials']['accessToken']
+    call('POST', f'/api/games/{gid}/start', {'accessToken': tok})
+    for _ in range(turns):
+        step = call('POST', f'/api/games/{gid}/turn/end', {'accessToken': tok})
+        if not isinstance(step, dict) or step.get('ERROR'):
+            break
+        if step.get('status') == 'FINISHED':
+            break
+    return gid, tok, balance_fingerprint(gid, tok)
+
+
+BY_TURN_TURNS = 150
+# Имя начинается с «Баланс прогон» нарочно: уборка сносит брошенные партии по ПРЕФИКСУ из
+# HARNESS_NAMES, и своё новое слово там завело бы риск задеть чужое («Повтор» поймал бы и
+# «Повторимость» с соседнего экрана). Префикс берётся из уже существующих.
+paced = [client_driven(4242, BY_TURN_TURNS, 6, 'Баланс прогон ходами %d' % number)
+         for number in (1, 2)]
+paced_apart = [index for index, (one, two) in enumerate(zip(paced[0][2], paced[1][2]))
+               if one != two]
+check('партия повторяется и когда ходы заканчивает клиент по одному — этап 0',
+      paced[0][2] == paced[1][2] and len(paced[0][2]) > 0,
+      f"замеров {len(paced[0][2])} и {len(paced[1][2])}, расхождений {len(paced_apart)}"
+      + (f", первое на замере {paced_apart[0]}: {paced[0][2][paced_apart[0]]}"
+         f" против {paced[1][2][paced_apart[0]]}" if paced_apart else ''))
+for pgid, ptok, _ in paced:
+    call('DELETE', f'/api/games/{pgid}?accessToken={ptok}')
+
+
 # --- 13.8. Империи ИИ и правда играют: наука по нуждам, флот, десант (п. 15) ---
 #
 # Прогон балансировки показал, за что эти проверки: устремление правителя водило науку по
@@ -5360,10 +6284,13 @@ call('DELETE', f'/api/games/{lgid}?accessToken={ltok}')
 # копит флот. Проверяется вся дорога — бой заводится сам при заходе в сторожевую систему,
 # чудище на поле помечено чудищем, а строка, за которой оно стоит, не считается империей
 # НИГДЕ: ни в списке игроков, ни в окне «Инфо», ни в справочнике кораблей.
+# Соседи ИИ здесь нужны только как империи в списках (чудище среди них числиться не
+# должно), а их ходы сценарию мешают: флот охотника летит один, и сосед мог перехватить его
+# или добить сторожа раньше. Поэтому ИИ в партии не действует (трек техдолга, пункт 17).
 mon_game = call('POST', '/api/games', {'name': 'Чудище', 'playerName': 'Охотник',
                                        'galaxySize': 'SMALL', 'seed': 4242,
                                        'totalPlayers': 3, 'galacticEvents': False,
-                                       'council': False})
+                                       'council': False, 'aiActive': False})
 if 'game' in mon_game:
     mgid = mon_game['game']['id']
     mtok = mon_game['credentials']['accessToken']
@@ -5381,6 +6308,10 @@ if 'game' in mon_game:
           not any(code.startswith('monster-') for code in comp_codes),
           str([c for c in comp_codes if c.startswith('monster-')]))
 
+    # Флот на чудище строят двигателем и топливом, а стартовых технологий нет (п. 9,
+    # 01.10.2026): без этого фрегата в стройке не было, и весь бой с чудищем молча
+    # пропускался — счёт прогона упал на десяток проверок без единого провала.
+    research_shipbuilding(mgid, mtok)
     mmap = call('GET', f'/api/games/{mgid}/map?accessToken={mtok}&revealAll=true')
     mhome = [st for st in mmap['systems']
              if any(pl.get('ownerPlayerId') == mpid for pl in st['planets'])][0]
@@ -5398,6 +6329,11 @@ if 'game' in mon_game:
     # Четыре фрегата: одного чудищу мало даже на залп, а нам нужен бой, а не казнь.
     frigate = [a for a in mcolony['colony']['available']
                if a['code'].startswith('SHIP:') and a['name'].endswith('Frigate')]
+    # Блок ниже стоит под условием, и молчащее условие — это пропуск, а не отказ: так он и
+    # пропал однажды целиком. Поэтому то, без чего он не идёт, проверяется явно.
+    check('для похода на чудище есть и логово, и фрегат в стройке — п. 8, п. 11.1',
+          bool(lair) and bool(frigate),
+          f"логово {bool(lair)}, фрегат {[a['code'] for a in frigate]}")
     if lair and frigate:
         code = frigate[0]['code']
         call('POST', f"/api/games/{mgid}/planets/{mcolony['id']}/project",
@@ -5542,9 +6478,13 @@ if 'game' in mon_game:
 # раньше пятидесятого хода, не собирается в поединке двоих и не собирается вовсе там, где
 # его выключили. Числа правил закрыты юнит-тестами (CouncilRulesTest), а здесь живая
 # партия: голоса записаны, счёт сходится, а избрание согласовано с двумя третями.
+# Зерно меняется вместе с поведением ИИ: партия трёх ИИ без событий идёт так, как решают они,
+# и правка ИИ уводит её в другую историю. 909096 перестало избирать после пункта 8
+# backlog-promo (02.10.2026, ИИ видит чужие флоты только своими глазами); 909098 избирает
+# на 150-м ходу.
 council_game = call('POST', '/api/games', {'name': 'Совет', 'playerName': 'Наблюдатель',
                                            'galaxySize': 'SMALL', 'observer': True,
-                                           'seed': 909090, 'totalPlayers': 3,
+                                           'seed': 909098, 'totalPlayers': 3,
                                            'galacticEvents': False})
 if 'game' in council_game:
     council_id = council_game['game']['id']
@@ -5593,8 +6533,10 @@ if 'game' in council_game:
     # четыреста ходов — это провал проверки, а не повод молча её не делать.
     #
     # Число кругов ИЗМЕРЕНО, а не выбрано на глаз: на этом зерне правитель избирается на
-    # 350-м ходу (замер 23.09.2026, после перевода оружия на числа оригинала — прежние
-    # двенадцать кругов упирались в 325-й ход и проваливались, хотя механика цела).
+    # 225-м ходу (замер 01.10.2026). Зерно сменено тогда же: без стартовых технологий
+    # прежнее (909090) не избирало никого и за тысячу ходов — партия пошла иначе, а не
+    # сломался совет. Из шести соседних зёрен три избирали на 225–300-м ходу, три — нет
+    # за четыреста; правило «две трети» в партии троих и не обязано срабатывать всегда.
     elected = None
     for _ in range(16):
         session = call('GET', f'/api/games/{council_id}/council?accessToken={council_tok}')
@@ -5672,6 +6614,72 @@ if 'game' in off_game:
     check('без избрания отказываться не от чего — п. 3', nothing.get('ERROR') == 409,
           str(nothing)[:120])
     call('DELETE', f'/api/games/{off_id}?accessToken={off_tok}')
+
+# Голос игрока в совете — п. 3. Совет, у которого есть избиратель-человек, идёт в ДВА хода:
+# на ходу созыва записаны голоса ИИ, а человек голосует сам до конца следующего хода.
+# Партия с человеком, а не с наблюдателем: наблюдатель — это ИИ, и его не спрашивают.
+# Зерно постоянное: на нём человек не попадает в кандидаты (кандидат голосует за себя без
+# вопроса), и бюллетень у него есть в каждом прогоне.
+ballot_game = call('POST', '/api/games', {'name': 'Совет голос', 'playerName': 'Избиратель',
+                                          'galaxySize': 'SMALL', 'seed': 111,
+                                          'totalPlayers': 4, 'galacticEvents': False})
+if 'game' in ballot_game:
+    ballot_id = ballot_game['game']['id']
+    ballot_tok = ballot_game['credentials']['accessToken']
+    ballot_me = ballot_game['credentials']['playerId']
+    call('POST', f'/api/games/{ballot_id}/start', {'accessToken': ballot_tok})
+    call('POST', f'/api/games/{ballot_id}/turn/advance', {'accessToken': ballot_tok, 'turns': 50})
+    opened = call_auth('GET', f'/api/games/{ballot_id}/council', ballot_tok) or {}
+    ballot_mine = [v for v in opened.get('voters', []) if v.get('yours')]
+    check('совет с человеком созван и ждёт его голоса — п. 3',
+          opened.get('open') is True and opened.get('ballot') is True
+          and ballot_mine and ballot_mine[0].get('pending') is True
+          and call('GET', f'/api/games/{ballot_id}')['game']['status'] == 'IN_PROGRESS',
+          str({k: opened.get(k) for k in ('turn', 'open', 'ballot')}))
+    # Чужие голоса до итога скрыты: иначе человек голосовал бы подсчётом, а не мнением.
+    check('в открытом совете чужие голоса не объявлены — п. 3',
+          all(v.get('pending') and not v.get('choicePlayerId')
+              for v in opened.get('voters', []) if not v.get('yours')),
+          str([(v.get('name'), v.get('pending')) for v in opened.get('voters', [])]))
+    ballot_cands = [c['playerId'] for c in opened.get('candidates', [])]
+    wrong = call_auth('POST', f'/api/games/{ballot_id}/council/vote', ballot_tok,
+                      {'choicePlayerId': ballot_me})
+    check('голосовать можно только за кандидата — п. 3', wrong.get('ERROR') == 400, str(wrong)[:120])
+    if ballot_cands:
+        cast = call_auth('POST', f'/api/games/{ballot_id}/council/vote', ballot_tok,
+                         {'choicePlayerId': ballot_cands[0]})
+        # Голос переменяем до итога: воздержаться и вернуться к кандидату.
+        call_auth('POST', f'/api/games/{ballot_id}/council/vote', ballot_tok, {'choicePlayerId': None})
+        cast = call_auth('POST', f'/api/games/{ballot_id}/council/vote', ballot_tok,
+                         {'choicePlayerId': ballot_cands[0]})
+        cast_mine = [v for v in cast.get('voters', []) if v.get('yours')]
+        check('голос игрока принят и переменяем до итога — п. 3',
+              cast_mine and cast_mine[0].get('choicePlayerId') == ballot_cands[0]
+              and cast_mine[0].get('pending') is False, str(cast)[:160])
+        call('POST', f'/api/games/{ballot_id}/turn/advance', {'accessToken': ballot_tok, 'turns': 1})
+        closed = call_auth('GET', f'/api/games/{ballot_id}/council', ballot_tok) or {}
+        closed_mine = [v for v in closed.get('voters', []) if v.get('yours')]
+        check('в конце хода совет подводит итог с голосом игрока — п. 3',
+              closed.get('open') is False
+              and closed_mine and closed_mine[0].get('choicePlayerId') == ballot_cands[0]
+              and all(v.get('pending') is False for v in closed.get('voters', [])),
+              str({k: closed.get(k) for k in ('turn', 'open', 'electedName')}))
+        late = call_auth('POST', f'/api/games/{ballot_id}/council/vote', ballot_tok,
+                         {'choicePlayerId': None})
+        check('после итога голосовать не о чем — п. 3', late.get('ERROR') == 409, str(late)[:120])
+        # Молчание не запирает выборы: не ответивший голосует доверием в конце хода.
+        if call('GET', f'/api/games/{ballot_id}')['game']['status'] == 'IN_PROGRESS':
+            call('POST', f'/api/games/{ballot_id}/turn/advance', {'accessToken': ballot_tok, 'turns': 24})
+            second = call_auth('GET', f'/api/games/{ballot_id}/council', ballot_tok) or {}
+            call('POST', f'/api/games/{ballot_id}/turn/advance', {'accessToken': ballot_tok, 'turns': 1})
+            silent = call_auth('GET', f'/api/games/{ballot_id}/council', ballot_tok) or {}
+            check('не проголосовавшему голос подаёт доверие — п. 3',
+                  second.get('open') is True and second.get('turn') == 75
+                  and silent.get('open') is False
+                  and all(v.get('pending') is False for v in silent.get('voters', [])),
+                  str({'созыв': second.get('turn'), 'открыт': second.get('open'),
+                       'после': silent.get('open')}))
+    call('DELETE', f'/api/games/{ballot_id}?accessToken={ballot_tok}')
 
 # --- 14. Удаление партии ---
 bad = call('DELETE', f'/api/games/{gid}?accessToken=nosuchtoken')
@@ -5769,7 +6777,7 @@ summary.append('  начат              ' + time.strftime('%H:%M:%S', time.loc
 summary.append('  длился             %.1f мин' % ((time.time() - run_started) / 60))
 summary.append('  python             ' + sys.version.split()[0])
 summary.append('  пульт балансировки ' + ('занят прогоном' if running_run else 'свободен'))
-summary.append('  подробный вывод    ' + ('включён' if trace else 'выключен') + ' (MOO3_TRACE)')
+summary.append('  подробный вывод    ' + ('включён' if trace else 'выключен') + ' (SDDNW_TRACE)')
 summary.append('')
 summary.append('РЕЗУЛЬТАТ')
 summary.append('  проверок           %d' % len(report))

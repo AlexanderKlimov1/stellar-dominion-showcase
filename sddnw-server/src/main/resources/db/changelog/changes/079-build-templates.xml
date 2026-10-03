@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+      Шаблоны стройки — п. 10: набор «завод, лаборатория, космопорт», который закладывают
+      колонии одним движением.
+
+      ЗАЧЕМ. Очередь держит семь мест и заводится каждой колонии отдельно; к середине партии
+      колоний два десятка, и один и тот же порядок развития игрок набирает руками снова и
+      снова. Список колоний умеет заложить ОДИН проект многим колониям (`enqueueAll`) — а
+      нужен обратный ход: набор проектов одной колонии.
+
+      ШАБЛОН ПРИНАДЛЕЖИТ УЧЁТНОЙ ЗАПИСИ, А НЕ ПАРТИИ, и это главное решение здесь. Порядок
+      развития — привычка игрока, а не состояние партии: он переживает партию, годится для
+      следующей и должен быть виден из главного меню, где никакой партии ещё нет. Поэтому
+      таблица живёт рядом с учётными записями, в источнике данных истории
+      (`sddnw.history.datasource`), — там же, где язык, размер текста и раскладка клавиш.
+
+      `tier` — СТАДИЯ РАЗВИТИЯ, которую игрок назначает шаблону сам (1, 2, 3…): ранняя
+      колония, зрелая, столица. Игра её не толкует и ничего по ней не решает — это ярлык,
+      по которому шаблоны группируются в списке и который отвечает на вопрос «а этот для
+      чего». Толковать её сервером значило бы выдумать правило, которого игрок не просил.
+
+      `projects` — порядок стройки ОДНОЙ СТРОКОЙ через запятую, а не своей таблицей: строк
+      в шаблоне полдесятка, меняются они все разом одним «сохранить», и выбирать из них по
+      одной незачем. Та же причина, по которой строкой хранится очередь колонии
+      (`planet.build_queue`) и раскладка клавиш (`account.hotkeys`).
+
+      Внешнего ключа на `account` нет по той же причине, что и у `player.account_id`
+      (миграция 077): в режиме балансового прогона игра уходит в память, а записи остаются
+      в Postgres, и межбазовых ключей не бывает. Чужие шаблоны убираются вместе с записью —
+      явной уборкой в `AccountService.deleteByAdmin`.
+    -->
+    <changeSet id="079-build-template" author="sddnw">
+        <createTable tableName="build_template">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="account_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="varchar(80)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="tier" type="int" defaultValueNumeric="1">
+                <constraints nullable="false"/>
+            </column>
+            <column name="projects" type="varchar(1000)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamptz">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex tableName="build_template" indexName="idx_build_template_account">
+            <column name="account_id"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

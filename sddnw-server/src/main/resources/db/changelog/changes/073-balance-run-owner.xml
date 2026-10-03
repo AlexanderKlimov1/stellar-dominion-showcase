@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+      Хозяин и пульс балансового прогона (трек техдолга, пункт 15).
+
+      История прогонов одна на все экземпляры сервера, и при старте каждый закрывал ВСЕ
+      «идущие» записи — считая, что идти они могли только в нём самом. Сервер, поднятый
+      рядом, обрывал так чужой оракул на полпути. Теперь у прогона есть хозяин (экземпляр,
+      который его ведёт) и пульс — хозяин отмечается раз в полминуты. Закрывается только
+      чужой прогон с замолчавшим пульсом: значит, вести его больше некому.
+
+      Прогоны, заведённые до этой миграции, пульса не имеют и закрываются по-прежнему —
+      вести их уже некому: старые экземпляры не бьются.
+    -->
+    <changeSet id="073-balance-run-owner" author="sddnw">
+        <addColumn tableName="balance_run">
+            <column name="owner_instance" type="varchar(120)"/>
+            <column name="heartbeat_at" type="timestamp with time zone"/>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

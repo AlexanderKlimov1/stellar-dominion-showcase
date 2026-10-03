@@ -38,7 +38,7 @@
             "en": "Ships are built a third cheaper, but a scientist works twice as badly.",
             "ru": "Корабли строятся на треть дешевле, но учёный работает вдвое хуже."
           },
-          "picks": -3,
+          "picks": -1,
           "effects": [
             {
               "type": "RESEARCH_PERCENT",
@@ -82,7 +82,7 @@
             "en": "A scientist and a taxpayer work half again as well, but enemy agents feel at ease.",
             "ru": "Учёный и налогоплательщик работают в полтора раза лучше, зато чужие агенты чувствуют себя вольготнее."
           },
-          "picks": 6,
+          "picks": 7,
           "effects": [
             {
               "type": "RESEARCH_PERCENT",
@@ -112,7 +112,7 @@
             "en": "A single organism: a worker and a farmer work half again as well, the counter-espionage is stronger.",
             "ru": "Единый организм: рабочий и фермер работают в полтора раза лучше, контрразведка крепче."
           },
-          "picks": 18,
+          "picks": 19,
           "effects": [
             {
               "type": "PRODUCTION_PERCENT",
@@ -222,7 +222,7 @@
             "en": "A farmer gives a quarter less food: two units turn into one and a half.",
             "ru": "Фермер даёт на четверть меньше еды: две единицы обращаются в полторы."
           },
-          "picks": -8,
+          "picks": -11,
           "effects": [
             {
               "type": "FOOD_PERCENT",
@@ -325,7 +325,7 @@
             "en": "Every worker gives two production more.",
             "ru": "Каждый рабочий даёт на две единицы производства больше."
           },
-          "picks": 7,
+          "picks": 9,
           "effects": [
             {
               "type": "PRODUCTION_PER_WORKER",
@@ -392,7 +392,7 @@
             "en": "Every scientist gives two research points more.",
             "ru": "Каждый учёный даёт на два очка исследований больше."
           },
-          "picks": 6,
+          "picks": 4,
           "effects": [
             {
               "type": "RESEARCH_PER_SCIENTIST",
@@ -423,7 +423,7 @@
             "en": "The tax from colonists is half the usual.",
             "ru": "Налог с жителей вдвое ниже обычного."
           },
-          "picks": -4,
+          "picks": -6,
           "effects": [
             {
               "type": "INCOME_PERCENT",
@@ -441,7 +441,7 @@
             "en": "The tax from colonists is half again as high.",
             "ru": "Налог с жителей выше на половину."
           },
-          "picks": 8,
+          "picks": 6,
           "effects": [
             {
               "type": "INCOME_PERCENT",
@@ -459,7 +459,7 @@
             "en": "The tax from colonists is twice the usual.",
             "ru": "Налог с жителей вдвое выше обычного."
           },
-          "picks": 11,
+          "picks": 9,
           "effects": [
             {
               "type": "INCOME_PERCENT",
@@ -557,7 +557,7 @@
             "en": "Ship attack is 20% lower.",
             "ru": "Атака кораблей ниже на 20%."
           },
-          "picks": -2,
+          "picks": -1,
           "effects": [
             {
               "type": "SHIP_ATTACK_PERCENT",
@@ -691,7 +691,7 @@
             "en": "The empire gathers one espionage point less a turn.",
             "ru": "Империя набирает на очко шпионажа меньше за ход."
           },
-          "picks": -2,
+          "picks": 0,
           "effects": [
             {
               "type": "ESPIONAGE_POINTS",
@@ -780,7 +780,7 @@
             "en": "The race grew up in high gravity: heavy worlds cost it nothing, and its soldiers take one more blow.",
             "ru": "Раса выросла в большой тяжести: тяжёлые миры ей нипочём, а солдат держит лишний удар."
           },
-          "picks": 3,
+          "picks": 2,
           "effects": [
             {
               "type": "GRAVITY_HIGH",
@@ -834,7 +834,7 @@
             "en": "The race lives below the surface: the planet's capacity grows with its size — from two colonists on a tiny world to ten on a huge one.",
             "ru": "Раса живёт под поверхностью: вместимость планеты растёт с её размером — от двух жителей на крошечной до десяти на огромной."
           },
-          "picks": 20,
+          "picks": 17,
           "effects": [
             {
               "type": "MAX_POPULATION_PER_SIZE",
@@ -891,7 +891,7 @@
             "en": "The home world is one size larger than usual — and holds more colonists.",
             "ru": "Родной мир на размер больше обычного — и вмещает больше жителей."
           },
-          "picks": 6,
+          "picks": 5,
           "effects": [
             {
               "type": "HOME_SIZE_STEPS",
@@ -930,7 +930,7 @@
             "en": "The home world is strewn with the legacy of a vanished civilisation: a scientist there gives two extra points.",
             "ru": "Родной мир усыпан наследием ушедшей цивилизации: учёный на нём даёт два лишних очка."
           },
-          "picks": 4,
+          "picks": 2,
           "effects": [
             {
               "type": "HOME_RESEARCH_PER_SCIENTIST",
@@ -961,7 +961,7 @@
             "en": "A colonist eats half the food, but half a portion of production on top of that. Ships repair themselves.",
             "ru": "Житель съедает половину еды, но полпорции производства сверх того. Корабли чинятся сами."
           },
-          "picks": -3,
+          "picks": -2,
           "effects": [
             {
               "type": "FOOD_CONSUMPTION_PERCENT",
@@ -987,7 +987,7 @@
             "en": "The race eats stone: it needs no food at all, and there is no need to keep farmers. Farming sides of the race are not taken with this one.",
             "ru": "Раса ест камень: еда ей не нужна вовсе, и фермеров можно не держать. Сельских сторон расы с этим не берут."
           },
-          "picks": 14,
+          "picks": 16,
           "excludes": [
             "food-poor",
             "food-good",
@@ -1084,7 +1084,7 @@
             "en": "The race does not choose: at every level of the tree it gets a random technology.",
             "ru": "Раса не выбирает: на каждом уровне дерева ей достаётся случайная технология."
           },
-          "picks": -4,
+          "picks": -8,
           "effects": [
             {
               "type": "UNCREATIVE",
@@ -1134,7 +1134,7 @@
             "en": "Poisoned air costs the race nothing: the usable share of any planet is a quarter higher, and pollution does not get in the way.",
             "ru": "Расе нипочём отравленный воздух: пригодная доля любой планеты выше на четверть, загрязнение не мешает."
           },
-          "picks": 14,
+          "picks": 16,
           "effects": [
             {
               "type": "TOLERANT",
@@ -1156,7 +1156,7 @@
             "en": "Trade goods and surplus food go for twice as much, and trade treaties bring half again as much.",
             "ru": "Товары и лишняя еда идут вдвое дороже, договоры о торговле приносят в полтора раза больше."
           },
-          "picks": 5,
+          "picks": 3,
           "effects": [
             {
               "type": "TRADE_INCOME_PERCENT",

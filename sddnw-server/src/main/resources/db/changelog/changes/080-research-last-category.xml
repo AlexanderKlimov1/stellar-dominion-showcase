@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+      Раздел последнего прорыва — п. 9 (30.09.2026, решение хозяина проекта).
+
+      Прорыв освобождает цель, и если игрок не выбрал новую, очки следующего хода пропадали:
+      в MOO II исследование идёт только в выбранный проект. На деле это наказывало за
+      одно пропущенное окно — экран всплывает сам, но его закрывают, не глядя. Теперь,
+      оставшись без цели, империя человека продолжает ТОТ ЖЕ раздел следующим уровнем
+      (`ResearchService.keepSection`).
+
+      Помнить раздел нужно отдельным полем: цель (`research_category_code`) после прорыва
+      обязана быть пустой — по её пустоте клиент узнаёт, что пора открыть экран выбора.
+    -->
+    <changeSet id="080-research-last-category" author="sddnw">
+        <addColumn tableName="player">
+            <column name="research_last_category_code" type="varchar(64)"/>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

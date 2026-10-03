@@ -2,7 +2,7 @@
 rem Run the game - all three ways it is started, and every check they need:
 rem
 rem     run-all.bat             server on 8080 + Vite dev server on 5173, the everyday way
-rem     run-all.bat dist        server only; it serves the built client from moo3-client\dist
+rem     run-all.bat dist        server only; it serves the built client from sddnw-client\dist
 rem     run-all.bat published   the same, with the settings from run-published.cmd, and
 rem                             then publish.bat puts port 8080 on the internet
 rem
@@ -17,7 +17,7 @@ rem the first jar keeps the file open so the next build.cmd fails on repackage. 
 rem Vite does not fail at all: it quietly moves to 5174, where neither the browser nor the
 rem proxy to /api looks for it.
 rem
-rem The server is started from moo3-server on purpose: the paths to the JSON reference
+rem The server is started from sddnw-server on purpose: the paths to the JSON reference
 rem files and to the built client are relative, and a server started elsewhere answers
 rem 500 instead of reading them - see the project rules.
 
@@ -25,8 +25,8 @@ setlocal
 set "ROOT=%~dp0"
 set "SERVER_PORT=8080"
 set "CLIENT_PORT=5173"
-set "SERVER_JAR=%ROOT%moo3-server\target\moo3-server-0.1.0-SNAPSHOT.jar"
-set "DIST=%ROOT%moo3-client\dist"
+set "SERVER_JAR=%ROOT%sddnw-server\target\sddnw-server-0.1.0-SNAPSHOT.jar"
+set "DIST=%ROOT%sddnw-client\dist"
 set "MODE=%~1"
 
 echo.
@@ -44,15 +44,15 @@ rem it is started, and inherited by the window it runs in. A server that is alre
 rem cannot be told any of this - it would have to be restarted.
 :settings
 if not exist "%ROOT%run-published.cmd" goto :no_settings
-set "MOO3_RUN_ALL=1"
+set "SDDNW_RUN_ALL=1"
 call "%ROOT%run-published.cmd"
-set "MOO3_RUN_ALL="
-if not defined MOO3_CLIENT_URL goto :no_address
-if not defined MOO3_CORS_ORIGINS goto :no_address
-echo %MOO3_CLIENT_URL% | findstr /i /c:"localhost" /c:"127.0.0.1" >nul
+set "SDDNW_RUN_ALL="
+if not defined SDDNW_CLIENT_URL goto :no_address
+if not defined SDDNW_CORS_ORIGINS goto :no_address
+echo %SDDNW_CLIENT_URL% | findstr /i /c:"localhost" /c:"127.0.0.1" >nul
 if not errorlevel 1 goto :local_address
-echo [published] address: %MOO3_CLIENT_URL%
-echo [published] /api is open to that origin only, /actuator shows %MOO3_ACTUATOR%
+echo [published] address: %SDDNW_CLIENT_URL%
+echo [published] /api is open to that origin only, /actuator shows %SDDNW_ACTUATOR%
 goto :server
 
 :no_settings
@@ -60,12 +60,12 @@ echo [published] run-published.cmd is missing - it holds the address the game is
 goto :fail
 
 :no_address
-echo [published] run-published.cmd sets no MOO3_CLIENT_URL / MOO3_CORS_ORIGINS
+echo [published] run-published.cmd sets no SDDNW_CLIENT_URL / SDDNW_CORS_ORIGINS
 echo [published] without them confirmation mail links outsiders to their own localhost
 goto :fail
 
 :local_address
-echo [published] MOO3_CLIENT_URL points at localhost: %MOO3_CLIENT_URL%
+echo [published] SDDNW_CLIENT_URL points at localhost: %SDDNW_CLIENT_URL%
 echo [published] that is the address of whoever opens the mail, not of this machine
 goto :fail
 
@@ -79,7 +79,7 @@ rem The script is called by its full path on purpose: with NoDefaultCurrentDirec
 rem set - and some machines have it - cmd does not look for a command in the current
 rem directory at all, and "cmd /k run.cmd" says "not recognized" from the right folder.
 echo [server] port %SERVER_PORT% is free, starting
-start "moo3 server" /D "%ROOT%moo3-server" cmd /k "%ROOT%moo3-server\run.cmd"
+start "sddnw server" /D "%ROOT%sddnw-server" cmd /k "%ROOT%sddnw-server\run.cmd"
 call :await %SERVER_PORT% 90
 if errorlevel 1 (
   echo [server] port %SERVER_PORT% has not opened in 90 s - look at the server window
@@ -89,7 +89,7 @@ if errorlevel 1 (
 goto :client
 
 rem A running server keeps the environment it was started with, and there is no way to
-rem hand it new settings. Whether it got them is visible from outside: with MOO3_ACTUATOR
+rem hand it new settings. Whether it got them is visible from outside: with SDDNW_ACTUATOR
 rem narrowed down, /actuator/metrics is gone.
 :server_busy
 echo [server] port %SERVER_PORT% is already taken - the server runs, not starting a second one
@@ -100,7 +100,7 @@ goto :client
 
 :no_jar
 echo [server] jar not found: %SERVER_JAR%
-echo [server] build it first: moo3-server\build.cmd
+echo [server] build it first: sddnw-server\build.cmd
 goto :fail
 
 rem --- client ----------------------------------------------------------------
@@ -111,9 +111,9 @@ if /i "%MODE%"=="published" goto :client_built
 
 call :listening %CLIENT_PORT%
 if not errorlevel 1 goto :client_busy
-if not exist "%ROOT%moo3-client\node_modules" goto :no_modules
+if not exist "%ROOT%sddnw-client\node_modules" goto :no_modules
 echo [client] port %CLIENT_PORT% is free, starting
-start "moo3 client" /D "%ROOT%moo3-client" cmd /k npm run dev
+start "sddnw client" /D "%ROOT%sddnw-client" cmd /k npm run dev
 call :await %CLIENT_PORT% 60
 if errorlevel 1 (
   echo [client] port %CLIENT_PORT% has not opened in 60 s - look at the client window
@@ -127,7 +127,7 @@ echo [client] port %CLIENT_PORT% is already taken - the client runs, not startin
 goto :done
 
 :no_modules
-echo [client] node_modules is missing - run moo3-client\setup.cmd
+echo [client] node_modules is missing - run sddnw-client\setup.cmd
 echo [client] npm install from the client directory would replace the junction to C:\react
 goto :fail
 
@@ -142,7 +142,7 @@ goto :done_dist
 
 :no_dist
 echo [client] %DIST% is not built
-echo [client] build it: npm run build --prefix "%ROOT%moo3-client"
+echo [client] build it: npm run build --prefix "%ROOT%sddnw-client"
 goto :fail
 
 rem --- publishing ------------------------------------------------------------

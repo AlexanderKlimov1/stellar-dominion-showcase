@@ -28,7 +28,7 @@ import urllib.request
 # сообщение показать. Непереводимое заменяем, а не падаем.
 sys.stdout.reconfigure(encoding='utf-8', errors='replace')
 
-BASE = os.environ.get('MOO3_BASE', 'http://localhost:8080')
+BASE = os.environ.get('SDDNW_BASE', 'http://localhost:8080')
 REPORT = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'ai-game-report.txt')
 
 report = []
@@ -91,7 +91,7 @@ def admin_login():
         # своими проверками подбора, а живут они в памяти сервера. Пишем это прямо: без
         # подсказки отказ читается как поломка входа.
         hint = ('\nЭто счётчики защиты входа: они в памяти сервера. Перезапустите '
-                'moo3-server\\run.cmd и повторите.' if answer.get('ERROR') == 429 else '')
+                'sddnw-server\\run.cmd и повторите.' if answer.get('ERROR') == 429 else '')
         raise SystemExit('вход администратора не удался: %s%s'
                          % (answer.get('body', {}).get('message', answer), hint))
     account_token = answer['token']

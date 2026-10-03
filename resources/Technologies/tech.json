@@ -1579,12 +1579,8 @@
     }
   },
   "starting_levels": {
-    "description": "Levels every race has from the first turn, as \"category:order\" references. A reference, not a name: names are translated, a level is identified by its place in the tree.",
-    "all_races": [
-      "power:1",
-      "chemistry:1",
-      "physics:1"
-    ]
+    "description": "Levels every race has from the first turn, as \"category:order\" references. A reference, not a name: names are translated, a level is identified by its place in the tree. Empty since 01.10.2026 (owner's decision): every level, the first ones included, is researched.",
+    "all_races": []
   },
   "notes": {
     "tech_system": "Восемь разделов без взаимных зависимостей; внутри раздела уровни идут лестницей, боковых ветвей нет.",

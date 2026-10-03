@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+      Срок хода (backlog-promo, пункт 11): настройка партии, по умолчанию — без срока.
+      turn_seconds — сколько длится ход, пусто — без срока; turn_started_at — когда начался
+      текущий ход, от него и считается срок. Кто ушёл из-за стола, в базе не хранится вовсе:
+      это знание живёт в памяти сервера (PresenceService), и почему — сказано там.
+    -->
+    <changeSet id="085-turn-clock" author="sddnw">
+        <addColumn tableName="game">
+            <column name="turn_seconds" type="integer"/>
+            <column name="turn_started_at" type="timestamp with time zone"/>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

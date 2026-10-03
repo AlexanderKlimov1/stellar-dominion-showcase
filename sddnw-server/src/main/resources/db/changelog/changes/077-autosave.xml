@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+      Автосохранение партии в конце хода и возврат тех же людей в неё — п. 3.
+
+      ЗАЧЕМ ЗАПИСЬ У ИГРОКА. До сих пор игрок партии не знал о своей учётной записи ничего:
+      пропуск записи спрашивался на входе (п. 3.1) и тут же выбрасывался, а империя жила
+      одним `access_token`. Пока сохранения поднимал один человек, этого хватало; но
+      автосохранение партии НА ДВОИХ поднимать «кому попало» нельзя — вернуться должны те же
+      люди, а имя игрока личностью не является (в игре два «Александра» — это два разных
+      человека, и различать их именем нельзя; п. «в имя, которое хранится, не кладут слов»).
+      Поэтому у места в партии появляется хозяин.
+
+      Внешнего ключа НЕТ И БЫТЬ НЕ МОЖЕТ: учётные записи лежат в другом источнике данных
+      (`sddnw.history.datasource`, `domain/entity/history/AccountEntity`), а межбазового
+      ключа не бывает. Пусто — место без хозяина: все империи ИИ, партии балансового
+      прогона (у них хозяина нет вовсе) и партии, начатые до этой миграции.
+
+      ЗАЧЕМ ДВА ПОЛЯ У СОХРАНЕНИЯ. `auto` отличает автосохранение от сделанного руками:
+      автосохранение у партии ОДНО и переписывается каждый ход, а сделанные руками копятся.
+      `human_accounts` — записи людей той партии через запятую; лежит колонкой, а не только
+      внутри слепка, потому что список загрузки читается ПРОЕКЦИЕЙ (сам слепок весит сотню
+      килобайт), а решить «моё или не моё» надо для каждой строки списка. В слепке та же
+      запись лежит ещё раз, у своего игрока: колонка говорит, КТО играл, а слепок — за КОГО
+      именно, и без второго места привязку при загрузке восстановить нечем.
+
+      Пусто в `human_accounts` — слепок, снятый до этой миграции: у него хозяев не записано,
+      и правило «только те же люди» к нему не применяется, иначе старые сохранения стали бы
+      незагружаемыми ни для кого.
+    -->
+    <changeSet id="077-player-account" author="sddnw">
+        <addColumn tableName="player">
+            <column name="account_id" type="uuid"/>
+        </addColumn>
+        <createIndex tableName="player" indexName="idx_player_account">
+            <column name="account_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="077-game-save-auto" author="sddnw">
+        <addColumn tableName="game_save">
+            <column name="auto" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="human_accounts" type="varchar(512)"/>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+      Занятие жителей в рейсе — п. 4.1.1 (01.10.2026, решение хозяина проекта).
+
+      Игрок берёт с полосы занятия определённых жителей, и сойти на новое место они обязаны
+      на то же дело, а фермеры там, где фермерствовать нельзя, — на производство. Рейс между
+      системами идёт до конца хода, поэтому дело хранится в самом рейсе. Пусто — рейс ИИ или
+      отправленный до этого поля: прибывших расставляет колония назначения, как и раньше.
+    -->
+    <changeSet id="081-transfer-job" author="sddnw">
+        <addColumn tableName="population_transfer">
+            <column name="job" type="varchar(16)"/>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

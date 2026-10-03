@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+      Тесный старт (backlog-promo, пункт 5): родные миры стоят ближе друг к другу, чтобы первое
+      знакомство наступало раньше. Включается только у гостевой партии; прочие партии — как
+      прежде, разнесённые по галактике.
+    -->
+    <changeSet id="086-close-start" author="sddnw">
+        <addColumn tableName="game">
+            <column name="close_start" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

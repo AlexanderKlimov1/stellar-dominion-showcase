@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+      Победа удержанием Wardenhold (п. 3, backlog-promo, пункт 1): империя, которая одна
+      держит колонию у особой звезды двадцать ходов подряд, побеждает.
+
+      `wardenhold_victory` — включено ли это условие в партии (гостевая партия включает
+      его всегда, прочие — по запросу создателя). `wardenhold_holder_player_id` и
+      `wardenhold_since_turn` — кто держит звезду сейчас и с какого хода: счёт идёт
+      непрерывно, и пересчитать его из летописи нечем, поэтому он хранится в самой партии.
+    -->
+    <changeSet id="082-wardenhold-victory" author="sddnw">
+        <addColumn tableName="game">
+            <column name="wardenhold_victory" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="wardenhold_holder_player_id" type="UUID"/>
+            <column name="wardenhold_since_turn" type="INTEGER"/>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

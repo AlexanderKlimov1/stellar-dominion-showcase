@@ -9,6 +9,10 @@
     python tools\\balance_run.py                       — 4 партии по 120 ходов, 2 потока
     python tools\\balance_run.py --games 40 --turns 150 --workers 4
     python tools\\balance_run.py --check-determinism    — та же партия дважды, сверка
+    python tools\\balance_run.py --check-determinism --by-turn --games 8 --empires 6
+                                     — то же, но ходы заканчиваются ПО ОДНОМУ, как их
+                                       заканчивает клиент: так ловится неповторимость,
+                                       которую пакетный прогон пропускает
 
 Партии заводятся под учётной записью администратора (admin.txt) и удаляются в конце —
 накапливать их в базе нельзя, на этом уже погорели (в базе набралось 830 штук).
@@ -31,7 +35,11 @@ from concurrent.futures import ThreadPoolExecutor
 
 sys.stdout.reconfigure(encoding='utf-8', errors='replace')
 
-BASE = 'http://localhost:8080'
+# Адрес сервера переопределяется переменной окружения, как в regress.py: рядом с прогонным
+# сервером на 8080 часто поднят второй, для проверки правок, и прогон, не умеющий смотреть
+# на него, молча мерил ЧУЖОЙ сервер — в этой сессии так и вышло: почин выглядел
+# недоделанным, потому что проверялся на неисправленной сборке.
+BASE = os.environ.get('SDDNW_BASE', 'http://localhost:8080')
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT_DIR = os.path.join(ROOT, 'tools', 'balance')
 DEFAULT_OUT = os.path.join(OUT_DIR, 'telemetry.jsonl')
@@ -126,7 +134,8 @@ def admin_token():
     return signed['token']
 
 
-def play(account, seed, turns, size, name, empires=None, designs=None):
+def play(account, seed, turns, size, name, empires=None, designs=None,
+         by_turn=False):
     """
     Одна партия: завести, прогнать ходы, снять телеметрию, удалить.
 
@@ -162,11 +171,29 @@ def play(account, seed, turns, size, name, empires=None, designs=None):
         return {'seed': seed, 'error': started.get('body')}
 
     started_at = time.time()
-    advanced = call('POST', '/api/games/%s/turn/advance' % game_id,
-                    {'accessToken': token, 'turns': turns})
-    if 'ERROR' in advanced:
-        call('DELETE', '/api/games/%s?accessToken=%s' % (game_id, token))
-        return {'seed': seed, 'error': advanced.get('body')}
+    if by_turn:
+        # ХОДАМИ, КАК ИХ ЗАКАНЧИВАЕТ КЛИЕНТ. Партия та же, и считает её тот же `endTurn`, —
+        # разница в том, что между ходами закрывается транзакция запроса, а строки партии
+        # успевают полежать в базе правленными. Класс поломок, который ловится только так,
+        # описан у `determinism`.
+        played = 0
+        for _ in range(turns):
+            step = call('POST', '/api/games/%s/turn/end' % game_id, {'accessToken': token})
+            if isinstance(step, dict) and step.get('ERROR'):
+                call('DELETE', '/api/games/%s?accessToken=%s' % (game_id, token))
+                return {'seed': seed, 'error': step.get('body')}
+            if not isinstance(step, dict) or not step.get('advanced'):
+                break
+            played += 1
+            if step.get('status') == 'FINISHED':
+                break
+        advanced = {'played': played}
+    else:
+        advanced = call('POST', '/api/games/%s/turn/advance' % game_id,
+                        {'accessToken': token, 'turns': turns})
+        if 'ERROR' in advanced:
+            call('DELETE', '/api/games/%s?accessToken=%s' % (game_id, token))
+            return {'seed': seed, 'error': advanced.get('body')}
 
     telemetry = call('GET', '/api/games/%s/telemetry?accessToken=%s' % (game_id, token))
     call('DELETE', '/api/games/%s?accessToken=%s' % (game_id, token))
@@ -237,30 +264,57 @@ def fingerprint(telemetry):
     return marks
 
 
-def determinism(account, seed, turns, size, empires=None):
-    """Та же партия дважды: парные прогоны балансировки держатся на этом."""
-    say('Проверка повторимости: зерно %d, %d ходов' % (seed, turns))
-    first = play(account, seed, turns, size, 'Повтор 1', empires)
-    second = play(account, seed, turns, size, 'Повтор 2', empires)
-    if 'error' in first or 'error' in second:
-        say('  прогон не удался: %s' % (first.get('error') or second.get('error')))
-        return False
+def determinism(account, seed, turns, size, empires=None, by_turn=False, games=1):
+    """
+    Та же партия дважды: парные прогоны балансировки держатся на этом.
 
-    left, right = fingerprint(first), fingerprint(second)
-    if left == right:
-        say('  совпало полностью: %d замеров' % len(left))
-        return True
+    `games` — сколько РАЗНЫХ зёрен проверить. Расхождение случается не в каждой партии, а
+    только там, где ходу пришлось разрешать спор равных: кому из двух подошедших флотов
+    достанется сторожевое чудище, какой из двух линкоров одного корпуса съест амёба. На
+    восьми партиях по 150 ходов и шести империях поломка 25.09.2026 проявлялась в четырёх —
+    одной партии для приговора мало, поэтому зёрен берётся несколько.
 
-    say('  РАСХОЖДЕНИЕ: замеров %d и %d' % (len(left), len(right)))
-    for index, (one, two) in enumerate(zip(left, right)):
-        if one != two:
-            say('  первое расхождение на замере %d:' % index)
-            say('    место %d, ход %d: мощь %s против %s, колоний %s против %s,'
-                ' жителей %s против %s, науки %s против %s, флот %s против %s'
-                % (one[0], one[1], one[2], two[2], one[3], two[3],
-                   one[4], two[4], one[5], two[5], one[6], two[6]))
-            break
-    return False
+    `by_turn` — заканчивать ходы ПО ОДНОМУ, как это делает клиент, вместо одного запроса
+    `turn/advance`. Прежде проверка знала только пакетный путь, и в игре жило четыре
+    источника неповторимости: порядок прибытия флотов, зерно быстрого боя (в него входили
+    биты случайного UUID системы), выбор слабейшего корабля и очередь встреч. Нашли их
+    обучением сети (`tools/sddnw_learn.py`), которое играет партию клиентом: доля мощи на
+    зерне 1001 выходила 0.1631, 0.1631 и 0.1445 при одних и тех же ходах игрока.
+    """
+    say('Проверка повторимости: зёрен %d, по %d ходов, ходы %s'
+        % (games, turns, 'по одному (как у клиента)' if by_turn else 'пакетом'))
+    good = True
+    for number in range(games):
+        own = seed + number
+        first = play(account, own, turns, size, 'Повтор 1', empires, by_turn=by_turn)
+        second = play(account, own, turns, size, 'Повтор 2', empires, by_turn=by_turn)
+        if 'error' in first or 'error' in second:
+            say('  зерно %d: прогон не удался: %s'
+                % (own, first.get('error') or second.get('error')))
+            good = False
+            continue
+
+        left, right = fingerprint(first), fingerprint(second)
+        if left == right:
+            say('  зерно %d: совпало полностью, %d замеров' % (own, len(left)))
+            continue
+
+        good = False
+        say('  зерно %d: РАСХОЖДЕНИЕ, замеров %d и %d' % (own, len(left), len(right)))
+        # Сверка ПО ХОДАМ, а не по порядку замеров: летопись идёт империя за империей, и
+        # первое расхождение в списке — это первое расхождение у ПЕРВОЙ империи, а не первое
+        # в партии. Искать причину надо с самого раннего хода, где числа разошлись.
+        mine = {(row[0], row[1]): row for row in left}
+        other = {(row[0], row[1]): row for row in right}
+        for key in sorted(set(mine) | set(other), key=lambda pair: (pair[1], pair[0])):
+            one, two = mine.get(key), other.get(key)
+            if one != two:
+                say('    ход %d, место %d: мощь %s против %s, колоний %s против %s,'
+                    ' жителей %s против %s, науки %s против %s, флот %s против %s'
+                    % (key[1], key[0], one[2], two[2], one[3], two[3],
+                       one[4], two[4], one[5], two[5], one[6], two[6]))
+                break
+    return good
 
 
 def random_build(design, budget, random, anti_budget=0):
@@ -388,7 +442,9 @@ def main():
     parser.add_argument('--seed', type=int, default=1000, help='зерно первой партии')
     parser.add_argument('--out', default=DEFAULT_OUT, help='куда писать JSONL')
     parser.add_argument('--check-determinism', action='store_true',
-                        help='сыграть одну партию дважды и сверить')
+                        help='сыграть партии дважды и сверить летопись')
+    parser.add_argument('--by-turn', action='store_true',
+                        help='заканчивать ходы по одному, как клиент, а не одним запросом')
     parser.add_argument('--curve', action='store_true',
                         help='курс «очко → сила»: империи получают сборки разного бюджета')
     parser.add_argument('--budgets', default='0,2,4,6,8,10',
@@ -412,7 +468,10 @@ def main():
         raise SystemExit(0)
 
     if options.check_determinism:
-        ok = determinism(account, options.seed, options.turns, options.size, options.empires)
+        # Партий в проверке столько, сколько ПАР укладывается в заказанное число: каждое
+        # зерно играется дважды, и «--games 8» значит восемь партий, то есть четыре зерна.
+        ok = determinism(account, options.seed, options.turns, options.size, options.empires,
+                         options.by_turn, max(1, options.games // 2))
         io.open(REPORT, 'w', encoding='utf-8').write('\n'.join(report) + '\n')
         raise SystemExit(0 if ok else 1)
 

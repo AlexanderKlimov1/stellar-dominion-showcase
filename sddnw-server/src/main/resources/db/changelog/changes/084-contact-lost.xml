@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <!--
+      Знакомство теряется, как в MOO II (п. 15, backlog-promo, пункт 5): пала последняя
+      колония или застава в системе, и ни одна занятая система больше не в пределах
+      дальности ни у кого из двоих. Строка отношений при этом НЕ удаляется — знакомство
+      ставится на паузу (решение хозяина проекта): война, договоры и доверие сохраняются и
+      возвращаются, когда знакомство восстановится. Первоисточник о них молчит, и
+      выдумывать сброс незачем.
+    -->
+    <changeSet id="084-contact-lost" author="sddnw">
+        <addColumn tableName="diplomacy_relation">
+            <column name="in_contact" type="boolean" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

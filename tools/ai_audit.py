@@ -44,8 +44,8 @@ def call(method, path, body=None, token=None):
 
 
 def sql(query):
-    env = dict(os.environ, PGPASSWORD='moo3', PGCLIENTENCODING='UTF8')
-    done = subprocess.run([PSQL, '-h', 'localhost', '-p', '5433', '-U', 'moo3', '-d', 'moo3',
+    env = dict(os.environ, PGPASSWORD='sddnw', PGCLIENTENCODING='UTF8')
+    done = subprocess.run([PSQL, '-h', 'localhost', '-p', '5433', '-U', 'sddnw', '-d', 'sddnw',
                            '-t', '-A', '-F', '|', '-c', query],
                           capture_output=True, text=True, encoding='utf-8', env=env)
     if done.returncode != 0:
@@ -55,7 +55,7 @@ def sql(query):
 
 def admin_token():
     # Пароль один на оба режима сервера: учётные записи живут в постоянном источнике данных.
-    for path in (r'C:\Works\moo3\admin.txt',):
+    for path in (r'C:\stellar-dominion\admin.txt',):
         try:
             found = re.search(r'пароль:\s*(\S+)', io.open(path, encoding='utf-8').read())
         except OSError:
