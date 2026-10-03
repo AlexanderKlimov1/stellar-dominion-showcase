@@ -58,7 +58,6 @@ FILES = (
     'moo3-client/vite.config.ts',
     'moo3-client/setup.cmd',
     'README.md',
-    'CLAUDE.md',
     'balance-metrics-works.txt',
     'demo.html',
     'docs/renaming.md',
@@ -176,7 +175,7 @@ React + Phaser, а рядом — мастерская приборов, кот�
 | Клиент: 116 модулей, экраны и карта галактики | `moo3-client/src` |
 | Правила игры данными, а не кодом | `resources/` |
 | Инструменты: балансировка, игра в оригинал, обучение сети | `tools/` |
-| Как всё устроено и почему именно так | `README.md`, `CLAUDE.md` |
+| Как всё устроено и почему именно так | `README.md` |
 | Журнал балансировки: каждая правка цены и на чём она измерена | `balance-metrics-works.txt` |
 
 ## Собрать нельзя — и это нарочно
