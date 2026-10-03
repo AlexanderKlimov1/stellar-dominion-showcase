@@ -1478,7 +1478,7 @@ public class AiEmpireService {
      * проигранные высадки, а понять это можно было бы только по счётчику захватов.
      * <p>
      * Всё нужное лежит в контексте хода: изученное обеими сторонами, расы и постройки
-     * колонии. Своих выборок фаза не делает — см. «Грабли» в CLAUDE.md.
+     * колонии. Своих выборок фаза не делает — см. «Грабли» в правилах проекта.
      */
     private Boolean worthLanding(TurnContext context, PlayerEntity empire,
                                  PlanetEntity target, Integer troops) {

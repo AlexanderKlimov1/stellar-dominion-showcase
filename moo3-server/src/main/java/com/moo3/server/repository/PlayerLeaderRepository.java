@@ -17,7 +17,7 @@ public interface PlayerLeaderRepository extends JpaRepository<PlayerLeaderEntity
      * <p>
      * Фаза конца хода трогает лидеров каждого игрока, а запрос «на игрока» внутри
      * посчитанного хода стоит дороже, чем кажется: каждый сброс Hibernate тянет за собой
-     * всё, что ход успел изменить (см. «Грабли» в CLAUDE.md).
+     * всё, что ход успел изменить (см. «Грабли» в правилах проекта).
      */
     List<PlayerLeaderEntity> findAllByPlayerIdIn(Collection<UUID> playerIds);
 }

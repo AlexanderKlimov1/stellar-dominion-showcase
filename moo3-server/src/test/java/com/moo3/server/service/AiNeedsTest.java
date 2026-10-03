@@ -21,7 +21,7 @@ class AiNeedsTest {
      * Нужды считаются по переданным данным, поэтому службам тут неоткуда взяться.
      * <p>
      * Список {@code null} приходится править вместе с зависимостями службы — грабли,
-     * записанные в CLAUDE.md: сборка ловит это позже всего, уже на тестах.
+     * записанные в правилах проекта: сборка ловит это позже всего, уже на тестах.
      */
     private final AiEmpireService ai = new AiEmpireService(
             null, null, null, null, null, null, null, null, null, null, null, null, null, null,

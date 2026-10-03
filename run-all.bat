@@ -19,7 +19,7 @@ rem proxy to /api looks for it.
 rem
 rem The server is started from moo3-server on purpose: the paths to the JSON reference
 rem files and to the built client are relative, and a server started elsewhere answers
-rem 500 instead of reading them - see CLAUDE.md.
+rem 500 instead of reading them - see the project rules.
 
 setlocal
 set "ROOT=%~dp0"
